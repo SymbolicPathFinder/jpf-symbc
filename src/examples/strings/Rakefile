@@ -1,0 +1,54 @@
+
+require 'timeout'
+require 'paint'
+
+require_relative 'gradient'
+
+class Z3Str2
+	def self.exception
+		'edu.ucsb.cs.vlab.Z3Interface$ExternalToolException'
+	end
+
+	def self.run test
+		grad = Gradient.new(0x63ff00, 0xff2424, 100)
+		result = ""
+		puts "Testing #{test}"
+		dots = Thread.new do
+			dot = 0
+			while true do
+				print Paint['.', "##{grad.gradient(dot)}"]
+				dot += 1
+				sleep 2
+			end
+		end
+
+		begin
+			Timeout.timeout(100) do
+				result = `jpf #{test}`
+			end
+		rescue Timeout::Error
+			result = "timeout"
+		ensure
+			Thread.kill(dots)
+			puts ""
+			return result
+		end
+	end
+
+	def self.check test
+		result = Z3Str2.run test
+		if result == "timeout" 
+			return "timeout"
+		else
+			return !(result.include?(Z3Str2.exception))
+		end
+	end
+end
+
+task :default do
+	Dir["*.jpf"].each do |file|
+		puts "#{file} => #{Z3Str2.check(file)}"
+		sleep 1
+	end
+end
+

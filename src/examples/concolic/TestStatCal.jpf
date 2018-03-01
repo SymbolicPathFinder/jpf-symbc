@@ -1,0 +1,15 @@
+target = concolic.TestStatCalc
+
+coverage.include=*.StatCalculator
+coverage.show_methods=true
+coverage.show_bodies=true
+
+symbolic.concolic=true
+#symbolic.debug=on
+symbolic.method=concolic.StatCalculator.addValue(sym)
+listener=gov.nasa.jpf.symbc.SymbolicListener,.symbc.concolic.ConcreteExecutionListener,gov.nasa.jpf.listener.CoverageAnalyzer
+
+
+classpath = ${jpf-symbc}/build/examples
+sourcepath = ${jpf-symbc}/build/examples
+

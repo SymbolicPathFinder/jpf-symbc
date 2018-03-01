@@ -1,0 +1,38 @@
+target=strings.MysteryQuestionMin
+
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+# To specify a mix of concrete and symbolic values
+# symbolic.method=test2(sym#conc), test(conc#sym)
+# in this configuration test2(int x, int z)
+# x is symbolic while z is concrete
+# test(int x, int z) x is concrete while z is symbolic
+# to specify the parameter as concrete it just needs
+# to be anything but "sym". So conc, con, concrete
+# are all valid specifications of concrete variables
+
+# in this particular configuration all the input
+# parameters to methods test2 and test are symbolic
+symbolic.dp=z3str2
+
+# settings for the symbolic string support, either
+# "none" (default), "cvc", "automata" (recommended) or
+# "sat". At the moment symbolic.dp must be equal to
+# "choco" for it to work.
+symbolic.string_dp=automata
+#symbolic.string_dp_timeout_ms=0
+symbolic.string_dp_timeout_ms=3000
+# As a side note for eclipse users, to run cvc3
+# enabled programs, the eclipse plugin which allows
+# you to right click on a .jpf test file and click
+# "Verify..." does not work. In order to run cvc3
+# you need to go through "Run Configuration"
+
+symbolic.method= strings.MysteryQuestionMin.preserveSomeHtmlTagsAndRemoveWhitespaces(sym)
+search.depth_limit = 30
+#listener = gov.nasa.jpf.symbc.SymbolicListenerClean
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+
+vm.storage.class=nil

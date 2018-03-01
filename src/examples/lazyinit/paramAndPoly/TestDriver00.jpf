@@ -1,0 +1,16 @@
+target = uberlazy.TestDriver00
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples 
+
+symbolic.lazy = true
+
+#the configuration allows to consider all subtypes
+#during the instantiation. All subtypes are considered
+#by default in the aliasing. 
+symbolic.lazy.subtypes = true
+
+type_classpath = ${jpf-symbc}/build/examples/uberlazy
+
+symbolic.method = uberlazy.TestDriver00.run(), uberlazy.TestDriver00.swapNode()

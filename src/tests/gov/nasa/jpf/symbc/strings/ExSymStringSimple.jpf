@@ -1,0 +1,17 @@
+target=gov.nasa.jpf.symbc.strings.ExSymStringSimple
+
+classpath=${jpf-symbc}/build/tests
+
+sourcepath=${jpf-symbc}/src/tests
+
+
+symbolic.dp=choco
+
+symbolic.string_dp=automata
+
+
+
+#symbolic.method=gov.nasa.jpf.symbc.strings.MysteryQuestionMin.preserveSomeHtmlTagsAndRemoveWhitespaces(sym#sym)
+search.depth_limit = 23 
+
+#listener = gov.nasa.jpf.symbc.SymbolicListenerClean

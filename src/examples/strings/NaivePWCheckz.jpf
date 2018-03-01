@@ -1,0 +1,17 @@
+target=strings.NaivePWCheck
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.strings = true
+symbolic.dp=choco
+#symbolic.string_dp=z3str2
+symbolic.string_dp=ABC
+symbolic.string_dp_timeout_ms=3000
+symbolic.debug=true
+
+symbolic.method = strings.NaivePWCheck.verifyPassword(sym)
+search.depth_limit = 20
+search.multiple_errors=true
+#listener = gov.nasa.jpf.symbc.sequences.TimingChannelListener
+#listener = sidechannel.TimingChannelListener
+vm.storage.class=nil

@@ -1,0 +1,3851 @@
+Running Symbolic PathFinder ...
+symbolic.dp=choco
+symbolic.string_dp_timeout_ms=3000
+symbolic.string_dp=z3str2
+symbolic.choco_time_bound=30000
+symbolic.max_pc_length=2147483647
+symbolic.max_pc_msec=0
+symbolic.min_int=-2147483648
+symbolic.min_long=-9223372036854775808
+symbolic.min_short=-32768
+symbolic.min_byte=-128
+symbolic.min_char=0
+symbolic.max_int=2147483647
+symbolic.max_long=9223372036854775807
+symbolic.max_short=32767
+symbolic.max_byte=127
+symbolic.max_char=65535
+symbolic.min_double=4.9E-324
+symbolic.max_double=1.7976931348623157E308
+JavaPathfinder core system v8.0 (rev 34) - (C) 2005-2014 United States Government. All rights reserved.
+
+
+====================================================== system under test
+strings.WU_FTPD.main()
+
+====================================================== search started: 12/16/15 1:47 PM
+New sym int cmd_1_SYMSTRING.length min=-2147483648, max=2147483647
+New sym int Length_0_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 1
+CONST_0 < Length_0_ -> true
+
+### PCs: total:1 sat:1 unsat:0
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 1
+CONST_0 >= Length_0_ -> true
+
+### PCs: total:2 sat:2 unsat:0
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int IndexOf_1_ min=-1, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 2
+IndexOf_1_ != CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+### PCs: total:3 sat:3 unsat:0
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+IndexOf_1_ = CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+### PCs: total:4 sat:4 unsat:0
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int lastIndexOfChar_2_ min=-1, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(I)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_3_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 3
+Length_3_ <= CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+### PCs: total:5 sat:5 unsat:0
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (lastIndexOfChar cmd_1 47))) 32))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+Length_3_ > CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_0 >= Length_0_ -> false
+
+### PCs: total:6 sat:5 unsat:1
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 2
+IndexOf_1_ = CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+### PCs: total:7 sat:6 unsat:1
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 2
+IndexOf_1_ = CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+### PCs: total:8 sat:7 unsat:1
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 2 constraint # = 2
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_0 >= Length_0_[0]
+numeric PC: constraint # = 2
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 1
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #1
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 2
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int lastIndexOfChar2_4_ min=-1, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(II)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_5_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 3
+Length_5_ <= CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+### PCs: total:9 sat:8 unsat:1
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) 32))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+Length_5_ > CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_0 >= Length_0_ -> false
+
+### PCs: total:10 sat:8 unsat:2
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 2
+IndexOf_1_ != CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+### PCs: total:11 sat:9 unsat:2
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 2
+IndexOf_1_ != CONST_-1 &&
+CONST_0 >= Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+IndexOf_1_[0] != CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+### PCs: total:12 sat:10 unsat:2
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 2 constraint # = 2
+IndexOf_1_[0] != CONST_-1 &&
+CONST_0 >= Length_0_[0]
+numeric PC: constraint # = 2
+IndexOf_1_[0] != CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 2
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #2
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 2
+IndexOf_1_[0] != CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+IndexOf_1_[0] != CONST_-1 &&
+CONST_0 >= Length_0_[0] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 1
+CONST_0 >= Length_0_[0] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_0)_6_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 2
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:13 sat:11 unsat:2
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:14 sat:12 unsat:2
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 3
+IndexOf_1_ != CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:15 sat:13 unsat:2
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+IndexOf_1_ = CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:16 sat:14 unsat:2
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(I)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_7_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 4
+Length_7_ <= CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:17 sat:15 unsat:2
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (lastIndexOfChar cmd_1 47))) 32))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+Length_7_ > CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:18 sat:15 unsat:3
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 3
+IndexOf_1_ = CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:19 sat:16 unsat:3
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 3
+IndexOf_1_ = CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+### PCs: total:20 sat:17 unsat:3
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 3 constraint # = 3
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1]
+numeric PC: constraint # = 3
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 3
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #3
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 3
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(II)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_8_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 4
+Length_8_ <= CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:21 sat:18 unsat:3
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) 32))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+Length_8_ > CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:22 sat:18 unsat:4
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 3
+IndexOf_1_ != CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:23 sat:19 unsat:4
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 3
+IndexOf_1_ != CONST_-1 &&
+CONST_1 >= Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+IndexOf_1_[0] != CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+### PCs: total:24 sat:20 unsat:4
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 3 constraint # = 3
+IndexOf_1_[0] != CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1]
+numeric PC: constraint # = 3
+IndexOf_1_[0] != CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 4
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #4
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 3
+IndexOf_1_[0] != CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+IndexOf_1_[0] != CONST_-1 &&
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+CONST_1 >= Length_0_[1] &&
+CONST_0 < Length_0_[1] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_1)_9_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 3
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:25 sat:21 unsat:4
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:26 sat:22 unsat:4
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 4
+IndexOf_1_ != CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:27 sat:23 unsat:4
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+IndexOf_1_ = CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:28 sat:24 unsat:4
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(I)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_10_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 5
+Length_10_ <= CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:29 sat:25 unsat:4
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (lastIndexOfChar cmd_1 47))) 32))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+Length_10_ > CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:30 sat:25 unsat:5
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 4
+IndexOf_1_ = CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:31 sat:26 unsat:5
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 4
+IndexOf_1_ = CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+### PCs: total:32 sat:27 unsat:5
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 4 constraint # = 4
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2]
+numeric PC: constraint # = 4
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 5
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #5
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 4
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(II)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_11_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 5
+Length_11_ <= CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:33 sat:28 unsat:5
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) 32))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+Length_11_ > CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:34 sat:28 unsat:6
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 4
+IndexOf_1_ != CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:35 sat:29 unsat:6
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 4
+IndexOf_1_ != CONST_-1 &&
+CONST_2 >= Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+IndexOf_1_[0] != CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+### PCs: total:36 sat:30 unsat:6
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 4 constraint # = 4
+IndexOf_1_[0] != CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2]
+numeric PC: constraint # = 4
+IndexOf_1_[0] != CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 6
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #6
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 4
+IndexOf_1_[0] != CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+IndexOf_1_[0] != CONST_-1 &&
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+CONST_2 >= Length_0_[2] &&
+CONST_1 < Length_0_[2] &&
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_2)_12_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 4
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:37 sat:31 unsat:6
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:38 sat:32 unsat:6
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 5
+IndexOf_1_ != CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:39 sat:33 unsat:6
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+IndexOf_1_ = CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:40 sat:34 unsat:6
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(I)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_13_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 6
+Length_13_ <= CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:41 sat:35 unsat:6
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (lastIndexOfChar cmd_1 47))) 32))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+Length_13_ > CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:42 sat:35 unsat:7
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 5
+IndexOf_1_ = CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:43 sat:36 unsat:7
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 5
+IndexOf_1_ = CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+### PCs: total:44 sat:37 unsat:7
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 5 constraint # = 5
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3]
+numeric PC: constraint # = 5
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 7
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #7
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 5
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(II)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_14_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 6
+Length_14_ <= CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:45 sat:38 unsat:7
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) 32))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+Length_14_ > CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:46 sat:38 unsat:8
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 5
+IndexOf_1_ != CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:47 sat:39 unsat:8
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 5
+IndexOf_1_ != CONST_-1 &&
+CONST_3 >= Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+IndexOf_1_[0] != CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+### PCs: total:48 sat:40 unsat:8
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 5 constraint # = 5
+IndexOf_1_[0] != CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3]
+numeric PC: constraint # = 5
+IndexOf_1_[0] != CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 8
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #8
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 5
+IndexOf_1_[0] != CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+IndexOf_1_[0] != CONST_-1 &&
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+CONST_3 >= Length_0_[3] &&
+CONST_2 < Length_0_[3] &&
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_3)_15_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 5
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:49 sat:41 unsat:8
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:50 sat:42 unsat:8
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 6
+IndexOf_1_ != CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:51 sat:43 unsat:8
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+IndexOf_1_ = CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:52 sat:44 unsat:8
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(I)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_16_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 7
+Length_16_ <= CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:53 sat:45 unsat:8
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (lastIndexOfChar cmd_1 47))) 32))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+Length_16_ > CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:54 sat:45 unsat:9
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 6
+IndexOf_1_ = CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:55 sat:46 unsat:9
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 6
+IndexOf_1_ = CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+### PCs: total:56 sat:47 unsat:9
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 6 constraint # = 6
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4]
+numeric PC: constraint # = 6
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 9
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #9
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 6
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(II)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_17_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 7
+Length_17_ <= CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:57 sat:48 unsat:9
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) 32))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+Length_17_ > CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:58 sat:48 unsat:10
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 6
+IndexOf_1_ != CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:59 sat:49 unsat:10
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 6
+IndexOf_1_ != CONST_-1 &&
+CONST_4 >= Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+IndexOf_1_[0] != CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+### PCs: total:60 sat:50 unsat:10
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 6 constraint # = 6
+IndexOf_1_[0] != CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4]
+numeric PC: constraint # = 6
+IndexOf_1_[0] != CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 10
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #10
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 6
+IndexOf_1_[0] != CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+IndexOf_1_[0] != CONST_-1 &&
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+CONST_4 >= Length_0_[4] &&
+CONST_3 < Length_0_[4] &&
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_4)_18_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 6
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:61 sat:51 unsat:10
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:62 sat:52 unsat:10
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 7
+IndexOf_1_ != CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:63 sat:53 unsat:10
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+IndexOf_1_ = CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:64 sat:54 unsat:10
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(I)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_19_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 8
+Length_19_ <= CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:65 sat:55 unsat:10
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (lastIndexOfChar cmd_1 47))) 32))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 8
+Length_19_ > CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:66 sat:55 unsat:11
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 7
+IndexOf_1_ = CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:67 sat:56 unsat:11
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot 
+no live threads
+numeric PC: constraint # = 7
+IndexOf_1_ = CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" )))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+### PCs: total:68 sat:57 unsat:11
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 7 constraint # = 7
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5]
+numeric PC: constraint # = 7
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 11
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #11
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot #11
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 7
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (lastIndexOfChar cmd_1 47))) "%n" ))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+IndexOf_1_[-1] = CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(II)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_20_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 8
+Length_20_ <= CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:69 sat:58 unsat:11
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) 32))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 8
+Length_20_ > CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:70 sat:58 unsat:12
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+numeric PC: constraint # = 7
+IndexOf_1_ != CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:71 sat:59 unsat:12
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot 
+no live threads
+numeric PC: constraint # = 7
+IndexOf_1_ != CONST_-1 &&
+CONST_5 >= Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (not (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" )))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+IndexOf_1_[0] != CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+### PCs: total:72 sat:60 unsat:12
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+--------->property violated
+pc 7 constraint # = 7
+IndexOf_1_[0] != CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5]
+numeric PC: constraint # = 7
+IndexOf_1_[0] != CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== error 12
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.RuntimeException: String may contain threat
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== snapshot #12
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot #12
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:114)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 7
+IndexOf_1_[0] != CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+(assert (Contains (Concat "/home/ftp/bin" (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) "%n" ))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+IndexOf_1_[0] != CONST_-1 &&
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+CONST_5 >= Length_0_[5] &&
+CONST_4 < Length_0_[5] &&
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_5)_21_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 7
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:73 sat:61 unsat:12
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:74 sat:62 unsat:12
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 8
+IndexOf_1_ != CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:75 sat:63 unsat:12
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 8
+IndexOf_1_ = CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:76 sat:64 unsat:12
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(I)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_22_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 9
+Length_22_ <= CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:77 sat:65 unsat:12
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (lastIndexOfChar cmd_1 47))) 32))
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 9
+Length_22_ > CONST_32 &&
+IndexOf_1_ = CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:78 sat:65 unsat:13
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot 
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:113)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 8
+IndexOf_1_ = CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.lastIndexOf(II)I
+Symbolic string analysis!!!invokevirtual java.lang.String.substring(I)Ljava/lang/String;
+New sym int Length_23_ min=0, max=30
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 9
+Length_23_ <= CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:79 sat:66 unsat:13
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (<= (Length (Substring cmd_1  (LastIndexof cmd_1 47 (Indexof cmd_1 " ")))) 32))
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 9
+Length_23_ > CONST_32 &&
+IndexOf_1_ != CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> false
+
+### PCs: total:80 sat:66 unsat:14
+
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+Symbolic string analysis!!!invokevirtual java.lang.StringBuilder.toString()Ljava/lang/String;
+Symbolic string analysis!!!invokevirtual java.lang.String.contains(Ljava/lang/CharSequence;)Z
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot 
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:113)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 8
+IndexOf_1_ != CONST_-1 &&
+CONST_6 >= Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+CONST_6 >= Length_0_[6] &&
+CONST_5 < Length_0_[6] &&
+CONST_4 < Length_0_[6] &&
+CONST_3 < Length_0_[6] &&
+CONST_2 < Length_0_[6] &&
+CONST_1 < Length_0_[6] &&
+CONST_0 < Length_0_[6] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_6)_24_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 8
+CONST_7 < Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:81 sat:67 unsat:14
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 8
+CONST_7 >= Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:82 sat:68 unsat:14
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+Symbolic string analysis!!!invokevirtual java.lang.String.indexOf(I)I
+numeric PC: constraint # = 9
+IndexOf_1_ != CONST_-1 &&
+CONST_7 >= Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:83 sat:69 unsat:14
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (not (= (Indexof cmd_1 " ") (- 1))))
+(assert (>= 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 9
+IndexOf_1_ = CONST_-1 &&
+CONST_7 >= Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:84 sat:70 unsat:14
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+[Z3str2-Translator] Translating indexof char:
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (= (Indexof cmd_1 " ") (- 1)))
+(assert (>= 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot 
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:99)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 8
+CONST_7 >= Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+New sym int CharAt(CONST_7)_25_ min=0, max=65535
+Symbolic string analysis!!!invokevirtual java.lang.String.charAt(I)C
+Symbolic string analysis!!!invokevirtual java.lang.String.length()I
+numeric PC: constraint # = 9
+CONST_8 < Length_0_ &&
+CONST_7 < Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:85 sat:71 unsat:14
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 8 (Length cmd_1)))
+(assert (< 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 9
+CONST_8 >= Length_0_ &&
+CONST_7 < Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+### PCs: total:86 sat:72 unsat:14
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (>= 8 (Length cmd_1)))
+(assert (< 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== search constraint
+depth limit reached: 10
+
+====================================================== snapshot 
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at strings.WU_FTPD.site_exec(WU_FTPD.java:43)
+	at strings.WU_FTPD.main(WU_FTPD.java:24)
+
+numeric PC: constraint # = 8
+CONST_7 < Length_0_ &&
+CONST_6 < Length_0_ &&
+CONST_5 < Length_0_ &&
+CONST_4 < Length_0_ &&
+CONST_3 < Length_0_ &&
+CONST_2 < Length_0_ &&
+CONST_1 < Length_0_ &&
+CONST_0 < Length_0_ -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 7 (Length cmd_1)))
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 7
+CONST_6 < Length_0_[8] &&
+CONST_5 < Length_0_[8] &&
+CONST_4 < Length_0_[8] &&
+CONST_3 < Length_0_[8] &&
+CONST_2 < Length_0_[8] &&
+CONST_1 < Length_0_[8] &&
+CONST_0 < Length_0_[8] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 6 (Length cmd_1)))
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 6
+CONST_5 < Length_0_[7] &&
+CONST_4 < Length_0_[7] &&
+CONST_3 < Length_0_[7] &&
+CONST_2 < Length_0_[7] &&
+CONST_1 < Length_0_[7] &&
+CONST_0 < Length_0_[7] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 5 (Length cmd_1)))
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 5
+CONST_4 < Length_0_[6] &&
+CONST_3 < Length_0_[6] &&
+CONST_2 < Length_0_[6] &&
+CONST_1 < Length_0_[6] &&
+CONST_0 < Length_0_[6] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 4 (Length cmd_1)))
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 4
+CONST_3 < Length_0_[5] &&
+CONST_2 < Length_0_[5] &&
+CONST_1 < Length_0_[5] &&
+CONST_0 < Length_0_[5] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 3 (Length cmd_1)))
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 3
+CONST_2 < Length_0_[4] &&
+CONST_1 < Length_0_[4] &&
+CONST_0 < Length_0_[4] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 2 (Length cmd_1)))
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 2
+CONST_1 < Length_0_[3] &&
+CONST_0 < Length_0_[3] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 1 (Length cmd_1)))
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+numeric PC: constraint # = 1
+CONST_0 < Length_0_[2] -> true
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Calling Z3str2
+
+Z3str2 translation:
+(declare-variable cmd_1 String)
+
+(assert (< 0 (Length cmd_1)))
+(check-sat)
+(get-model)
+
+
+====================================================== Method Sequences
+[site_exec(**UNDEFINED**)]
+[(expected = java.lang.RuntimeException.class), site_exec(**UNDEFINED**), ##EXCEPTION## "java.lang.RuntimeException: String may contain threat..."]
+
+====================================================== JUnit 4.0 test class
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+public class strings_WU_FTPDTest {
+
+	private strings.WU_FTPD strings_wu_ftpd;
+
+	@Before
+	public void setUp() throws Exception {
+		strings_wu_ftpd = new strings.WU_FTPD();
+	}
+
+	@Test
+	public void test0() {
+		strings_wu_ftpd.site_exec(**UNDEFINED**);
+	}
+
+	@Test(expected = java.lang.RuntimeException.class)
+	public void test1() {
+		strings_wu_ftpd.site_exec(**UNDEFINED**);
+		//should lead to ##EXCEPTION## "java.lang.RuntimeException: String may contain threat..."
+	}
+}
+
+====================================================== results
+error #1: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #2: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #3: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #4: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #5: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #6: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #7: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #8: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #9: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #10: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #11: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+error #12: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.RuntimeException: String may contain thr..."
+
+====================================================== statistics
+elapsed time:       00:00:00
+states:             new=56,visited=0,backtracked=56,end=12
+search:             maxDepth=10,constraints=8
+choice generators:  thread=1 (signal=0,lock=1,sharedRef=0,threadApi=0,reschedule=0), data=28
+heap:               new=821,released=379,maxLive=314,gcCycles=44
+instructions:       5240
+max memory:         481MB
+loaded code:        classes=61,methods=1342
+
+====================================================== search finished: 12/16/15 1:47 PM

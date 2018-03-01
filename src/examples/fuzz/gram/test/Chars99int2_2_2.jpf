@@ -1,0 +1,7 @@
+target=fuzz.gram.test.Chars99int2_2
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.dp=z3bitvector
+native_classpath=../../git/local-test-jpf-add2/test-jpf-add2/bin
+listener = Dbg_inst_listener

@@ -1,0 +1,16 @@
+target=summerschool.SwapSimple
+
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.method = summerschool.SwapSimple.test(sym#sym)
+
+#symbolic.debug=true
+
+listener = gov.nasa.jpf.symbc.SymbolicListener
+
+symbolic.min_int=-100
+symbolic.max_int=100
+
+symbolic.min_double=-100.0
+symbolic.max_double=100.0

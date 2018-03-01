@@ -1,0 +1,22 @@
+target=gov.nasa.jpf.symbc.ExException
+
+classpath=${jpf-symbc}/build/tests
+
+sourcepath=${jpf-symbc}/src/tests
+
+#symbolic.dp=no_solver
+#symbolic.dp=coral
+#symbolic.dp=choco2
+#symbolic.dp=yices
+#symbolic.dp=cvc3bitvec
+
+symbolic.method= gov.nasa.jpf.symbc.ExException.test(sym)
+
+#listener = gov.nasa.jpf.symbc.SymbolicListener
+symbolic.lazy=true
+vm.storage.class=nil
+symbolic.minint=-10000
+symbolic.maxint=10000
+symbolic.undefined=100000
+symbolic.debug=true
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

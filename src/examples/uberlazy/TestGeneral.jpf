@@ -1,0 +1,15 @@
+target = uberlazy.TestGeneral
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples
+
+type_classpath = ${jpf-symbc}/build/examples/uberlazy
+
+symbolic.lazy = true
+symbolic.lazy.subtypes = true
+
+symbolic.method = uberlazy.TestGeneral.test(sym#conc)
+listener = .symbc.sequences.SymbolicSequenceListener,\
+			.listener.CoverageAnalyzer
+#search.class = .search.heuristic.BFSHeuristic

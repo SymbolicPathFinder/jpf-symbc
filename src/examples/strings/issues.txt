@@ -1,0 +1,9 @@
+mona export -> _export
+AC flags
+install libltoolintl not in libStranger install docs
+JAVA_HOME path  user/lib/.../jni.h
+sudo usr/bin/install -c libabc.la /usr/local/lib
+install glog, config and install
+google logging double init Driver.cpp line 29
+ast2dot comment out line 93
+

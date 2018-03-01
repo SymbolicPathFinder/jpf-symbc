@@ -1,0 +1,19 @@
+target=concolic.MathSin
+
+
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.method=concolic.MathSin.mysin(sym)
+symbolic.concolic=true
+#symbolic.heuristicRandom=true
+
+#symbolic.heuristicPartition=true
+
+#symbolic.debug=on
+
+listener = .symbc.concolic.ConcreteExecutionListener
+
+
+vm.storage.class=nil

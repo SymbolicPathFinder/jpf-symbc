@@ -1,0 +1,10 @@
+target=TestArray
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = TestArray.testBasic(sym),TestArray.testArrayList(sym)
+symbolic.min_int=-100
+symbolic.max_int=100
+symbolic.dp=z3
+#vm.storage.class=nil
+#listener = .symbc.SymbolicListener
+#listener = .listener.ChoiceTracker

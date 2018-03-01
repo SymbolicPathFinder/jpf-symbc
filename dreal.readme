@@ -1,0 +1,49 @@
+In this file we explain how to use dReal solver with Symbolic Path Finder (SPF). dReal is an SMT solver 
+that support first-order logic formulas over the real numbers. The tool can handle formulas with nonlinear
+real functions in the framework of delta-complete decision procedures (for more information please look 
+at https://dreal.github.io/).
+
+In order to install SPF that supports dReal one needs to 1) download SPF version that contains support
+for dReal, and 2) install dReal itself. "http://babelfish.arc.nasa.gov/trac/jpf/wiki/projects/jpf-symbc" 
+contains address of the repository. Any version committed on or after "Thu, 30 Jul 2015 12:51:29 -0700" 
+should be fine for our purpose. After obtaining a copy of SPF, one also need to install dReal. Required
+information regarding downloading and installing this tool can be found in "https://dreal.github.io/".
+dReal problem solver of SPF has been tested with version 2 of dReal.
+
+After downloading and installing both SPF and dReal, we need to configure properties required for SPF.
+As with the other properties of SPF and JPF (Java Path Finder), properties related to dReal solver are 
+specified in "jpf.properties" file. Currently, there are three properties specific to the dReal solver 
+that should be specified in this file: "dreal.timeBound", "dreal.precision", and "dreal.mode".
+
+1) dreal.timeBound, an integer value with default -1 (in milliseconds),  
+SPF constructs mathematical constraints and give them to dReal solver to check for their satisfiability. 
+Since these constraints can become arbitrary large, even if their satisfiability remains decidable, it is 
+possible that for some formula, dReal cannot find an answer in a reasonable amount of time. Setting this 
+parameter will force dReal to stop and return "unknown" if it did not find an answer after the given 
+number of milliseconds. Non-positive values mean dReal will wait as much as required to find an answer.
+
+2) dreal.precision, a positive real (double) value with default "0.00001",
+dReal, looks for "delta" satisfiability of the input formula. The delta relaxation is specified with this
+parameter and will be directly passed to the dReal.  
+
+3) dreal.mode, "strictified" or "relaxed" with default "strictified".
+As we mentioned before, dReal looks for satisfiability of "relaxed" formula. As a result, if a formula is
+found to be delta-sat, there is no guarantee that actual formula will also be satisfiable. In other words,
+dReal decides between "unsat" and "delta-sat". This is the behavior one can expect with "relaxed" value 
+parameter. On the other hand, one can also ask dReal to decide between "sat" and "delta-unsat". In order
+to do this, "strictified" should be used as the value of this parameter.
+
+Note that, as we are writing this document, strictification is not directly supported by dReal. What 
+actually happens is that each constraint will be strictified first, and the result will be given to dReal
+next. As a consequence, all equalities will be replaced by 'false'. Similarly, in the other scenario, 
+'true' will take place of all inequalities.
+
+Finally, note that even if a formula is found to be satisfiable, there is no guarantee that the generated 
+model will actually satisfy constraints in the implementation. The reason for this is that dReal works 
+with Type II computable functions which in principle are very different from floating point numbers and 
+functions used by java.   
+
+Last but not least, one should also tell were to find the dReal executable file. The current interface to 
+dReal is completely independent of SPF and JPF. As a result, jpf.properties file is not used to specify 
+the path to dReal. Instead, the path is specified by setting the property "dreal-bin-path" through command 
+line (e.g. "-Ddreal-bin-path=/path/to/dreal/bin").

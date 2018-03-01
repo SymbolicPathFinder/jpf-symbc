@@ -1,0 +1,16 @@
+target=gov.nasa.jpf.symbc.ExSymExeSuzette
+
+classpath=${jpf-symbc}/build/tests
+
+sourcepath=${jpf-symbc}/src/tests
+
+
+symbolic.method= gov.nasa.jpf.symbc.ExSymExeSuzette.test(sym#sym)
+
+vm.storage.class=nil
+symbolic.minint=-100
+symbolic.maxint=100
+symbolic.undefined=1000
+#symbolic.debug=true
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+listener = gov.nasa.jpf.symbc.SymbolicListenerClean

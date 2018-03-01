@@ -1,0 +1,41 @@
+target=gov.nasa.jpf.symbc.ExSymExeComplexMath
+classpath=${jpf-symbc}/build/tests
+sourcepath=${jpf-symbc}/src/tests
+symbolic.method= gov.nasa.jpf.symbc.ExSymExeComplexMath.test2(sym)
+listener = gov.nasa.jpf.symbc.SymbolicListener
+vm.storage.class=nil
+
+symbolic.dp=coral
+
+# For more info about what these options do (and how CORAL works),
+# check our documentation/publications in http://pan.cin.ufpe.br/coral/
+#
+# CORAL has a lot more options, but you probably won't need to 
+# use them directly. If you want to play with them, look at the
+# configure(Config conf) method in ProblemCoral.   
+
+#RNG seed
+coral.seed=464655
+
+#coral's solver to execute - choose from: {PSO_OPT4J,RANDOM,AVM}
+#default is PSO_OPT4J
+coral.solver=PSO_OPT4J
+
+#number of iterations executed before the solver stops
+#default for PSO_OPT4J is 600, RANDOM is 360000 and AVM is 20000
+coral.iterations=600
+
+#enable some optimizations. default is true
+coral.optimize=true
+
+#specify a interval-based constraint solver to be used to improve CORAL's 
+#results. supported values (and solvers) are 'realpaver' (preferred, found
+#at http://pagesperso.lina.univ-nantes.fr/info/perso/permanents/granvil/realpaver/)
+#and 'icos' (not recommended, found at https://sites.google.com/site/ylebbah/icos)
+#
+#default value is 'none' (no interval solver will be used)
+coral.interval_solver=none
+
+#full path to the executable of the interval solver specified in the
+#previous option
+coral.interval_solver.path=none

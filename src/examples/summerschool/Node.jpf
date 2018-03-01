@@ -1,0 +1,7 @@
+target=summerschool.Node
+
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method=summerschool.Node.swapNode()
+symbolic.lazy = true
+

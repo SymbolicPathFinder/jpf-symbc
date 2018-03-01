@@ -1,0 +1,15 @@
+target = arrays.TestAALOADUndefinedLength
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples 
+
+symbolic.lazy = true
+
+type_classpath = ${jpf-symbc}/build/examples/arrays
+
+symbolic.method = arrays.TestAALOADUndefinedLength.run(sym)
+
+symbolic.dp=z3
+search.multiple_errors=true
+symbolic.arrays=true

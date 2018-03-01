@@ -1,0 +1,12 @@
+domain{
+	windStrength_1_SYMINT:-15,15;
+	position_2_SYMINT: 0,15;
+};
+
+usageProfile{
+	windStrength_1_SYMINT<-10 : 5/100;
+	windStrength_1_SYMINT>=-10 && windStrength_1_SYMINT<=-5 : 10/100;
+	windStrength_1_SYMINT>-5 && windStrength_1_SYMINT<5 : 70/100;
+	windStrength_1_SYMINT>=5 && windStrength_1_SYMINT<=10 : 10/100;
+	windStrength_1_SYMINT>10 : 5/100;
+};

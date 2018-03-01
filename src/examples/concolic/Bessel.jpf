@@ -1,0 +1,32 @@
+target=concolic.Bessel
+
+target_args=1.0
+
+@using=jpf-core
+@using=jpf-symbc
+
+classpath = ${jpf-symbc}/build/examples
+sourcepath = ${jpf-symbc}/build/examples
+
+symbolic.method=concolic.Bessel.run_bessel(sym)
+
+symbolic.concolic=true
+#symbolic.heuristicRandom=true
+symbolic.heuristcPartition=true
+
+
+symbolic.debug=on
+
+listener = .symbc.concolic.ConcreteExecutionListener
+
+symbolic.minint=-100
+
+symbolic.maxint=100
+
+symbolic.minreal=1.0
+
+symbolic.maxreal=10.0
+
+symbolic.undefined=1
+
+vm.storage.class=nil

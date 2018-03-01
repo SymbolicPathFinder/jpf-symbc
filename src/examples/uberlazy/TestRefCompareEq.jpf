@@ -1,0 +1,13 @@
+target = uberlazy.TestRefCompareEq
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples 
+
+type_classpath = ${jpf-symbc}/build/examples/uberlazy
+
+#using this instruction factory ensures you use the uberlazy algorithm
+vm.insn_factory.class=gov.nasa.jpf.symbc.uberlazy.UberLazyInstructionFactory
+
+symbolic.method = uberlazy.TestRefCompareEq.run()
+#,uberlazy.TestRefCompareEq.testEquality()

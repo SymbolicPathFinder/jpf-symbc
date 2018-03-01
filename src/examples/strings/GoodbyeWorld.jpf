@@ -1,0 +1,16 @@
+target=strings.GoodbyeWorld
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+#symbolic.dp=choco
+symbolic.strings=true
+symbolic.string_dp=z3str2
+symbolic.string_dp_timeout_ms=3000
+symbolic.debug=true
+
+symbolic.method= strings.GoodbyeWorld.hello(sym)
+search.depth_limit = 10
+search.multiple_errors=true
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+#listener = sidechannel.TimingChannelListener
+vm.storage.class=nil

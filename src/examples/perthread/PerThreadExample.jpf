@@ -1,0 +1,22 @@
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+target=perthread.PerThreadExample
+
+symbolic.method = perthread.PerThreadExample$InstanceFieldPropagation.doWork();
+
+listener = gov.nasa.jpf.symbc.symexectree.visualizer.SymExecTreeVisualizerListener
+#listener = gov.nasa.jpf.symbc.SymbolicListener
+symbolic.visualizer.basepath = ${jpf-symbc}/prettyprint
+symbolic.visualizer.outputformat = pdf
+
+symbolic.green = false
+
+symbolic.lazy = true
+#symbolic.lazy.subtypes = true
+#vm.storage.class=nil
+
+symbolic.debug=true
+
+#symbolic.dp = cvc3

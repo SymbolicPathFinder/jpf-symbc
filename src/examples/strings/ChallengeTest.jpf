@@ -1,0 +1,16 @@
+target=strings.ChallengeTest
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.strings = true
+#symbolic.dp=choco
+#symbolic.string_dp=ABC
+symbolic.string_dp=no_solver
+symbolic.string_dp_timeout_ms=3000
+symbolic.debug=true
+
+symbolic.method= strings.ChallengeTest.test(sym)
+search.depth_limit = 5
+search.multiple_errors=true
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+#vm.storage.class=nil

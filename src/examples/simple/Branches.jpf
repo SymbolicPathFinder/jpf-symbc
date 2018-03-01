@@ -1,0 +1,20 @@
+classpath = ${jpf-symbc}/build/examples
+sourcepath = ${jpf-symbc}/src/examples
+
+target = simple.Branches
+symbolic.method = simple.Branches.branch(sym#sym)
+symbolic.minint=-100
+symbolic.maxint=100
+
+symbolic.green = true
+green.taskmanager = za.ac.sun.cs.green.taskmanager.ParallelTaskManager
+green.store = za.ac.sun.cs.green.store.redis.RedisStore
+green.services = sat
+green.service.sat = (slice (canonize choco cvc3))
+green.service.sat.slice = za.ac.sun.cs.green.service.slicer.SATSlicerService
+green.service.sat.canonize = za.ac.sun.cs.green.service.canonizer.SATCanonizerService
+green.service.sat.choco = za.ac.sun.cs.green.service.choco.SATChocoService
+green.service.sat.cvc3 = za.ac.sun.cs.green.service.cvc3.SATCVC3Service
+
+vm.storage.class=nil
+listener = .symbc.GreenListener

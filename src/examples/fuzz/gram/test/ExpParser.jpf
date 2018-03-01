@@ -1,0 +1,12 @@
+target=fuzz.gram.test.ExpParser
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.collect_constraints=true
+symbolic.db=no_solver
+symbolic.optimizechoices=false
+#symbolic.dp=z3bitvector
+#search.multiple_errors=true
+#listener = .symbc.SymbolicListener
+#listener = .listener.ChoiceTracker
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

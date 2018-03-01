@@ -1,0 +1,27 @@
+target = modpow.Driver 
+
+
+classpath=${jpf-symbc}/build/main;${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+#listener=sidechannel.TimingChannelQuantifier,
+#listener=gov.nasa.jpf.symbc.numeric.solvers.IncrementalListener
+
+#symbolic.debug = true
+
+search.multiple_errors=true
+symbolic.arrays=true
+symbolic.dp=z3bitvector
+
+
+symbolic.reliability.tmpDir=${jpf-security}/build/tmp
+symbolic.reliability.omegaPath=${jpf-security}/tools/omega/oc
+symbolic.reliability.lattePath=${jpf-security}/tools/latte-integrale-1.7.3/bin/count
+
+symbolic.min_int=-10
+symbolic.max_int=10
+
+symbolic.min_byte=1
+symbolic.max_byte=10
+
+##sidechannel.verbose = true
