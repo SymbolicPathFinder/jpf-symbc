@@ -20,7 +20,6 @@ package gov.nasa.jpf.symbc.bytecode;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
-import gov.nasa.jpf.symbc.arrays.ArrayExpression;
 import gov.nasa.jpf.symbc.heap.HeapChoiceGenerator;
 import gov.nasa.jpf.symbc.heap.HeapNode;
 import gov.nasa.jpf.symbc.heap.Helper;
@@ -70,7 +69,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 	    StackFrame frame = ti.getModifiableTopFrame();
 	    int objRef = frame.peek(); // don't pop yet, we might re-enter
 	    lastThis = objRef;
-	    if (objRef == MJIEnv.NULL) {
+	    if (objRef == -1) {
 	      return ti.createAndThrowException("java.lang.NullPointerException",
 	                                        "referencing field '" + fname + "' on null object");
 	    }
@@ -91,8 +90,8 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 		  return super.execute(ti);
 	  }
 
-	  if(attr instanceof StringExpression || attr instanceof SymbolicStringBuilder || attr instanceof ArrayExpression)
-			return super.execute(ti); // Strings and arrays are handled specially
+	  if(attr instanceof StringExpression || attr instanceof SymbolicStringBuilder)
+			return super.execute(ti); // Strings are handled specially
 
 	  if (SymbolicInstructionFactory.debugMode)
 		  System.out.println("lazy initialization");

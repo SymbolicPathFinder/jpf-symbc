@@ -96,14 +96,17 @@ public abstract class SwitchInstruction extends gov.nasa.jpf.jvm.bytecode.Switch
             assert pc != null;
             int idx;
             if (SymbolicInstructionFactory.collect_constraints) {
+                // Find which concrete branch corresponds the the value. If none, then idx == matches.length, which
+                // means that the default branch is chosen.
                 for (idx = 0; idx < matches.length; idx++) {
-                    if (value == matches[idx]) { // find which concrete branch
+                    if (value == matches[idx]) {
                         break;
                     }
                 }
                 ((PCChoiceGenerator) cg).select(idx); // YN: set the choice correctly
-            } else
+            } else {
                 idx = (Integer) cg.getNextChoice();
+            }
             if (idx == matches.length) { // default branch
                 lastIdx = DEFAULT;
                 for (int i = 0; i < matches.length; i++)

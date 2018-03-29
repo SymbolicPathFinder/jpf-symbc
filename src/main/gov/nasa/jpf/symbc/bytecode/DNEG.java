@@ -57,10 +57,10 @@ public class DNEG extends gov.nasa.jpf.jvm.bytecode.DNEG {
 
 		sf.pushLong(Types.doubleToLong(-v1));
 		
-		if(sym_v1!=null) {
-			RealExpression result = sym_v1._neg();
-			sf.setLongOperandAttr(result);
-		}
+		if(sym_v1!=null){
+                 RealExpression result = sym_v1._neg();
+		 sf.setLongOperandAttr(result);
+                }
 		//System.out.println("Execute DNEG: " + sf.getLongOperandAttr());
 
 		return getNext(th);

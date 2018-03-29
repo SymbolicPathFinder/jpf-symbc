@@ -38,6 +38,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
  * YN: fixed choice selection in symcrete support (Yannic Noller <nolleryc@gmail.com>)
  */
 public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
+    
+    public static int lastLength = -1; // YN: helper variable for last known length
 
     @Override
     public Instruction execute(ThreadInfo ti) {
@@ -53,6 +55,7 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
         }
 
         int len = (eiArray.getArrayFields()).arrayLength(); // assumed concrete
+        lastLength = len; // YN: store last length
 
         if (!ti.isFirstStepInsn()) {
             PCChoiceGenerator arrayCG;
@@ -62,6 +65,9 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
             else
                 arrayCG = new PCChoiceGenerator(0, len + 1); // add 2 error cases: <0, >=len
 
+            arrayCG.setOffset(this.position);
+            arrayCG.setMethodName(this.getMethodInfo().getFullName());
+            
             ti.getVM().getSystemState().setNextChoiceGenerator(arrayCG);
 
             // ti.reExecuteInstruction();

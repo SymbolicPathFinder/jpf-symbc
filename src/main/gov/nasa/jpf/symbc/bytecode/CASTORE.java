@@ -38,6 +38,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
  * YN: added symcrete support (Yannic Noller <nolleryc@gmail.com>)
  */
 public class CASTORE extends gov.nasa.jpf.jvm.bytecode.CASTORE {
+    
+    public static int lastLength = -1; // YN: helper variable for last known length
 
     @Override
     public Instruction execute(ThreadInfo ti) {
@@ -52,6 +54,7 @@ public class CASTORE extends gov.nasa.jpf.jvm.bytecode.CASTORE {
         }
 
         int len = (eiArray.getArrayFields()).arrayLength(); // assumed concrete
+        lastLength = len; // YN: store last length
 
         if (!ti.isFirstStepInsn()) {
             PCChoiceGenerator arrayCG;

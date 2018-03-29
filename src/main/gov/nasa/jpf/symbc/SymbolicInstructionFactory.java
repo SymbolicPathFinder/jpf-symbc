@@ -442,72 +442,68 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 		  }
 
 	  // array ops
-      public Instruction arraylength() {
-          return (symArrays ? new gov.nasa.jpf.symbc.bytecode.symarrays.ARRAYLENGTH() : super.arraylength());
-      }
-
 	  public Instruction aaload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.AALOAD() : new AALOAD(): super.aaload());
+		    return (filter.isPassing(ci) ? new AALOAD() : super.aaload());
 		  }
 
 	  public Instruction aastore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.AASTORE() : new AASTORE(): super.aastore());
+			return (filter.isPassing(ci) ? new AASTORE() : super.aastore());
 		  }
 		  
 	  public Instruction baload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.BALOAD() : new BALOAD(): super.baload());
+		    return (filter.isPassing(ci) ? new BALOAD() : super.baload());
 		  }
 
 	  public Instruction bastore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.BASTORE() : new BASTORE(): super.bastore());
+			return (filter.isPassing(ci) ? new BASTORE() : super.bastore());
 		  }
 	  
 	  public Instruction caload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.CALOAD() : new CALOAD(): super.caload());
+		    return (filter.isPassing(ci) ? new CALOAD() : super.caload());
 		  }
 
 	  public Instruction castore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.CASTORE() : new CASTORE(): super.castore());
+			return (filter.isPassing(ci) ? new CASTORE() : super.castore());
 		  }
 	  
 	  public Instruction daload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.DALOAD() : new DALOAD(): super.daload());
+		    return (filter.isPassing(ci) ? new DALOAD() : super.daload());
 		  }
 
 	  public Instruction dastore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.DASTORE() : new DASTORE(): super.dastore());
+			return (filter.isPassing(ci) ? new DASTORE() : super.dastore());
 		  }
 	  
 	  public Instruction faload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.FALOAD() : new FALOAD(): super.faload());
+		    return (filter.isPassing(ci) ? new FALOAD() : super.faload());
 		  }
 
 	  public Instruction fastore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.FASTORE() : new FASTORE(): super.fastore());
+			return (filter.isPassing(ci) ? new FASTORE() : super.fastore());
 		  }
 	  
 	  public Instruction iaload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.IALOAD() : new IALOAD(): super.iaload());
+		    return (filter.isPassing(ci) ? new IALOAD() : super.iaload());
 		  }
 
 	  public Instruction iastore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.IASTORE() : new IASTORE(): super.iastore());
+			return (filter.isPassing(ci) ? new IASTORE() : super.iastore());
 		  }
 	  
 	  public Instruction laload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.LALOAD() : new LALOAD(): super.laload());
+		    return (filter.isPassing(ci) ? new LALOAD() : super.laload());
 		  }
 
 	  public Instruction lastore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.LASTORE() : new LASTORE(): super.lastore());
+			return (filter.isPassing(ci) ? new LASTORE() : super.lastore());
 		  }
 	  
 	  public Instruction saload() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.SALOAD() : new SALOAD(): super.saload());
+	    return (filter.isPassing(ci) ? new SALOAD() : super.saload());
 	  }
 
 	  public Instruction sastore() {
-		    return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.SASTORE() : new SASTORE(): super.sastore());
+		return (filter.isPassing(ci) ? new SASTORE() : super.sastore());
 	  }
 	  
 		//TODO: to review
@@ -527,7 +523,7 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 		  }
 
 	  public Instruction newarray(int typeCode) {
-		  return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.NEWARRAY(typeCode) : new NEWARRAY(typeCode) : super.newarray(typeCode));
+		  return (filter.isPassing(ci) ? new NEWARRAY(typeCode) : super.newarray(typeCode));
 	      }
 
 	  public Instruction multianewarray(String clsName, int dimensions){
@@ -583,12 +579,6 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	 */
 	private final boolean pcChoiceOptimization;
 
-  /*
-   * With this setting, symbolic arrays rely on
-   * array theory in Z3
-   */
-  private final boolean symArrays;
-
 	static public boolean concolicMode;
 	static public boolean heuristicRandomMode;
 	static public boolean heuristicPartitionMode;
@@ -616,6 +606,7 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	 public  SymbolicInstructionFactory (Config conf){
 		 String[] cc = conf.getStringArray("symbolic.collect_constraints");
 			if (cc != null && cc[0].equals("true")) {
+				System.out.println("Mixed symbolic/concrete execution ...");
 				collect_constraints = true;
 			} else {
 				collect_constraints = false;
@@ -723,8 +714,6 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 		}
 		
 		this.pcChoiceOptimization = conf.getBoolean("symbolic.optimizechoices", true);
-
-    this.symArrays = conf.getBoolean("symbolic.arrays", false);
 
 		/* load bitvector length, default to 32 */
 		bvlength = conf.getInt("symbolic.bvlength", 32);

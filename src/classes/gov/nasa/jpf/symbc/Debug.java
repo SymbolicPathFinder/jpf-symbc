@@ -39,9 +39,8 @@ package gov.nasa.jpf.symbc;
 
 import gov.nasa.jpf.vm.Verify;
 
-import java.util.Vector;
-
 public class Debug {
+    
     native public static void printPC(String msg);
     native public static String getSolvedPC();
     native public static String getPC_prefix_notation();
@@ -60,7 +59,7 @@ public class Debug {
     //native public static short addSymbolic(short v, String name);
     native public static byte addSymbolicByte(byte v, String name);
     native public static char addSymbolicChar(char v, String name);
-    //native public static double addSymbolic(double v, String name);
+    native public static double addSymbolicDouble(double v, String name);
     //native public static boolean addSymbolic(boolean v, String name);
     //native public static String addSymbolic(String v, String name);
     
@@ -124,4 +123,10 @@ public class Debug {
     // performs abstract state matching
     native public static boolean matchAbstractState(Object v);
     
+    /* YN: user-defined cost*/
+    native public static void addCost(Object v);
+    native public static void setLastObservedInputSize(Object v);
+    native public static int getLastObservedInputSize();
+    native public static double getLastMeasuredMetricValue();
+    native public static void clearMeasurements();
 }

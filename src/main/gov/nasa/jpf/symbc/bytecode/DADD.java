@@ -39,10 +39,9 @@ public class DADD extends gov.nasa.jpf.jvm.bytecode.DADD {
 
 		double r = v1 + v2;
 
-		if (sym_v1 == null && sym_v2 == null)
-			sf.pushLong(Types.doubleToLong(r));
-		else
-			sf.pushLong(0);
+		
+		sf.pushLong(Types.doubleToLong(r));
+		
 
 		RealExpression result = null;
 		if (sym_v1 != null) {

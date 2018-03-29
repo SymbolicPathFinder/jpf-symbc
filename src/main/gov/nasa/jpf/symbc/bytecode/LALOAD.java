@@ -37,6 +37,8 @@ import gov.nasa.jpf.vm.ThreadInfo;
  * YN: added symcrete support (Yannic Noller <nolleryc@gmail.com>)
  */
 public class LALOAD extends gov.nasa.jpf.jvm.bytecode.LALOAD {
+    
+    public static int lastLength = -1; // YN: helper variable for last known length
 
     @Override
     public Instruction execute(ThreadInfo ti) {
@@ -51,6 +53,8 @@ public class LALOAD extends gov.nasa.jpf.jvm.bytecode.LALOAD {
 
         ElementInfo eiArray = ti.getElementInfo(arrayRef);
         int len = (eiArray.getArrayFields()).arrayLength(); // assumed concrete
+        lastLength = len; // YN: store last length
+        
         if (!ti.isFirstStepInsn()) {
             PCChoiceGenerator arrayCG;
 
@@ -60,6 +64,9 @@ public class LALOAD extends gov.nasa.jpf.jvm.bytecode.LALOAD {
                 arrayCG = new PCChoiceGenerator(0, len + 1); // add 2 error cases: <0, >=len
             }
 
+            arrayCG.setOffset(this.position);
+            arrayCG.setMethodName(this.getMethodInfo().getFullName());
+            
             ti.getVM().getSystemState().setNextChoiceGenerator(arrayCG);
 
             if (SymbolicInstructionFactory.debugMode)

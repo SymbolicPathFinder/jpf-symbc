@@ -22,11 +22,8 @@ package gov.nasa.jpf.symbc.bytecode;
 
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
-import gov.nasa.jpf.symbc.arrays.ArrayExpression;
 import gov.nasa.jpf.symbc.heap.Helper;
-import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.Expression;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.MinMax;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
@@ -237,8 +234,7 @@ public class BytecodeUtils {
 
 			// create a choice generator to associate the precondition with it
 			ChoiceGenerator<?> cg = null;
-			if (invInst.getInvokedMethod().getAnnotation("gov.nasa.jpf.symbc.Preconditions") != null ||
-        conf.getStringArray("symbolic.arrays") != null) {
+			if (invInst.getInvokedMethod().getAnnotation("gov.nasa.jpf.symbc.Preconditions") != null) {
 				if (!th.isFirstStepInsn()) { // first time around
 					cg = new PCChoiceGenerator(1);
 					th.getVM().setNextChoiceGenerator(cg);
@@ -277,11 +273,6 @@ public class BytecodeUtils {
 
 			// special treatment of "this"
 			String lazy[] = conf.getStringArray("symbolic.lazy");
-      String symarrays[] = conf.getStringArray("symbolic.arrays");
-      boolean symarray = false;
-      if (symarrays != null) {
-          symarray = symarrays[0].equalsIgnoreCase("true");
-      }
 			//TODO: to review
 //			if(lazy != null) {
 //				if(lazy[0].equalsIgnoreCase("true")) {
@@ -345,118 +336,47 @@ public class BytecodeUtils {
 						sf.setOperandAttr(stackIdx, sym_v);
 						outputString = outputString.concat(" " + sym_v + ",");
 					} else if(argTypes[j].equalsIgnoreCase("int[]") || argTypes[j].equalsIgnoreCase("long[]") || argTypes[j].equalsIgnoreCase("byte[]")){
-            if (symarray) {
-                ArrayExpression sym_v = new ArrayExpression(th.getElementInfo(sf.peek()).toString());
-                expressionMap.put(name, sym_v);
-                sf.setOperandAttr(stackIdx, sym_v);
-                outputString = outputString.concat(" " + sym_v + ",");
+						Object[] argValues = invInst.getArgumentValues(th);
+						ElementInfo eiArray = (ElementInfo)argValues[j];
 
-                PCChoiceGenerator prev_cg = cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
-                PathCondition pc;
-                if (prev_cg == null) 
-                    pc = new PathCondition();
-                else
-                    pc = ((PCChoiceGenerator)prev_cg).getCurrentPC();
-
-                pc._addDet(Comparator.GE, sym_v.length, new IntegerConstant(0));
-                ((PCChoiceGenerator) cg).setCurrentPC(pc);
-            } else {
-						  Object[] argValues = invInst.getArgumentValues(th);
-						  ElementInfo eiArray = (ElementInfo)argValues[j];
-
-						  if(eiArray!=null)
-						  	for(int i =0; i< eiArray.arrayLength(); i++) {
-						  		IntegerExpression sym_v = new SymbolicInteger(varName(name+i, VarType.INT));
-						  		expressionMap.put(name+i, sym_v);
-						  		eiArray.addElementAttr(i, sym_v);
-						  		outputString = outputString.concat(" " + sym_v + ",");
-						  	}
-						  else
-						  	System.out.println("Warning: input array empty! "+name);
-            }
+						if(eiArray!=null)
+							for(int i =0; i< eiArray.arrayLength(); i++) {
+								IntegerExpression sym_v = new SymbolicInteger(varName(name+i, VarType.INT));
+								expressionMap.put(name+i, sym_v);
+								eiArray.addElementAttr(i, sym_v);
+								outputString = outputString.concat(" " + sym_v + ",");
+							}
+						else
+							System.out.println("Warning: input array empty! "+name);
 					} else if(argTypes[j].equalsIgnoreCase("float[]") || argTypes[j].equalsIgnoreCase("double[]")){
-            if (symarray) {
-                ArrayExpression sym_v = new ArrayExpression(th.getElementInfo(sf.peek()).toString());
-                expressionMap.put(name, sym_v);
-                sf.setOperandAttr(stackIdx, sym_v);
-                outputString = outputString.concat(" " + sym_v + ",");
+						Object[] argValues = invInst.getArgumentValues(th);
+						ElementInfo eiArray = (ElementInfo)argValues[j];
 
-              PCChoiceGenerator prev_cg = cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
-                PathCondition pc;
-                if (prev_cg == null) 
-                    pc = new PathCondition();
-                else
-                    pc = ((PCChoiceGenerator)prev_cg).getCurrentPC();
-
-                pc._addDet(Comparator.GE, sym_v.length, new IntegerConstant(0));
-                ((PCChoiceGenerator) cg).setCurrentPC(pc);
-            } else {
-						  Object[] argValues = invInst.getArgumentValues(th);
-						  ElementInfo eiArray = (ElementInfo)argValues[j];
-
-						  if(eiArray!=null)
-						  	for(int i =0; i< eiArray.arrayLength(); i++) {
-						  		RealExpression sym_v = new SymbolicReal(varName(name+i, VarType.REAL));
-						  		expressionMap.put(name+i, sym_v);
-						  		eiArray.addElementAttr(i, sym_v);
-						  		outputString = outputString.concat(" " + sym_v + ",");
-						  	}
-						  else
-						  	System.out.println("Warning: input array empty! "+name);
-            }
+						if(eiArray!=null)
+							for(int i =0; i< eiArray.arrayLength(); i++) {
+								RealExpression sym_v = new SymbolicReal(varName(name+i, VarType.REAL));
+								expressionMap.put(name+i, sym_v);
+								eiArray.addElementAttr(i, sym_v);
+								outputString = outputString.concat(" " + sym_v + ",");
+							}
+						else
+							System.out.println("Warning: input array empty! "+name);
 					} else if(argTypes[j].equalsIgnoreCase("boolean[]")){
-            if (symarray) {
-                ArrayExpression sym_v = new ArrayExpression(th.getElementInfo(sf.peek()).toString());
-                expressionMap.put(name, sym_v);
-                sf.setOperandAttr(stackIdx, sym_v);
-                outputString = outputString.concat(" " + sym_v + ",");
+						Object[] argValues = invInst.getArgumentValues(th);
+						ElementInfo eiArray = (ElementInfo)argValues[j];
 
-              PCChoiceGenerator prev_cg = cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
-                PathCondition pc;
-                if (prev_cg == null) 
-                    pc = new PathCondition();
-                else
-                    pc = ((PCChoiceGenerator)prev_cg).getCurrentPC();
+						if(eiArray!=null)
+							for(int i =0; i< eiArray.arrayLength(); i++) {
+								IntegerExpression sym_v = new SymbolicInteger(varName(name+i, VarType.INT),0,1);
+								expressionMap.put(name+i, sym_v);
+								eiArray.addElementAttr(i, sym_v);
+								outputString = outputString.concat(" " + sym_v + ",");
+							}
+						else
+							System.out.println("Warning: input array empty! "+name);
+					}
 
-                pc._addDet(Comparator.GE, sym_v.length, new IntegerConstant(0));
-                ((PCChoiceGenerator) cg).setCurrentPC(pc);
-            } else {
-						  Object[] argValues = invInst.getArgumentValues(th);
-						  ElementInfo eiArray = (ElementInfo)argValues[j];
-
-						  if(eiArray!=null)
-						  	for(int i =0; i< eiArray.arrayLength(); i++) {
-						  		IntegerExpression sym_v = new SymbolicInteger(varName(name+i, VarType.INT),0,1);
-						  		expressionMap.put(name+i, sym_v);
-						  		eiArray.addElementAttr(i, sym_v);
-						  		outputString = outputString.concat(" " + sym_v + ",");
-						  	}
-						  else
-						  	System.out.println("Warning: input array empty! "+name);
-					  }
-					} else if (argTypes[j].contains("[]")) {
-            if (symarray) {
-                Object[] argValues = invInst.getArgumentValues(th);
-                ElementInfo eiArray = (ElementInfo)argValues[j];
-                // If the type name contains [] but wasn't catched previously, it is an object array
-                ArrayExpression sym_v = new ArrayExpression(th.getElementInfo(sf.peek()).toString(), argTypes[j].substring(0, argTypes[j].length() - 2));
-                // We remove the [] at the end of the type to keep only the type of the object
-                expressionMap.put(name, sym_v);
-                sf.setOperandAttr(stackIdx, sym_v);
-                outputString = outputString.concat(" " + sym_v + ",");
-
-              PCChoiceGenerator prev_cg = cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
-                PathCondition pc;
-                if (prev_cg == null) 
-                    pc = new PathCondition();
-                else
-                    pc = ((PCChoiceGenerator)prev_cg).getCurrentPC();
-
-                pc._addDet(Comparator.GE, sym_v.length, new IntegerConstant(0));
-                ((PCChoiceGenerator) cg).setCurrentPC(pc);
-            }
-
-					} else {
+					else {
                         // the argument is of reference type and it is symbolic
 						if(lazy != null) {
 							if(lazy[0].equalsIgnoreCase("true")) {
