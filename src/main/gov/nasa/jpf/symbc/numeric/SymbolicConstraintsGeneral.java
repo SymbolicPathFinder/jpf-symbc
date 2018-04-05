@@ -3,16 +3,16 @@
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  *
- * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License, 
+ * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0. 
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
@@ -37,9 +37,9 @@
 
 package gov.nasa.jpf.symbc.numeric;
 
+import gov.nasa.jpf.symbc.Observations;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.solvers.*;
-//import gov.nasa.jpf.symbc.numeric.solvers.ProblemChoco2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,6 +114,8 @@ public class SymbolicConstraintsGeneral {
             pb = new ProblemCompare(pc, this);
         } else if (dp[0].equalsIgnoreCase("z3bitvector")) {
             pb = new ProblemZ3BitVector();
+        } else if (dp[0].equalsIgnoreCase("z3optimize")) {
+            pb = new ProblemZ3Optimize();
         }
         // added option to have no-solving
         // as a result symbolic execution will explore an over-approximation of the
@@ -126,6 +128,15 @@ public class SymbolicConstraintsGeneral {
                     "## Error: unknown decision procedure symbolic.dp=" + dp[0] + "\n(use choco or IAsolver or CVC3)");
 
         pb = PCParser.parse(pc, pb);
+
+        // YN: z3 optimize
+        if (Observations.lastObservedSymbolicExpression != null) {
+            if (pb instanceof ProblemZ3Optimize) {
+                ((ProblemZ3Optimize) pb).maximize(
+                        PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+            }
+        }
+
         if (pb == null)
             result = Boolean.FALSE;
         else
@@ -189,6 +200,8 @@ public class SymbolicConstraintsGeneral {
             ((ProblemZ3) pb).cleanup();
         } else if (pb instanceof ProblemZ3BitVector) {
             ((ProblemZ3BitVector) pb).cleanup();
+        } else if (pb instanceof ProblemZ3Optimize) {
+            ((ProblemZ3Optimize) pb).cleanup();
         }
     }
 
@@ -243,11 +256,11 @@ public class SymbolicConstraintsGeneral {
             /*
              * catch (Exception exp) { Boolean isSolvable = true; sym_intvar_mappings = symIntegerVar.entrySet(); i_int
              * = sym_intvar_mappings.iterator();
-             * 
+             *
              * while(i_int.hasNext() && isSolvable) { Entry<SymbolicInteger,Object> e = i_int.next(); SymbolicInteger
              * pcVar = e.getKey(); Object dpVar = e.getValue(); // cast pcVar.solution=(int)(pb.getRealValueInf(dpVar) +
              * pb.getRealValueSup(dpVar)) / 2; //(int)pcVar.solution_inf;
-             * 
+             *
              * pb.post(pb.eq(dpVar, pcVar.solution)); isSolvable = pb.solve(); if (isSolvable == null) isSolvable =
              * Boolean.FALSE; } if(!isSolvable) System.err.println("# Warning: PC "+pc.stringPC()
              * +" is solvable but could not find the solution!"); } // end catch

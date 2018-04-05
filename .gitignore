@@ -1,0 +1,13 @@
+.hg
+.hgignore
+local.properties
+.version
+nbproject/private/*
+build/*
+dist/*
+tmp/*
+trace
+*.class
+*.orig
+*~
+*.DS_Store

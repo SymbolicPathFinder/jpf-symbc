@@ -3,16 +3,16 @@
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  *
- * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License, 
+ * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0. 
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
@@ -49,14 +49,11 @@ import gov.nasa.jpf.symbc.numeric.solvers.IncrementalSolver;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemCoral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
-
-
-
-
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,7 +97,7 @@ public class PCParser {
       e_leftRef = ((BinaryLinearIntegerExpression)eRef).left;
       e_rightRef = ((BinaryLinearIntegerExpression)eRef).right;
     } else { // bin non lin expr
-      if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3BitVector || 
+      if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector ||
           pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
         opRef = ((BinaryNonLinearIntegerExpression)eRef).op;
         e_leftRef = ((BinaryNonLinearIntegerExpression)eRef).left;
@@ -136,7 +133,7 @@ public class PCParser {
         else if (e_rightRef instanceof IntegerConstant)
           return pb.mult(((IntegerConstant)e_rightRef).value,getExpression(e_leftRef));
         else {
-          if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3BitVector || 
+          if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize ||  pb instanceof ProblemZ3BitVector ||
           pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental)
             return pb.mult(getExpression(e_leftRef),getExpression(e_rightRef));
           else
@@ -150,7 +147,7 @@ public class PCParser {
         else if (e_rightRef instanceof IntegerConstant)
           return pb.div(getExpression(e_leftRef),((IntegerConstant)e_rightRef).value);
         else {
-          if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3BitVector || 
+          if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector ||
           pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental)
             return pb.div(getExpression(e_leftRef),getExpression(e_rightRef));
           else
@@ -164,12 +161,12 @@ public class PCParser {
         else if (e_rightRef instanceof IntegerConstant)
           return pb.rem(getExpression(e_leftRef),((IntegerConstant)e_rightRef).value);
         else {
-          if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3BitVector || 
+          if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector ||
           pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental)
             return pb.rem(getExpression(e_leftRef),getExpression(e_rightRef));
           else
             throw new RuntimeException("## Error: Binary Non Linear Operation");
-        }	
+        }
       case AND:
         if(e_leftRef instanceof IntegerConstant && e_rightRef instanceof IntegerConstant)
           throw new RuntimeException("## Error: this is not a symbolic expression"); //
@@ -501,7 +498,7 @@ public class PCParser {
     return true;
   }
 
-  //Added by Gideon, to handle CNF style constraints??? 
+  //Added by Gideon, to handle CNF style constraints???
   static public boolean createDPLinearOrIntegerConstraint (LogicalORLinearIntegerConstraints c) {
     List<Object> orList = new ArrayList<Object>();
 
@@ -513,7 +510,7 @@ public class PCParser {
       switch(c_compRef){
         case EQ:
           if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value == ((IntegerConstant) c_rightRef).value) 
+            if (((IntegerConstant) c_leftRef).value == ((IntegerConstant) c_rightRef).value)
               return true;
           }
           else if (c_leftRef instanceof IntegerConstant) {
@@ -541,7 +538,7 @@ public class PCParser {
           break;
         case NE:
           if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value != ((IntegerConstant) c_rightRef).value) 
+            if (((IntegerConstant) c_leftRef).value != ((IntegerConstant) c_rightRef).value)
               return true;
           }
           else if (c_leftRef instanceof IntegerConstant) {
@@ -569,7 +566,7 @@ public class PCParser {
           break;
         case LT:
           if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value < ((IntegerConstant) c_rightRef).value) 
+            if (((IntegerConstant) c_leftRef).value < ((IntegerConstant) c_rightRef).value)
               return true;
           }
           else if (c_leftRef instanceof IntegerConstant) {
@@ -912,7 +909,7 @@ public class PCParser {
   // Added by Aymeric to support symbolic Arrays
   public static boolean createArrayConstraint(ArrayConstraint cRef) {
     Comparator c_compRef = cRef.getComparator();
-    
+
     SelectExpression selex = null;
         StoreExpression stoex = null;
         IntegerExpression sel_right = null;
@@ -921,22 +918,22 @@ public class PCParser {
           selex = (SelectExpression)cRef.getLeft();
           sel_right = (IntegerExpression)cRef.getRight();
         } else if (cRef.getLeft() instanceof StoreExpression) {
-           stoex = (StoreExpression)cRef.getLeft(); 
+           stoex = (StoreExpression)cRef.getLeft();
            sto_right = (ArrayExpression)cRef.getRight();
         } else {
             throw new RuntimeException("ArrayConstraint is not select or store");
         }
-           
+
         switch(c_compRef) {
         case EQ:
 
             if (selex != null && sel_right != null) {
                 // The array constraint is a select
                 ArrayExpression ae = (ArrayExpression) selex.arrayExpression;
-                pb.post(pb.eq(pb.select(pb.makeArrayVar(ae.getName()), 
-                  (selex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)selex.indexExpression).value) : 
+                pb.post(pb.eq(pb.select(pb.makeArrayVar(ae.getName()),
+                  (selex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)selex.indexExpression).value) :
 getExpression(selex.indexExpression)),
-                  (sel_right instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)sel_right).value) : 
+                  (sel_right instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)sel_right).value) :
 getExpression(sel_right)));
                 break;
             }
@@ -944,10 +941,10 @@ getExpression(sel_right)));
                 // The array constraint is a store
                 ArrayExpression ae = (ArrayExpression) stoex.arrayExpression;
                 ArrayExpression newae = (ArrayExpression) sto_right;
-                pb.post(pb.eq(pb.store(pb.makeArrayVar(ae.getName()), 
-                  (stoex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)stoex.indexExpression).value) : 
-getExpression(stoex.indexExpression), 
-                  (stoex.value instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)stoex.value).value) :  
+                pb.post(pb.eq(pb.store(pb.makeArrayVar(ae.getName()),
+                  (stoex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)stoex.indexExpression).value) :
+getExpression(stoex.indexExpression),
+                  (stoex.value instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)stoex.value).value) :
 getExpression(stoex.value)),
                    pb.makeArrayVar(newae.getName())));
                 break;
@@ -957,7 +954,7 @@ getExpression(stoex.value)),
             if (selex != null && sel_right != null) {
                 // The array constraint is a select
                 ArrayExpression ae = (ArrayExpression) selex.arrayExpression;
-                pb.post(pb.neq(pb.select(pb.makeArrayVar(ae.getName()), getExpression(selex.indexExpression)), 
+                pb.post(pb.neq(pb.select(pb.makeArrayVar(ae.getName()), getExpression(selex.indexExpression)),
 getExpression(sel_right)));
                 break;
             }
@@ -965,7 +962,7 @@ getExpression(sel_right)));
                 // The array constraint is a store
                 ArrayExpression ae = (ArrayExpression)stoex.arrayExpression;
                 ArrayExpression newae = (ArrayExpression) sto_right;
-                pb.post(pb.neq(pb.store(pb.makeArrayVar(ae.getName()), getExpression(stoex.indexExpression), 
+                pb.post(pb.neq(pb.store(pb.makeArrayVar(ae.getName()), getExpression(stoex.indexExpression),
 getExpression(stoex.value)), newae));
                 break;
             }
@@ -974,8 +971,8 @@ getExpression(stoex.value)), newae));
             throw new RuntimeException("ArrayConstraint is not select or store");
         }
         return true;
-    }      
-    
+    }
+
 public static boolean createRealArrayConstraint(final RealArrayConstraint cRef) {
         final Comparator c_compRef = cRef.getComparator();
 
@@ -988,22 +985,22 @@ public static boolean createRealArrayConstraint(final RealArrayConstraint cRef) 
              selex = (SelectExpression)cRef.getLeft();
              sel_right = (RealExpression)cRef.getRight();
         } else if (cRef.getLeft() instanceof RealStoreExpression) {
-           stoex = (RealStoreExpression)cRef.getLeft(); 
+           stoex = (RealStoreExpression)cRef.getLeft();
            sto_right = (ArrayExpression)cRef.getRight();
         } else {
            throw new RuntimeException("ArrayConstraint is not select or store");
         }
-        
+
         switch(c_compRef) {
         case EQ:
 
             if (selex != null && sel_right != null) {
                 // The array constraint is a select
                 ArrayExpression ae = selex.arrayExpression;
-                pb.post(pb.eq(pb.realSelect(pb.makeRealArrayVar(ae.getName()), 
-                  (selex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)selex.indexExpression).value) : 
+                pb.post(pb.eq(pb.realSelect(pb.makeRealArrayVar(ae.getName()),
+                  (selex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)selex.indexExpression).value) :
 getExpression(selex.indexExpression)),
-                  (sel_right instanceof RealConstant) ? pb.makeRealConst(((RealConstant)sel_right).value) : 
+                  (sel_right instanceof RealConstant) ? pb.makeRealConst(((RealConstant)sel_right).value) :
 getExpression(sel_right)));
                 break;
             }
@@ -1011,10 +1008,10 @@ getExpression(sel_right)));
                 // The array constraint is a store
                 ArrayExpression ae = stoex.arrayExpression;
                 ArrayExpression newae = sto_right;
-                pb.post(pb.eq(pb.realStore(pb.makeRealArrayVar(ae.getName()), 
-                  (stoex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)stoex.indexExpression).value) : 
-getExpression(stoex.indexExpression), 
-                  (stoex.value instanceof RealConstant) ? pb.makeRealConst(((RealConstant)stoex.value).value) :  
+                pb.post(pb.eq(pb.realStore(pb.makeRealArrayVar(ae.getName()),
+                  (stoex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)stoex.indexExpression).value) :
+getExpression(stoex.indexExpression),
+                  (stoex.value instanceof RealConstant) ? pb.makeRealConst(((RealConstant)stoex.value).value) :
 getExpression(stoex.value)),
                    pb.makeRealArrayVar(newae.getName())));
                 break;
@@ -1024,7 +1021,7 @@ getExpression(stoex.value)),
             if (selex != null && sel_right != null) {
                 // The array constraint is a select
                 ArrayExpression ae = selex.arrayExpression;
-                pb.post(pb.neq(pb.realSelect(pb.makeRealArrayVar(ae.getName()), getExpression(selex.indexExpression)), 
+                pb.post(pb.neq(pb.realSelect(pb.makeRealArrayVar(ae.getName()), getExpression(selex.indexExpression)),
 getExpression(sel_right)));
                 break;
             }
@@ -1032,7 +1029,7 @@ getExpression(sel_right)));
                 // The array constraint is a store
                 ArrayExpression ae = stoex.arrayExpression;
                 ArrayExpression newae = sto_right;
-                pb.post(pb.neq(pb.realStore(pb.makeRealArrayVar(ae.getName()), getExpression(stoex.indexExpression), 
+                pb.post(pb.neq(pb.realStore(pb.makeRealArrayVar(ae.getName()), getExpression(stoex.indexExpression),
 getExpression(stoex.value)), newae));
                 break;
             }
@@ -1059,7 +1056,7 @@ getExpression(stoex.value)), newae));
       //If we use an incremental solver, then we push the context
       //*before* adding the constraint header
       ((IncrementalSolver)pb).push();
-      
+
       //Note that for an incremental solver
       //we only add the constraint header
       if(addConstraint(cRef) == false) {
@@ -1097,13 +1094,13 @@ getExpression(stoex.value)), newae));
       constraintResult= createDPLinearOrIntegerConstraint((LogicalORLinearIntegerConstraints)cRef);
 
     } else if (cRef instanceof ArrayConstraint) {
-        if (pb instanceof ProblemZ3 || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3BitVectorIncremental) {
+        if (pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3BitVectorIncremental) {
             constraintResult = createArrayConstraint((ArrayConstraint)cRef);
         } else {
             throw new RuntimeException("## Error : Array constraints only handled by z3. Try specifying a z3 instance as symbolic.dp");
         }
     } else if (cRef instanceof RealArrayConstraint) {
-        if (pb instanceof ProblemZ3 || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3BitVectorIncremental) { 
+        if (pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3BitVectorIncremental) {
             constraintResult = createRealArrayConstraint((RealArrayConstraint)cRef);
         } else {
             throw new RuntimeException("## Error : Array constraints only handled by z3. Try specifying a z3 instance as symbolic.dp");
@@ -1111,12 +1108,12 @@ getExpression(stoex.value)), newae));
     }
     else {
       //System.out.println("## Warning: Non Linear Integer Constraint (only coral or z3 can handle it)" + cRef);
-      if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental)
+      if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental)
         constraintResult= createDPNonLinearIntegerConstraint((NonLinearIntegerConstraint)cRef);
       else
         throw new RuntimeException("## Error: Non Linear Integer Constraint not handled " + cRef);
     }
-    
+
     return constraintResult; //false -> not sat
 
   }
