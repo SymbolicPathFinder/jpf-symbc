@@ -127,20 +127,29 @@ public class SymbolicConstraintsGeneral {
             throw new RuntimeException(
                     "## Error: unknown decision procedure symbolic.dp=" + dp[0] + "\n(use choco or IAsolver or CVC3)");
 
-        pb = PCParser.parse(pc, pb);
+        /*
+         * Parse path condition to solver. Note: do not override the actual pb
+         * variable in case the result is null. The cleanup afterwards will not
+         * work otherwise and the solver gets filled up with wrong assertions,
+         * e.g. with Z3.
+         */
+        ProblemGeneral tempPb = PCParser.parse(pc, pb);
 
-        // YN: z3 optimize
-        if (Observations.lastObservedSymbolicExpression != null) {
-            if (pb instanceof ProblemZ3Optimize) {
-                ((ProblemZ3Optimize) pb).maximize(
-                        PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
-            }
-        }
-
-        if (pb == null)
+        if (tempPb == null)
             result = Boolean.FALSE;
-        else
+        else {
+            pb = tempPb;
+
+            // YN: z3 optimize
+            if (Observations.lastObservedSymbolicExpression != null) {
+                if (pb instanceof ProblemZ3Optimize) {
+                    ((ProblemZ3Optimize) pb).maximize(
+                            PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+                }
+            }
+
             result = pb.solve();
+        }
 
         if (SymbolicInstructionFactory.debugMode)
             System.out.println("numeric PC: " + pc + " -> " + result + "\n");
