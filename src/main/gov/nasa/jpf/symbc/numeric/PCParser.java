@@ -1040,7 +1040,15 @@ getExpression(stoex.value)), newae));
         return true;
     }
 
-  // result is in pb
+  /**
+   * Merges the given path condition with the given ProblemGeneral object (i.e. the solver).
+   * Normally the merging means only adding the assertions from the path condition to the 
+   * solver's internal representation.
+   * 
+   * @param pc PathCondition
+   * @param pbtosolve ProblemGeneral
+   * @return the merged ProblemGener al object; NULL if problem is unsat
+   */
   public static ProblemGeneral parse(PathCondition pc, ProblemGeneral pbtosolve) {
     pb=pbtosolve;
 
