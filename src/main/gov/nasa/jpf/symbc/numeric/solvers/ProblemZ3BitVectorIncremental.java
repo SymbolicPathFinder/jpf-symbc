@@ -102,6 +102,11 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
     solver.pop();
   }
 
+  @Override
+  public void reset() {
+    solver.reset();
+  }
+
   public void cleanup() {
     // nothing to be done here
   }

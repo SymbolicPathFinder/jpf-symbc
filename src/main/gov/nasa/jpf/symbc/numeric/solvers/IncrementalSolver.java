@@ -20,4 +20,5 @@ package gov.nasa.jpf.symbc.numeric.solvers;
 public interface IncrementalSolver {
   public void push();
   public void pop();
+  public void reset();
 }

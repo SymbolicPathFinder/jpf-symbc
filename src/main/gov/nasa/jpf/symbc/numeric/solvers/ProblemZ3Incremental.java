@@ -89,6 +89,11 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
 
   }
 
+  @Override
+  public void reset() {
+    solver.reset();
+  }
+
   public void cleanup() {
     // nothing to be done here
   }

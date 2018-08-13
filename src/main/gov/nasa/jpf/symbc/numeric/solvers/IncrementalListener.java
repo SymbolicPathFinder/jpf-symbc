@@ -24,10 +24,12 @@ import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.VM;
 
 public class IncrementalListener extends PropertyListenerAdapter {
   
-  private IncrementalSolver solver;
+  public static IncrementalSolver solver;
   
   public IncrementalListener(Config config, JPF jpf) {
     String stringDp = SymbolicInstructionFactory.dp[0];
@@ -41,6 +43,14 @@ public class IncrementalListener extends PropertyListenerAdapter {
     }
 
   }
+  
+  @Override
+  public void choiceGeneratorAdvanced (VM vm, ChoiceGenerator<?> currentCG) {
+    if(currentCG instanceof PCChoiceGenerator) {
+      solver.push();
+    }
+  }
+  
   @Override
   public void stateBacktracked(Search search) {
     if(search.getVM().getSystemState().getChoiceGenerator() instanceof PCChoiceGenerator) {
