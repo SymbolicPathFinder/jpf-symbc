@@ -1117,7 +1117,7 @@ public class ProblemZ3 extends ProblemGeneral {
             if (temp instanceof com.microsoft.z3.RatNum) {
                 strResult = ((com.microsoft.z3.RatNum) temp).toDecimalString(10);
             }
-            return Double.parseDouble(strResult);
+            return Double.parseDouble(strResult.replace('?', '0'));
             // }
             // else {
             // assert false; // should not be reachable
