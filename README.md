@@ -7,3 +7,5 @@ The two copies will be kept in sync.
 To compile and run the tool you will also need jpf-core which can be downloaded from here:
 https://github.com/javapathfinder/jpf-core
 
+See related projects that use Symbolic PathFinder:
+https://github.com/isstac
