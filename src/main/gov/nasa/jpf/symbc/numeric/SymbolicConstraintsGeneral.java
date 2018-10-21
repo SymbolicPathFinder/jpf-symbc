@@ -41,10 +41,8 @@ import gov.nasa.jpf.symbc.Observations;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.solvers.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -53,15 +51,9 @@ import java.util.Map.Entry;
 // Warning: should never use / modify the types from pb:
 // types come in and out of each particular dp !!!!!!!!!!!!!!!
 
-/**
- * YN: added boolean to suppress console outputs (Yannic Noller <nolleryc@gmail.com>)
- */
 public class SymbolicConstraintsGeneral {
     protected ProblemGeneral pb;
     protected Boolean result; // tells whether result is satisfiable or not
-
-    /* YN: added boolean to suppress console outputs */
-    public static boolean suppressOutput = false;
 
     public boolean isSatisfiable(PathCondition pc) {
         if (pc == null || pc.count == 0) {
@@ -162,9 +154,6 @@ public class SymbolicConstraintsGeneral {
         }
 
         if (result == null) {
-            if (!suppressOutput) {
-                System.out.println("## Warning: timed out/ don't know (returned PC not-satisfiable) " + pc);
-            }
             return false;
         }
         if (result == Boolean.TRUE) {
@@ -187,9 +176,6 @@ public class SymbolicConstraintsGeneral {
             System.out.println(" --> " + pc + " -> " + result);
 
         if (result == null) {
-            if (!suppressOutput) {
-                System.out.println("## Warning: timed out/ don't know (returned PC not-satisfiable) " + pc);
-            }
             return false;
         }
         if (result == Boolean.TRUE) {
@@ -326,9 +312,6 @@ public class SymbolicConstraintsGeneral {
 
     }
 
-    /*
-     * YN: added this code from new version of PathCondition
-     */
     public Map<String, Object> solveWithValuation(PathCondition pc) {
         Map<String, Object> result = new HashMap<String, Object>();
 
@@ -354,8 +337,8 @@ public class SymbolicConstraintsGeneral {
                     Entry<SymbolicReal, Object> e = i_real.next();
                     SymbolicReal pcVar = e.getKey();
                     Object dpVar = e.getValue();
-                    double e_value = pb.getRealValue(dpVar);
-                    pcVar.solution = e_value; // may be undefined: throws an exception
+                    double e_value = pb.getRealValue(dpVar); // may be undefined: throws an exception
+                    pcVar.solution = e_value; 
                     result.put(pcVar.getName(), e_value);
                 }
             } catch (Exception exp) {
