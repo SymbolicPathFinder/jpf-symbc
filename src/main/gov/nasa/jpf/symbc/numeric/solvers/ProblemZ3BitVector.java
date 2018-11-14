@@ -1481,7 +1481,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 // TODO: decide on the precision when calling toDecimalString
                 strResult = ((com.microsoft.z3.RatNum) temp).toDecimalString(10);
             }
-            return Double.parseDouble(strResult);
+            //return Double.parseDouble(strResult);
+            return Double.parseDouble(strResult.replace('?', '0'));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: Exception caught in Z3 JNI: \n" + e);

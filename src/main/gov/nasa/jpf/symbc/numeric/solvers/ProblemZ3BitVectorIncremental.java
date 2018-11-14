@@ -1389,7 +1389,8 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
           strResult = ((com.microsoft.z3.RatNum)temp).toDecimalString(10);
         }
 
-        return Double.parseDouble(strResult);
+       // return Double.parseDouble(strResult);
+        return Double.parseDouble(strResult.replace('?', '0'));
       }
       else {
         assert false; // should not be reachable
