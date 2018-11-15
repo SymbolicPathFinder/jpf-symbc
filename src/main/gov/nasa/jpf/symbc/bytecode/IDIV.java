@@ -56,12 +56,14 @@ public class IDIV extends gov.nasa.jpf.jvm.bytecode.IDIV {
         // super.execute takes care of if(v1==0) return th.createAndThrowException ...
 
         if (sym_v1 == null) {
+        	
             Instruction next_insn = super.execute(th);
             if (sym_v2 != null) // result is symbolic expression
                 sf.setOperandAttr(sym_v2._div(v1));
             return next_insn;
         }
 
+       
         // div by zero check affects path condition
         // sym_v1 is non-null and should be checked against zero
 
@@ -86,8 +88,14 @@ public class IDIV extends gov.nasa.jpf.jvm.bytecode.IDIV {
             }
         }
 
-        super.execute(th); // pops v1, v2 and pushes r = v2 / v1;
-
+        //super.execute(th); // pops v1, v2 and pushes r = v2 / v1;
+        sf.pop();
+        sf.pop();
+        if(v1==0)
+        	sf.push(0);
+        else
+        	sf.push(v2/v1);
+        
         PathCondition pc;
         ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
 
@@ -102,7 +110,7 @@ public class IDIV extends gov.nasa.jpf.jvm.bytecode.IDIV {
             pc._addDet(Comparator.EQ, sym_v1, 0);
             if (pc.simplify()) { // satisfiable
                 ((PCChoiceGenerator) cg).setCurrentPC(pc);
-
+                
                 return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
             } else {
                 th.getVM().getSystemState().setIgnored(true);
