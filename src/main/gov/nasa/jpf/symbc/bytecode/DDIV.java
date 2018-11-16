@@ -56,6 +56,7 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
 
     @Override
     public Instruction execute(ThreadInfo th) {
+    	//System.out.println("here");
         StackFrame sf = th.getModifiableTopFrame();
 
         RealExpression sym_v1 = (RealExpression) sf.getOperandAttr(1);
@@ -64,10 +65,24 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
         double v2 = sf.peekDouble(2);
         // super.execute should take care of if(v1==0) return th.createAndThrowException
         // (BUT IT DOESN'T)...
-        if (v1 == 0)
-            return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
+       // if (v1 == 0.0)
+         //   return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
         if (sym_v1 == null) {
-            Instruction next_insn = super.execute(th);
+            //Instruction next_insn = super.execute(th);
+        	sf.popDouble();
+            sf.popDouble();
+            
+            if (v1 == 0.0) {
+                //return ti.createAndThrowException("java.lang.ArithmeticException",
+                //                                  "division by zero");
+            	System.err.println("division by 0.0 NAN");
+            }
+
+            double r = v2 / v1;
+            
+            sf.pushDouble(r);
+            Instruction next_insn = getNext(th);
+            
             if (sym_v2 != null) // result is symbolic expression
                 sf.setLongOperandAttr(sym_v2._div(v1));
             return next_insn;
@@ -116,7 +131,8 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
             pc._addDet(Comparator.EQ, sym_v1, 0);
             if (pc.simplify()) { // satisfiable
                 ((PCChoiceGenerator) cg).setCurrentPC(pc);
-
+                System.err.println("division by 0.0 NAN");
+                assert false;
                 return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
             } else {
                 th.getVM().getSystemState().setIgnored(true);
