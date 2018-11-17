@@ -81,6 +81,15 @@ public class StringConstraint {
 //	    right.addRelationship(this);
 	  }
 
+    public StringConstraint(StringConstraint original) {
+      left = original.left;
+      comp = original.comp;
+      right = original.right;
+      if (original.and!= null){
+        and = new StringConstraint(original.and);
+      }
+    }
+
   public Set<StringExpression> getOperands() {
     Set<StringExpression> operands = new HashSet<StringExpression>();
     operands.add(right);
@@ -178,6 +187,10 @@ public class StringConstraint {
 	    if (and!=null) and.accept(visitor);
 			visitor.postVisit(this);
 	}
+
+  public StringConstraint not() {
+      return new StringConstraint(getLeft(), getComparator().not(), getRight());
+  }
 
 	public void accept(CollectVariableVisitor visitor) {
 		visitor.preVisit(this);
