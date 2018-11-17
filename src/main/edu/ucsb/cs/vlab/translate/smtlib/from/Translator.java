@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import edu.ucsb.cs.vlab.translate.smtlib.Results;
 import edu.ucsb.cs.vlab.translate.smtlib.TranslationManager;
 import gov.nasa.jpf.symbc.numeric.Constraint;
+import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.StringConstraint;
 import gov.nasa.jpf.symbc.string.StringPathCondition;
 
@@ -25,6 +26,10 @@ public class Translator<Manager extends TranslationManager> {
 
 	public String translate(final StringPathCondition spc) {
 		return translate(spc, new HashSet<String>(), new HashSet<String>());
+	}
+	
+	public String translate(final PathCondition pc) {
+		return translate(pc, new HashSet<String>(), new HashSet<String>());
 	}
 	
 	public String translate(final StringPathCondition spc, final HashSet<String> additional_declaration, final HashSet<String> additional_assertions) {	
@@ -45,6 +50,51 @@ public class Translator<Manager extends TranslationManager> {
 		
 		ArrayList<String> decls = new ArrayList<String>(Arrays.asList(
 			symbolicStringDeclarations(Results.stringVariables),
+		        symbolicNumericDeclarations(Results.numericVariables)
+		));
+		
+		String predecls = decls.stream().collect(Collectors.joining("\n"));
+
+		for(final String added : additional_declaration) {
+			String[] a = added.trim().split(" ");
+			String fixedLeft = a[0].replace('(', '_').replace(')', '_');
+			if (!Results.stringVariables.contains(fixedLeft)) {
+        			String proposal = "(declare-fun " + fixedLeft + " ()";
+        			String typing = " " + (a.length > 1 ? a[1] : "Int") + ")";
+        			if(predecls.indexOf(proposal) == -1)
+        				decls.add(0, proposal + typing);
+			}
+		}
+
+
+		String declarations = decls.stream().collect(Collectors.joining("\n"));
+		
+		final String footer = getFooter();
+		
+		final String result = unwrap(header + "\n" + declarations + assertions + "\n" + footer);
+		
+		//System.out.println("Translating:");
+		//System.out.println(result);
+//		System.out.println();
+		
+		return result;
+	}
+	
+	public String translate(final PathCondition pc, final HashSet<String> additional_declaration, final HashSet<String> additional_assertions) {	
+		final Constraint npc = pc.header;
+
+		final String header = getHeader();
+		
+		// translate the constraints
+
+		final String assertions = Arrays.asList(
+			additional_assertions.stream().collect(Collectors.joining("\n")),
+		        manager.numCons.collect(npc)
+		).stream().collect(Collectors.joining("\n"));
+
+		// pull out the declarations
+		
+		ArrayList<String> decls = new ArrayList<String>(Arrays.asList(
 		        symbolicNumericDeclarations(Results.numericVariables)
 		));
 		

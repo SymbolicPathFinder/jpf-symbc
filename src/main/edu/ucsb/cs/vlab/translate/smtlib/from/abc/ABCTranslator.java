@@ -107,8 +107,8 @@ class Manager extends TranslationManager {
 		public void init() {
 			map(StringComparator.CONTAINS, "(contains");
 			map(StringComparator.NOTCONTAINS, "(not (contains");
-			map(StringComparator.STARTSWITH, "(startsWith");
-			map(StringComparator.NOTSTARTSWITH, "(not (startsWith");
+			map(StringComparator.STARTSWITH, "(StartsWith");
+			map(StringComparator.NOTSTARTSWITH, "(not (StartsWith");
 			map(StringComparator.ENDSWITH, "(endsWith");
 			map(StringComparator.NOTENDSWITH, "(not (endsWith");
 			map(StringComparator.EQUALS, "(=");
@@ -117,8 +117,8 @@ class Manager extends TranslationManager {
 			map(StringComparator.NOTEQUALSIGNORECASE, "(not (equalsIgnoreCase");
 			map(StringComparator.EMPTY, "(empty");
 			map(StringComparator.NOTEMPTY, "(not (empty");
-			map(StringComparator.MATCHES, "(matches");
-			map(StringComparator.NOMATCHES, "(not (matches");
+			map(StringComparator.MATCHES, "(in");
+			map(StringComparator.NOMATCHES, "(not (in");
 			map(StringComparator.REGIONMATCHES, "(regionMatches");
 			map(StringComparator.NOREGIONMATCHES, "(not (regionMatches");
 			map(StringComparator.ISINTEGER, "(isInteger");
@@ -162,6 +162,10 @@ class Manager extends TranslationManager {
 			};
 
 			map(StringOrOperation.NONSYM, (expr) -> {
+				if( ((StringConstant) expr).reg ) {
+					// Strip the double quotes around the string constant if it's a regular expression.
+					return ((StringConstant) expr).value;
+				}
 				return "\"" + ((StringConstant) expr).value + "\"";
 			});
 
