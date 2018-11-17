@@ -56,14 +56,20 @@ import java.util.Map;
 
 public class StringConstant extends StringExpression {
 	  public String value;
+	  public boolean reg = false; //Added flag to determine if the constant is used in a regular expression
 
 	  public StringConstant(String s) {
 	    value = s;
 	  }
 
+	  public StringConstant(String s, boolean reg) {
+ 		  value = s;
+ 		  this.reg = reg;
+ 	  }
+
 	   public StringConstant clone() {
 		  String newVal = new String(this.value);
-		  return new StringConstant(newVal);
+		  return new StringConstant(newVal, this.reg);
 	  }
 
 	  public StringExpression _concat(String s) {
