@@ -1404,6 +1404,31 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     }
 
     @Override
+    public Object makeIntConst(long value) {
+        checkBounds(value);
+        try {
+            return ctx.mkBV(value, this.bitVectorLength);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3 : Exception caught in Z3 JNI: " + e);
+        }
+    }
+
+    @Override
+    public Object makeRealConst(double value) {
+        try {
+            if (useFpForReals) {
+                FPSort sort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                return ctx.mkFPNumeral(value, sort);
+            }
+            return ctx.mkReal("" + value);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3 : Exception caught in Z3 JNI: " + e);
+        }
+    }
+
+    @Override
     public Object mixed(Object exp1, Object exp2) {
         BitVecExpr bvExpr = null;
         bvExpr = (exp1 instanceof BitVecExpr ? ((BitVecExpr) exp1) : ((BitVecExpr) exp2));
