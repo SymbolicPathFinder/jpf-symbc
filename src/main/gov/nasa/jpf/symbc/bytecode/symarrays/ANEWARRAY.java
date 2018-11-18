@@ -34,11 +34,13 @@ import gov.nasa.jpf.vm.ClassLoaderInfo;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.Heap;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LoadOnJPFRequired;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.Types;
 
 /**
- * Symbolic version of the NEWARRAY class from jpf-core. Has some extra code to
+ * Symbolic version of the ANEWARRAY class from jpf-core. Has some extra code to
  * detect if a symbolic variable is being used as the size of the new array, and
  * treat it accordingly.
  * 
@@ -48,50 +50,22 @@ import gov.nasa.jpf.vm.ThreadInfo;
  * 
  */
 
-public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
+public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
 
-	public NEWARRAY(int typeCode) {
-    	super(typeCode);
+	public ANEWARRAY(String typeDescriptor) {
+    	super(typeDescriptor);
     }
 	
 	@Override
 	public Instruction execute( ThreadInfo ti) {
-		/*
-		StackFrame frame = ti.getModifiableTopFrame();
-
-	    arrayLength = frame.pop();
-	    Heap heap = ti.getHeap();
-
-	    if (arrayLength < 0){
-	      return ti.createAndThrowException("java.lang.NegativeArraySizeException");
-	    }
-
-	    // there is no clinit for array classes, but we still have  to create a class object
-	    // since its a builtin class, we also don't have to bother with NoClassDefFoundErrors
-	    String clsName = "[" + type;
-	    ClassInfo ci = ClassLoaderInfo.getCurrentResolvedClassInfo(clsName);
-
-	    if (!ci.isRegistered()) {
-	      ci.registerClass(ti);
-	      ci.setInitialized();
-	    }
-	   
-	    if (heap.isOutOfMemory()) { // simulate OutOfMemoryError
-	      return ti.createAndThrowException("java.lang.OutOfMemoryError",
-	                                        "trying to allocate new " +
-	                                          getTypeName() +
-	                                        "[" + arrayLength + "]");
-	    }
-	    
-	    ElementInfo eiArray = heap.newArray(type, arrayLength, ti);
-	    int arrayRef = eiArray.getObjectRef();
-	    
-	    frame.pushRef(arrayRef);
-
-	    return getNext(ti);
-		*/
-		// old code
-	    // Corina: incorrect
+    String compType = Types.getTypeName(type);
+    if (Types.isReferenceSignature(type)) {
+      try {
+        ti.resolveReferencedClass(compType);
+      } catch (LoadOnJPFRequired lre) {
+        return ti.getPC();
+      }
+    }
 	    
 		StackFrame sf = ti.getModifiableTopFrame();
 		Object attr = sf.getOperandAttr();
@@ -124,6 +98,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
             assert pc != null;
 
             if ((Integer)cg.getNextChoice() == 0) {
+                // Checks if the length can be negative. If so, it is an error
                 pc._addDet(Comparator.LT, (IntegerExpression)attr, new IntegerConstant(0));
                 if (pc.simplify()) {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
@@ -133,6 +108,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
                     return getNext(ti);
                 }
             } else {
+                // Ensures that the length of the array is positive
                 pc._addDet(Comparator.GE, (IntegerExpression)attr, new IntegerConstant(0));
                 if (pc.simplify()) {
                     ((PCChoiceGenerator) cg).setCurrentPC(pc);
@@ -176,10 +152,10 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
 	    
 	    sf.pushRef(arrayRef);
 	    
-      // We create the initial array
+      // We create the initial symbolic array expression
 
       if (attr instanceof IntegerExpression) {
-          arrayAttr = new ArrayExpression(eiArray.toString());
+          arrayAttr = new ArrayExpression(eiArray.toString(), type);
           pc._addDet(Comparator.EQ, arrayAttr.length, (IntegerExpression)attr);
           pc.arrayExpressions.put(arrayAttr.getRootName(), arrayAttr);
           // TODO: Initialize all elements to 0

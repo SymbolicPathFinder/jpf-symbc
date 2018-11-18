@@ -530,6 +530,10 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 		  return (filter.isPassing(ci) ? (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.NEWARRAY(typeCode) : new NEWARRAY(typeCode) : super.newarray(typeCode));
 	      }
 
+	  public Instruction anewarray(String typeDescriptor) {
+		  return (filter.isPassing(ci) && (symArrays) ? new gov.nasa.jpf.symbc.bytecode.symarrays.ANEWARRAY(typeDescriptor) : super.anewarray(typeDescriptor));
+	      }
+
 	  public Instruction multianewarray(String clsName, int dimensions){
 		  return (filter.isPassing(ci) ? new MULTIANEWARRAY(clsName,dimensions) : super.multianewarray(clsName,dimensions));
 	      }
