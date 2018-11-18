@@ -1160,6 +1160,21 @@ public class ProblemZ3 extends ProblemGeneral {
     }
 
     @Override
+    public Object init_array(Object exp1, Object exp2) {
+      try {
+        // forall i. exp1[i] == exp2
+        Expr[] foralls = new Expr[1];
+        String name = ((ArrayExpr)exp1).toString() + "!init";
+        foralls[0] = ctx.mkIntConst(name); 
+        Expr body = ctx.mkEq(ctx.mkSelect((ArrayExpr)exp1, (IntExpr)foralls[0]), (IntExpr)exp2);
+        return ctx.mkForall(foralls, body, 1, null, null, null, null);
+      } catch (Exception e) {
+          e.printStackTrace();
+          throw new RuntimeException("## Error Z3 : Exception caught in Z3 JNI: " + e);
+      }
+    }
+
+    @Override
     public Object makeIntConst(long value) {
         try {
             return ctx.mkInt(value);

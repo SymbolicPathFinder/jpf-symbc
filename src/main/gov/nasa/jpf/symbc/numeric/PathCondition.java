@@ -45,6 +45,7 @@ import java.util.Map;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.arrays.ArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
+import gov.nasa.jpf.symbc.arrays.InitExpression;
 import gov.nasa.jpf.symbc.arrays.RealArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.RealStoreExpression;
 import gov.nasa.jpf.symbc.arrays.StoreExpression;
@@ -142,6 +143,14 @@ public class PathCondition implements Comparable<PathCondition> {
         flagSolved = false;
         t  = new RealArrayConstraint(se, c, ae);
         prependUnlessRepeated(t);
+    }
+
+    //Added by Aymeric
+    public void _initializeArray(InitExpression ie, ArrayExpression ae) {
+      Constraint t;
+      flagSolved = false;
+      t = new ArrayConstraint(ie, Comparator.EQ, ae);
+      prependUnlessRepeated(t);
     }
 
     // Added by Gideon

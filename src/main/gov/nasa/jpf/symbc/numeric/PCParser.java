@@ -40,6 +40,7 @@ package gov.nasa.jpf.symbc.numeric;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.arrays.ArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
+import gov.nasa.jpf.symbc.arrays.InitExpression;
 import gov.nasa.jpf.symbc.arrays.RealArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.RealStoreExpression;
 import gov.nasa.jpf.symbc.arrays.SelectExpression;
@@ -914,14 +915,17 @@ public class PCParser {
         StoreExpression stoex = null;
         IntegerExpression sel_right = null;
         ArrayExpression sto_right = null;
+        InitExpression initex = null;
         if (cRef.getLeft() instanceof SelectExpression) {
           selex = (SelectExpression)cRef.getLeft();
           sel_right = (IntegerExpression)cRef.getRight();
         } else if (cRef.getLeft() instanceof StoreExpression) {
            stoex = (StoreExpression)cRef.getLeft();
            sto_right = (ArrayExpression)cRef.getRight();
+        } else if (cRef.getLeft() instanceof InitExpression) {
+           initex = (InitExpression)cRef.getLeft();
         } else {
-            throw new RuntimeException("ArrayConstraint is not select or store");
+            throw new RuntimeException("ArrayConstraint is not select or store or init");
         }
 
         switch(c_compRef) {
@@ -949,7 +953,14 @@ getExpression(stoex.value)),
                    pb.makeArrayVar(newae.getName())));
                 break;
             }
-            throw new RuntimeException("ArrayConstraint is not correct select or store");
+            if (initex != null) {
+              // The array constraint is an initialization
+              ArrayExpression ae = (ArrayExpression) initex.arrayExpression;
+              IntegerConstant init_value = new IntegerConstant(initex.isRef? -1 : 0);
+              pb.post(pb.init_array(pb.makeArrayVar(ae.getName()), pb.makeIntConst(init_value.value)));
+              break;
+            }
+            throw new RuntimeException("ArrayConstraint is not correct select or store or init");
         case NE:
             if (selex != null && sel_right != null) {
                 // The array constraint is a select

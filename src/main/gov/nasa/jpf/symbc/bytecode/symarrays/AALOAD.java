@@ -316,7 +316,7 @@ public class AALOAD extends gov.nasa.jpf.jvm.bytecode.AALOAD {
                 return getNext(ti);
             }
           } else {
-                HelperResult hpResult = Helper.addNewArrayHeapNode(typeClassInfo, ti, arrayAttr, pcHeap, symInputHeap, numSymRefs, prevSymRefs, false, indexAttr, arrayRef);
+                HelperResult hpResult = Helper.addNewArrayHeapNode(typeClassInfo, ti, arrayAttr, pc, symInputHeap, numSymRefs, prevSymRefs, false, indexAttr, arrayRef);
                 daIndex = hpResult.idx;
                 HeapNode candidateNode = hpResult.n;
                 // Since the object is different from all the previously initialized ones, we don't need to add constraints
