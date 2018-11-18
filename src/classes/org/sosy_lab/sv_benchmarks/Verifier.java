@@ -1,6 +1,8 @@
 package org.sosy_lab.sv_benchmarks;
 
 import gov.nasa.jpf.symbc.Debug;
+import gov.nasa.jpf.vm.Verify;
+
 import java.util.Random;
 
 public final class Verifier {
@@ -12,7 +14,8 @@ public final class Verifier {
   }
   
   public static boolean nondetBoolean() {
-    return Debug.makeSymbolicBoolean("bool"+counter++);
+    //return Debug.makeSymbolicBoolean("bool"+counter++);
+	return Verify.randomBool();
   }
   
   public static byte nondetByte() {
