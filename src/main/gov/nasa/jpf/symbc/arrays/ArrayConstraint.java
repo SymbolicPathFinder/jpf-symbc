@@ -33,11 +33,17 @@ public class ArrayConstraint extends Constraint {
         super(se, c, ae);
     }
 
+    public ArrayConstraint(InitExpression ie, Comparator c, ArrayExpression ae) {
+      super(ie, c, ae);
+    }
+
     public Constraint copy() {
         if (this.getLeft() instanceof SelectExpression) {
             return new ArrayConstraint((SelectExpression)getLeft(), getComparator(), (IntegerExpression)getRight());
-        } else {
+        } else if (this.getLeft() instanceof StoreExpression) {
             return new ArrayConstraint((StoreExpression)getLeft(), getComparator(), (ArrayExpression)getRight());
+        } else {
+            return new ArrayConstraint((InitExpression)getLeft(), getComparator(), (ArrayExpression)getRight());
         }
     }
 
@@ -48,7 +54,7 @@ public class ArrayConstraint extends Constraint {
             try {
                 return new ArrayConstraint((StoreExpression)super.getLeft(), getComparator().not(), (ArrayExpression)getRight());
             } catch (Exception r) {
-                throw new RuntimeException("ArrayConstraint is not select or store");
+                throw new RuntimeException("Negation of an arrayConstraint that is not select or store");
             }
         }
     }

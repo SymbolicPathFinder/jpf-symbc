@@ -182,7 +182,6 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
           arrayAttr = new ArrayExpression(eiArray.toString());
           pc._addDet(Comparator.EQ, arrayAttr.length, (IntegerExpression)attr);
           pc.arrayExpressions.put(arrayAttr.getRootName(), arrayAttr);
-          // TODO: Initialize all elements to 0
       }
       sf.setOperandAttr(arrayAttr);
 

@@ -207,6 +207,10 @@ public abstract class ProblemGeneral{
       throw new RuntimeException("## Error : Real store array expressions not supported");
   }
 
+  public Object init_array(Object exp1, Object exp2) {
+      throw new RuntimeException("## Error : Array initialization not supported");
+  }
+
   public Object makeIntConst(long value) {
       throw new RuntimeException("## Error : makeIntConst not supported");
   }

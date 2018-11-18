@@ -22,6 +22,7 @@ package gov.nasa.jpf.symbc.bytecode.symarrays;
 
 
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
+import gov.nasa.jpf.symbc.arrays.InitExpression;
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
@@ -158,7 +159,8 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
           arrayAttr = new ArrayExpression(eiArray.toString(), type);
           pc._addDet(Comparator.EQ, arrayAttr.length, (IntegerExpression)attr);
           pc.arrayExpressions.put(arrayAttr.getRootName(), arrayAttr);
-          // TODO: Initialize all elements to 0
+          // Initialize all elements to null (i.e. -1)
+          pc._initializeArray(new InitExpression(arrayAttr, true), arrayAttr);
       }
       sf.setOperandAttr(arrayAttr);
 
