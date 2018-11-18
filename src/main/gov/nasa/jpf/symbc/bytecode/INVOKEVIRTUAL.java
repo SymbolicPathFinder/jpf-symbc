@@ -19,7 +19,7 @@ package gov.nasa.jpf.symbc.bytecode;
 
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
-port gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.MethodInfo;
 import gov.nasa.jpf.vm.ThreadInfo;
 
