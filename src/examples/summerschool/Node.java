@@ -25,11 +25,13 @@ public class Node {
 	Node next;
 
 	Node swapNode() {
+		
 		if(next!=null) 
 			if(elem>next.elem) {
 				Node t = next;
 				next = t.next;
 				t.next=this;
+				assert elem < t.next.elem;
 				return t;
 			}
 		return this;
