@@ -316,7 +316,7 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
             int stringRef) {
         String name = env.getStringObject(stringRef);
         env.setReturnAttribute(new StringSymbolic(name));
-        return env.newString("");
+        return env.newString("WWWWW's Birthday is 12-17-77");
     }
 
     // public static int makeSymbolicRef(MJIEnv env, int objRef, int stringRef, int objvRef) {
