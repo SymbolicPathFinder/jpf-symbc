@@ -69,7 +69,7 @@ public class GETFIELD extends gov.nasa.jpf.jvm.bytecode.GETFIELD {
 	    StackFrame frame = ti.getModifiableTopFrame();
 	    int objRef = frame.peek(); // don't pop yet, we might re-enter
 	    lastThis = objRef;
-	    if (objRef == -1) {
+	    if (objRef == MJIEnv.NULL) {
 	      return ti.createAndThrowException("java.lang.NullPointerException",
 	                                        "referencing field '" + fname + "' on null object");
 	    }
