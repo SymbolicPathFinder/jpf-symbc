@@ -571,6 +571,8 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
         return ctx.mkBVAdd((BitVecExpr) exp1, (BitVecExpr) exp2);
       } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
         return ctx.mkAdd((IntExpr) exp1, (IntExpr) exp2);
+      } else if (exp1 instanceof RealExpr && exp2 instanceof RealExpr) {
+          return ctx.mkAdd((RealExpr) exp1, (RealExpr) exp2);
       } else {
         throw new RuntimeException();
       }
