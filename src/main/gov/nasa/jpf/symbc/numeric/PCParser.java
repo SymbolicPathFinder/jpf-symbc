@@ -69,11 +69,13 @@ import java.util.Map.Entry;
 
 public class PCParser {
   static ProblemGeneral pb;
-  static public Map<SymbolicReal, Object>	symRealVar; // a map between symbolic real variables and DP variables
-  static Map<SymbolicInteger,Object>	symIntegerVar; // a map between symbolic variables and DP variables
+  static public Map<SymbolicReal, Object>	symRealVar =new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
+  static Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>(); // a map between symbolic variables and DP variables
   //static Boolean result; // tells whether result is satisfiable or not
   static int tempVars = 0; //Used to construct "or" clauses
 
+
+  
   //	 Converts IntegerExpression's into DP's IntExp's
   static Object getExpression(IntegerExpression eRef) {
     assert eRef != null;
@@ -1064,17 +1066,18 @@ getExpression(stoex.value)), newae));
     pb=pbtosolve;
 
 
-    symRealVar = new HashMap<SymbolicReal,Object>();
-    symIntegerVar = new HashMap<SymbolicInteger,Object>();
+    //symRealVar = new HashMap<SymbolicReal,Object>();
+    //symIntegerVar = new HashMap<SymbolicInteger,Object>();
     //result = null;
-    tempVars = 0;
+    //tempVars = 0;
 
     Constraint cRef = pc.header;
 
     if(pb instanceof IncrementalSolver) {
       //If we use an incremental solver, then we push the context
       //*before* adding the constraint header
-      ((IncrementalSolver)pb).push();
+    	//Corina: not needed as the push is done in the listener
+      //((IncrementalSolver)pb).push();
 
       //Note that for an incremental solver
       //we only add the constraint header
