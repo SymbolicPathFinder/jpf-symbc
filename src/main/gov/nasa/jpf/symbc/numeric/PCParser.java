@@ -1066,10 +1066,10 @@ getExpression(stoex.value)), newae));
     pb=pbtosolve;
 
 
-    //symRealVar = new HashMap<SymbolicReal,Object>();
-    //symIntegerVar = new HashMap<SymbolicInteger,Object>();
+    symRealVar = new HashMap<SymbolicReal,Object>();
+    symIntegerVar = new HashMap<SymbolicInteger,Object>();
     //result = null;
-    //tempVars = 0;
+    tempVars = 0;
 
     Constraint cRef = pc.header;
 
