@@ -170,10 +170,6 @@ public class BytecodeUtils {
      * 
      * @param invInst
      *            The instance of INVOKESPECIAL, INVOKESTATIC, or INVOKEVIRTUAL
-     * @param ss
-     *            The VM's system state
-     * @param ks
-     *            The VM's kernel state
      * @param th
      *            The current thread info
      * @return an InstructionOrSuper instance saying what to do next.
@@ -231,7 +227,7 @@ public class BytecodeUtils {
             // create a choice generator to associate the precondition with it
             ChoiceGenerator<?> cg = null;
             if (invInst.getInvokedMethod().getAnnotation("gov.nasa.jpf.symbc.Preconditions") != null
-                    || conf.getStringArray("symbolic.arrays") != null) {
+                    || conf.getStringArray("symbolic.arrays") != null || conf.getInt("veritestingMode") > 1) {
                 if (!th.isFirstStepInsn()) { // first time around
                     cg = new PCChoiceGenerator(1);
                     th.getVM().setNextChoiceGenerator(cg);

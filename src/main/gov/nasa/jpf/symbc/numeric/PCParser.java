@@ -37,6 +37,7 @@
 
 package gov.nasa.jpf.symbc.numeric;
 
+import com.microsoft.z3.Expr;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.arrays.ArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
@@ -63,6 +64,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import za.ac.sun.cs.green.expr.IntVariable;
+import za.ac.sun.cs.green.expr.RealVariable;
+import za.ac.sun.cs.green.expr.VisitorException;
 
 
 // parses PCs
@@ -71,7 +75,14 @@ public class PCParser {
   static ProblemGeneral pb;
   static public Map<SymbolicReal, Object>	symRealVar =new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
   static Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>(); // a map between symbolic variables and DP variables
+    static Map<IntVariable,Object>	intVariableMap; // a map between symbolic variables and DP variables
+    static Map<RealVariable,Object>	realVariableMap; // a map between symbolic variables and DP variables
+
   //static Boolean result; // tells whether result is satisfiable or not
+  // We need these maps to keep track of sym. variable mappings for variables sent previously to the solver,
+  // when using incremental solving.
+  static final Map<SymbolicInteger, Object> globalsymIntegerVar = new HashMap<>();
+  static final Map<IntVariable, Object> globalintVariableMap = new HashMap<>();
   static int tempVars = 0; //Used to construct "or" clauses
 
 
@@ -1063,11 +1074,14 @@ getExpression(stoex.value)), newae));
    * @return the merged ProblemGener al object; NULL if problem is unsat
    */
   public static ProblemGeneral parse(PathCondition pc, ProblemGeneral pbtosolve) {
+      saveGlobalVarMaps();
     pb=pbtosolve;
 
 
-    symRealVar = new HashMap<SymbolicReal,Object>();
-    symIntegerVar = new HashMap<SymbolicInteger,Object>();
+        symRealVar = new HashMap<SymbolicReal,Object>();
+        symIntegerVar = new HashMap<SymbolicInteger,Object>();
+        intVariableMap = new HashMap<IntVariable,Object>();
+        realVariableMap = new HashMap<RealVariable,Object>();
     //result = null;
     tempVars = 0;
 
@@ -1096,6 +1110,33 @@ getExpression(stoex.value)), newae));
     }
 
     return pb;
+  }
+
+  private static void saveGlobalVarMaps() {
+    if (symIntegerVar != null) {
+      populateGlobalSymInt();
+    }
+    if (intVariableMap != null) {
+      populateGlobalIntVar();
+    }
+  }
+
+  private static void populateGlobalSymInt() {
+    Set<Map.Entry<SymbolicInteger, Object>> sym_intvar_mappings = PCParser.symIntegerVar.entrySet();
+    Iterator<Map.Entry<SymbolicInteger, Object>> i_int = sym_intvar_mappings.iterator();
+    while (i_int.hasNext()) {
+      Map.Entry<SymbolicInteger, Object> e = i_int.next();
+      globalsymIntegerVar.put(e.getKey(), e.getValue());
+    }
+  }
+
+  private static void populateGlobalIntVar() {
+    Set<Map.Entry<IntVariable, Object>> intvar_mappings = PCParser.intVariableMap.entrySet();
+    Iterator<Map.Entry<IntVariable, Object>> i_int = intvar_mappings.iterator();
+    while (i_int.hasNext()) {
+      Map.Entry<IntVariable, Object> e = i_int.next();
+      globalintVariableMap.put(e.getKey(), e.getValue());
+    }
   }
 
   private static boolean addConstraint(Constraint cRef) {
@@ -1130,13 +1171,32 @@ getExpression(stoex.value)), newae));
     }
     else {
       //System.out.println("## Warning: Non Linear Integer Constraint (only coral or z3 can handle it)" + cRef);
-      if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental)
-        constraintResult= createDPNonLinearIntegerConstraint((NonLinearIntegerConstraint)cRef);
-      else
-        throw new RuntimeException("## Error: Non Linear Integer Constraint not handled " + cRef);
+        if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize ||
+                pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental ||
+                pb instanceof ProblemZ3BitVectorIncremental)
+            if (cRef instanceof GreenConstraint)
+                constraintResult = createDPGreenConstraint((GreenConstraint) cRef);
+            else
+                constraintResult= createDPNonLinearIntegerConstraint((NonLinearIntegerConstraint)cRef);
+        else
+            throw new RuntimeException("## Error: Non Linear Integer Constraint not handled " + cRef);
     }
 
     return constraintResult; //false -> not sat
 
+  }
+
+  private static boolean createDPGreenConstraint(GreenConstraint cRef) {
+    //ProblemZ3BitVector greenPb = new ProblemZ3BitVector();
+    GreenPbTranslator greenPbTranslator = new GreenPbTranslator();
+    try {
+      cRef.getExp().accept(greenPbTranslator);
+    }
+    catch (VisitorException e1) {
+      System.out.println("Error in translation to Z3");
+    }
+    Expr result = (Expr) greenPbTranslator.getTranslation() ;
+    pb.post(result);
+    return true;
   }
 }

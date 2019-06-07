@@ -37,8 +37,10 @@
 
 package gov.nasa.jpf.symbc.numeric.solvers;
 
+import java.io.*;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import com.microsoft.z3.*;
@@ -336,14 +338,16 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         }
     }
 
-    // public Object not(Object exp1){
-    // try{
-    // return ctx.mkNot((BoolExpr)exp1);
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // throw new RuntimeException("## Error Z3: not(Object) failed.\n" + e);
-    // }
-    // }
+    public Object logical_not(Object exp){
+        try{
+            if(exp instanceof BoolExpr)
+                return ctx.mkNot((BoolExpr)exp);
+            else throw new RuntimeException("## Error Z3: logical_not(Object) expected a BoolExpr.\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: logical_not(Object) failed.\n" + e);
+        }
+    }
 
     @Override
     public Object leq(long value, Object exp) {
@@ -547,6 +551,34 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: gt(Object, Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object logical_or(Object exp1, Object exp2) {
+        try {
+            if (exp1 instanceof BoolExpr && exp2 instanceof  BoolExpr) {
+                return ctx.mkOr((BoolExpr) exp1, (BoolExpr) exp2);
+            } else {
+                throw new RuntimeException("## Error Z3: logical_or(Object, Object) expected 2 BoolExprs.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: logical_or(Object, Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object logical_and(Object exp1, Object exp2) {
+        try {
+            if (exp1 instanceof BoolExpr && exp2 instanceof  BoolExpr) {
+                return ctx.mkAnd((BoolExpr) exp1, (BoolExpr) exp2);
+            } else {
+                throw new RuntimeException("## Error Z3: logical_and(Object, Object) expected 2 BoolExprs.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: logical_and(Object, Object) failed.\n" + e);
         }
     }
 
@@ -1326,6 +1358,18 @@ public class ProblemZ3BitVector extends ProblemGeneral {
             throw new RuntimeException("## Error Z3: div(double, Object) failed.\n" + e);
         }
     }
+
+    public Object power(Object exp1, Object exp2) {
+		return ctx.mkPower((ArithExpr)exp1, (ArithExpr)exp2);
+	}
+    
+	public Object power(Object exp1, double exp2) {
+		return ctx.mkPower((ArithExpr)exp1, ctx.mkReal("" + exp2));
+	}
+	
+	public Object power(double exp1, Object exp2) {
+		return ctx.mkPower(ctx.mkReal("" + exp1), (ArithExpr)exp2);
+	}
 
     private int bvCount = 0;
 

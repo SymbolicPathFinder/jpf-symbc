@@ -113,6 +113,17 @@ public class PathCondition implements Comparable<PathCondition> {
         return pc_new;
     }
 
+	// Added by Soha
+	public void _addDet(GreenConstraint greenConstraint) {
+		if (!this.hasConstraint(greenConstraint)) {
+			flagSolved = false;
+			Constraint t = (Constraint) greenConstraint;
+			t.and = header;
+			header = t;
+			count++;
+		}
+	}
+
     //Added by Aymeric
     public void _addDet(Comparator c, SelectExpression se, IntegerExpression ie) {
         Constraint t;
@@ -577,9 +588,9 @@ public class PathCondition implements Comparable<PathCondition> {
     /*
      * YN: added this code from new version of PathCondition
      */
-    public Map<String, Object> solveWithValuation() {
+    public Map<String, Object> solveWithValuation(SymbolicInteger symInt, IntVariable intVar) {
         SymbolicConstraintsGeneral solver = new SymbolicConstraintsGeneral();
-        Map<String, Object> result = solver.solveWithValuation(this);
+        Map<String, Object> result = solver.solveWithValuation(this,symInt, intVar);
         solver.cleanup();
         PathCondition.flagSolved = true;
         return result;

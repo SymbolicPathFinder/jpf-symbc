@@ -22,17 +22,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import gov.nasa.jpf.symbc.numeric.*;
 import za.ac.sun.cs.green.Instance;
 import za.ac.sun.cs.green.expr.Expression;
 import za.ac.sun.cs.green.expr.IntConstant;
 import za.ac.sun.cs.green.expr.IntVariable;
 import za.ac.sun.cs.green.expr.Operation;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
-import gov.nasa.jpf.symbc.numeric.BinaryLinearIntegerExpression;
-import gov.nasa.jpf.symbc.numeric.Constraint;
-import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
-import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
 
 public class SolverTranslator {
 
@@ -114,7 +110,7 @@ public class SolverTranslator {
 
 	}
 
-	private final static class Translator extends ConstraintExpressionVisitor {
+	public final static class Translator extends ConstraintExpressionVisitor {
 
 		private Stack<Expression> stack;
 
@@ -179,11 +175,50 @@ public class SolverTranslator {
 				l = stack.pop();
 				stack.push(new Operation(Operation.Operator.SUB, l, r));
 				break;
+			case DIV:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.DIV, l, r));
+				break;
 			case MUL:
 				r = stack.pop();
 				l = stack.pop();
 				stack.push(new Operation(Operation.Operator.MUL, l, r));
 				break;
+			case AND:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.BIT_AND, l, r));
+				break;
+			case OR:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.BIT_OR, l, r));
+				break;
+			case XOR:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.BIT_XOR, l, r));
+				break;
+			case SHIFTL:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.SHIFTL, l, r));
+				break;
+			case SHIFTR:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.SHIFTR, l, r));
+				break;
+			case SHIFTUR:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.SHIFTUR, l, r));
+				break;
+			case REM:
+				r = stack.pop();
+				l = stack.pop();
+				stack.push(new Operation(Operation.Operator.MOD, l, r));
 			default:
 				System.out.println("SolverTranslator : unsupported operation " + expression.getOp());
 				throw new RuntimeException();
@@ -193,6 +228,11 @@ public class SolverTranslator {
 		@Override
 		public void postVisit(IntegerConstant constant) {
 			stack.push(new IntConstant((int)constant.value));
+		}
+
+		@Override
+		public void postVisit(RealConstant constant) {
+			stack.push(new za.ac.sun.cs.green.expr.RealConstant(constant.value));
 		}
 
 		@Override
