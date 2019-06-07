@@ -1,0 +1,36 @@
+target=veritesting.Simple1
+veritestRegionExpectedCount = 2
+# Classes that wish to test a veritesting region can populate the expected value of
+# VeritestingListener.veritestRegionCount in this variable. TestVeritesting will assert
+# VeritestingListener.veritestRegionCount to be equal to veritestRegionExpectedCount
+# Since on every execution path, we expect a region to be instantiated, this variable should correspond to the
+# total number of execution paths we expect during equivalence-checking.
+# With 1 branch in simpleRegion(), I (vaibhav) expect the region inside simpleRegion() to be instantiated 2 times,
+# once on every execution path through the simpleRegion().
+
+classpath=${jpf-symbc}/build/examples,${jpf-symbc}/lib/com.ibm.wala.util-1.4.4-SNAPSHOT.jar
+sourcepath=${jpf-symbc}/src/examples
+vm.storage.class=nil
+symbolic.debug=false
+
+######## testing equivalence ######
+symbolic.method=veritesting.TestVeritesting.testHarness(con#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym#sym)
+
+#symbolic.min_int=-2147483648
+#symbolic.max_int=2147483647
+symbolic.min_double=-100.0
+symbolic.max_double=100.0
+
+#symbolic.dp=z3bitvector
+#listener = .symbc.VeritestingListener
+#listener = .symbc.SymbolicListener
+
+veritestingMode = 3
+symbolic.lazy = true
+performanceMode = false
+
+symbolic.dp=z3bitvectorinc
+listener = .symbc.VeritestingListener,gov.nasa.jpf.symbc.numeric.solvers.IncrementalListener
+symbolic.optimizechoices=false
+
+jitAnalysis = true

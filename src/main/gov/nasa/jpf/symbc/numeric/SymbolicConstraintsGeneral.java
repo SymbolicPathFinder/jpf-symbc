@@ -39,6 +39,7 @@ package gov.nasa.jpf.symbc.numeric;
 
 import gov.nasa.jpf.symbc.Observations;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
+import gov.nasa.jpf.symbc.VeritestingListener;
 import gov.nasa.jpf.symbc.numeric.solvers.*;
 import za.ac.sun.cs.green.expr.IntVariable;
 import za.ac.sun.cs.green.expr.RealVariable;
@@ -59,6 +60,7 @@ public class SymbolicConstraintsGeneral {
     protected Boolean result; // tells whether result is satisfiable or not
 
     public boolean isSatisfiable(PathCondition pc) {
+            long t0 = System.nanoTime();
         if (pc == null || pc.count == 0) {
             if (SymbolicInstructionFactory.debugMode)
                 System.out.println("## Warning: empty path condition");
@@ -122,13 +124,18 @@ public class SymbolicConstraintsGeneral {
             throw new RuntimeException(
                     "## Error: unknown decision procedure symbolic.dp=" + dp[0] + "\n(use choco or IAsolver or CVC3)");
 
-        /*
-         * Parse path condition to solver. Note: do not override the actual pb
-         * variable in case the result is null. The cleanup afterwards will not
-         * work otherwise and the solver gets filled up with wrong assertions,
-         * e.g. with Z3.
-         */
-        ProblemGeneral tempPb = PCParser.parse(pc, pb);
+
+
+    VeritestingListener.solverAllocTime += (System.nanoTime() - t0);
+    long t1 = System.nanoTime();
+    /*
+     * Parse path condition to solver. Note: do not override the actual pb
+     * variable in case the result is null. The cleanup afterwards will not
+     * work otherwise and the solver gets filled up with wrong assertions,
+     * e.g. with Z3.
+     */
+    ProblemGeneral tempPb = PCParser.parse(pc, pb);
+    VeritestingListener.parseTime += (System.nanoTime() - t1);
 
         if (tempPb == null)
             result = Boolean.FALSE;

@@ -45,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.microsoft.z3.*;
 
+import gov.nasa.jpf.symbc.VeritestingListener;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 
 public class ProblemZ3BitVector extends ProblemGeneral {
@@ -175,9 +176,13 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 System.out
                         .println("\nSolving time of z3 bitvector is " + TimeUnit.NANOSECONDS.toMillis(z3time) + " ms");
                 System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
-            } else {
-                result = solver.check() == Status.SATISFIABLE ? true : false;
-            }
+        	}
+        	else{
+        	    long t1 = System.nanoTime();
+        		result = solver.check() == Status.SATISFIABLE ? true : false;
+                VeritestingListener.z3Time += (System.nanoTime() - t1);
+                VeritestingListener.solverCount++;
+        	}
             return result;
         } catch (Exception e) {
             e.printStackTrace();
