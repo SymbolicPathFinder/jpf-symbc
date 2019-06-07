@@ -922,4 +922,18 @@ public class ProblemZ3Optimize extends ProblemGeneral {
     public void maximize(Object expr) {
         solver.MkMaximize((ArithExpr) expr);
     }
+
+    @Override
+    public Object logical_or(Object exp1, Object exp2) {
+        throw new RuntimeException("## Error Z3 \n");
+    }
+
+    @Override
+    public Object logical_and(Object exp1, Object exp2) {
+        throw new RuntimeException("## Error Z3 \n");
+    }
+
+    public Object logical_not(Object exp){
+        throw new RuntimeException("## Error Z3 \n");
+    }
 }

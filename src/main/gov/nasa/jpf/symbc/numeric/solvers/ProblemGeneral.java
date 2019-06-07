@@ -71,6 +71,9 @@ public abstract class ProblemGeneral{
 	public abstract Object gt(Object exp1, Object exp2) ;
 	public abstract Object gt(double value, Object exp) ;
 	public abstract Object gt(Object exp, double value) ;
+	public abstract Object logical_and(Object exp1, Object exp2);
+	public abstract Object logical_or(Object exp1, Object exp2);
+	public abstract Object logical_not(Object exp);
 
 	public abstract Object plus(long value, Object exp) ;
 	public abstract Object plus(Object exp, long value) ;

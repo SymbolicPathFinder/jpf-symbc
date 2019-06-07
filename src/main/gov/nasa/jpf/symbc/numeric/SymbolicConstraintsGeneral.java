@@ -40,6 +40,8 @@ package gov.nasa.jpf.symbc.numeric;
 import gov.nasa.jpf.symbc.Observations;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.solvers.*;
+import za.ac.sun.cs.green.expr.IntVariable;
+import za.ac.sun.cs.green.expr.RealVariable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import static gov.nasa.jpf.symbc.numeric.PCParser.*;
 // generalized to use different constraint solvers/decision procedures
 // Warning: should never use / modify the types from pb:
 // types come in and out of each particular dp !!!!!!!!!!!!!!!
@@ -239,7 +242,7 @@ public class SymbolicConstraintsGeneral {
             } // end catch
 
             // compute solutions for integer variables
-            Set<Entry<SymbolicInteger, Object>> sym_intvar_mappings = PCParser.symIntegerVar.entrySet();
+            Set<Entry<SymbolicInteger, Object>> sym_intvar_mappings = symIntegerVar.entrySet();
             Iterator<Entry<SymbolicInteger, Object>> i_int = sym_intvar_mappings.iterator();
             // try {
             while (i_int.hasNext()) {
@@ -312,7 +315,7 @@ public class SymbolicConstraintsGeneral {
 
     }
 
-    public Map<String, Object> solveWithValuation(PathCondition pc) {
+    public Map<String, Object> solveWithValuation(PathCondition pc, SymbolicInteger symInt, IntVariable intVar) {
         Map<String, Object> result = new HashMap<String, Object>();
 
         if (pc == null || pc.count == 0) {
@@ -344,7 +347,12 @@ public class SymbolicConstraintsGeneral {
             } catch (Exception exp) {
                 this.catchBody(PCParser.symRealVar, pb, pc);
             }
-
+            if (symInt != null && !symIntegerVar.containsKey(symInt) && globalsymIntegerVar.containsKey(symInt)) {
+                symIntegerVar.put(symInt, globalsymIntegerVar.get(symInt));
+            }
+            if (intVar != null && !intVariableMap.containsKey(intVar) && globalintVariableMap.containsKey(intVar)) {
+                intVariableMap.put(intVar, globalintVariableMap.get(intVar));
+            }
             // compute solutions for integer variables
             Set<Entry<SymbolicInteger, Object>> sym_intvar_mappings = PCParser.symIntegerVar.entrySet();
             Iterator<Entry<SymbolicInteger, Object>> i_int = sym_intvar_mappings.iterator();
@@ -355,6 +363,23 @@ public class SymbolicConstraintsGeneral {
                 e.getKey().solution = e_value;
                 result.put(e.getKey().getName(), e_value);
 
+            }
+
+// compute solutions for IntVariable objects in the model
+            final Set<Entry<IntVariable, Object>> intVariableSet = intVariableMap.entrySet();
+            final Iterator<Entry<IntVariable, Object>> intVariableItr = intVariableSet.iterator();
+            while (intVariableItr.hasNext()) {
+                final Entry<IntVariable, Object> e = intVariableItr.next();
+                long e_value = pb.getIntValue(e.getValue());
+                result.put(e.getKey().getName(), e_value);
+            }
+// compute solutions for RealVariable objects in the model
+            final Set<Entry<RealVariable, Object>> realVariableSet = PCParser.realVariableMap.entrySet();
+            final Iterator<Entry<RealVariable, Object>> realVariableItr = realVariableSet.iterator();
+            while (realVariableItr.hasNext()) {
+                final Entry<RealVariable, Object> e = realVariableItr.next();
+                double e_value = pb.getRealValue(e.getValue());
+                result.put(e.getKey().getName(), e_value);
             }
             cleanup();
             return result;

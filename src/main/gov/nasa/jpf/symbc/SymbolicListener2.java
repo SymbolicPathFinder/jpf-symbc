@@ -95,7 +95,7 @@ public class SymbolicListener2 extends PropertyListenerAdapter {
         
         Map<String, Object> solution = null;
         if (sat) {
-            solution = pc.solveWithValuation();
+            solution = pc.solveWithValuation(null, null);
         }
         if (solution != null) {
             try {

@@ -57,6 +57,7 @@ import gov.nasa.jpf.symbc.string.StringPathCondition;
 import gov.nasa.jpf.symbc.concolic.*;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.MJIEnv;
+import za.ac.sun.cs.green.expr.IntVariable;
 import gov.nasa.jpf.vm.VM;
 
 // path condition contains mixed constraints of integers and reals
@@ -112,6 +113,17 @@ public class PathCondition implements Comparable<PathCondition> {
         pc_new.arrayExpressions = this.arrayExpressions;
         return pc_new;
     }
+
+	// Added by Soha
+	public void _addDet(GreenConstraint greenConstraint) {
+		if (!this.hasConstraint(greenConstraint)) {
+			flagSolved = false;
+			Constraint t = (Constraint) greenConstraint;
+			t.and = header;
+			header = t;
+			count++;
+		}
+	}
 
     //Added by Aymeric
     public void _addDet(Comparator c, SelectExpression se, IntegerExpression ie) {
@@ -577,9 +589,9 @@ public class PathCondition implements Comparable<PathCondition> {
     /*
      * YN: added this code from new version of PathCondition
      */
-    public Map<String, Object> solveWithValuation() {
+    public Map<String, Object> solveWithValuation(SymbolicInteger symInt, IntVariable intVar) {
         SymbolicConstraintsGeneral solver = new SymbolicConstraintsGeneral();
-        Map<String, Object> result = solver.solveWithValuation(this);
+        Map<String, Object> result = solver.solveWithValuation(this,symInt, intVar);
         solver.cleanup();
         PathCondition.flagSolved = true;
         return result;

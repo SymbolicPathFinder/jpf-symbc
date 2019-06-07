@@ -3,16 +3,16 @@
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  *
- * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License, 
+ * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
  * 
- *        http://www.apache.org/licenses/LICENSE-2.0. 
+ *        http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
@@ -1115,7 +1115,7 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
   @Override
   public void postLogicalOR(Object[] constraint) {
     // TODO Auto-generated method stub
-    throw new RuntimeException("## Error Z3 \n");	
+    throw new RuntimeException("## Error Z3 \n");
   }
 
     // Added by Aymeric to support arrays
@@ -1199,6 +1199,44 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3 : Exception caught in Z3 JNI: " + e);
+        }
+    }
+    @Override
+    public Object logical_not(Object exp1) {
+        try {
+            return ctx.mkNot((BoolExpr) exp1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: Exception caught in Z3 JNI: \n" + e);
+
+        }
+    }
+
+    @Override
+    public Object logical_or(Object exp1, Object exp2) {
+        try {
+            if (exp1 instanceof BoolExpr && exp2 instanceof BoolExpr) {
+                return ctx.mkOr((BoolExpr) exp1, (BoolExpr) exp2);
+            } else {
+                throw new RuntimeException("## Error Z3: logical_or(Object, Object) expected 2 BoolExprs.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: logical_or(Object, Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object logical_and(Object exp1, Object exp2) {
+        try {
+            if (exp1 instanceof BoolExpr && exp2 instanceof BoolExpr) {
+                return ctx.mkAnd((BoolExpr) exp1, (BoolExpr) exp2);
+            } else {
+                throw new RuntimeException("## Error Z3: logical_and(Object, Object) expected 2 BoolExprs.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: logical_and(Object, Object) failed.\n" + e);
         }
     }
 }

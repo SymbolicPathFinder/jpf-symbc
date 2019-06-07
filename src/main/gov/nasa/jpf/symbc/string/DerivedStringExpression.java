@@ -66,7 +66,7 @@ public class DerivedStringExpression extends StringExpression {
   
   public Expression[] oprlist;
 
-  DerivedStringExpression(StringExpression l, StringOperator o, StringExpression r) {
+  public DerivedStringExpression(StringExpression l, StringOperator o, StringExpression r) {
 	oprlist = null;
     left = l;
     op = o;
@@ -75,7 +75,7 @@ public class DerivedStringExpression extends StringExpression {
 //    right.addDependent(this); 
   }
   
-  DerivedStringExpression(StringOperator o, Expression[] olist) {
+  public DerivedStringExpression(StringOperator o, Expression[] olist) {
 	  left = null;
 	  right = null;
 	  op = o;
@@ -89,7 +89,7 @@ public class DerivedStringExpression extends StringExpression {
 	  }
   }
   
-  DerivedStringExpression(StringOperator o, StringExpression r) {
+  public DerivedStringExpression(StringOperator o, StringExpression r) {
 	    left = null;
 	    op = o;
 	    right = r;

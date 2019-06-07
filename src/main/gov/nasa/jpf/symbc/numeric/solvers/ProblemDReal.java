@@ -186,6 +186,11 @@ public abstract class ProblemDReal extends ProblemGeneral {
 			return comp(">", (Term) exp, constant(value));
 		}
 
+		@Override
+		public Object logical_not(Object exp) {
+			throw new RuntimeException("## Error dReal unsupported operation");
+		}
+
 		private static TrueFormula TRUE = new TrueFormula();
 
 		@Override
@@ -322,6 +327,11 @@ public abstract class ProblemDReal extends ProblemGeneral {
 		@Override
 		public ComparisonFormula gt(final Object exp, final double value) {
 			return comp(">", (Term) exp, constant(value + super.precision));
+		}
+
+		@Override
+		public Object logical_not(Object exp) {
+			throw new RuntimeException("## Error: dReal unsupported operation");
 		}
 
 		private final Real precision;
@@ -764,6 +774,13 @@ public abstract class ProblemDReal extends ProblemGeneral {
 		throw new UnsupportedOperationException("## Error: dReal does not support bitwise operations");
 	}
 
+  public Object logical_or(Object exp1, Object exp2) {
+		throw new RuntimeException("## Error dReal does not support LOGICAL_OR");
+	}
+
+  public Object logical_and(Object exp1, Object exp2) {
+		throw new RuntimeException("## Error dReal does not support LOGICAL_AND");
+	}
 	// ------------------------------------------------------------------------------------------------------------------
 
 	@Override
