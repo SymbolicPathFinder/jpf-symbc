@@ -4,7 +4,6 @@ package gov.nasa.jpf.symbc;
 import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.symbc.veritesting.Heuristics.HeuristicManager;
 import gov.nasa.jpf.symbc.veritesting.Heuristics.PathStatus;
-import gov.nasa.jpf.symbc.veritesting.RangerDiscovery.DiscoverContract;
 import gov.nasa.jpf.symbc.veritesting.StaticRegionException;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
@@ -50,7 +49,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
-import static gov.nasa.jpf.symbc.veritesting.RangerDiscovery.DiscoverContract.contractDiscoveryOn;
 import static gov.nasa.jpf.symbc.veritesting.ChoiceGenerator.StaticBranchChoiceGenerator.*;
 import static gov.nasa.jpf.symbc.veritesting.StaticRegionException.ExceptionPhase.INSTANTIATION;
 import static gov.nasa.jpf.symbc.veritesting.StaticRegionException.throwException;
@@ -207,18 +205,11 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
             if (conf.hasValue("maxStaticExplorationDepth"))
                 maxStaticExplorationDepth = conf.getInt("maxStaticExplorationDepth");
 
-            if (conf.hasValue("contractDiscoveryOn"))
-                contractDiscoveryOn = conf.getBoolean("contractDiscoveryOn");
-
             StatisticManager.veritestingRunning = true;
             jpf.addPublisherExtension(ConsolePublisher.class, this);
             if (System.getenv("TIMEOUT_MINS") != null) {
                 timeout_mins = Integer.parseInt(System.getenv("TIMEOUT_MINS"));
             }
-
-            if (contractDiscoveryOn)
-                if (conf.hasValue("contractMethodName"))
-                    DiscoverContract.contractMethodName = conf.getString("contractMethodName");
         }
     }
 
@@ -593,10 +584,6 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
         /*--------------- LINEARIZATION TRANSFORMATION ---------------*/
         LinearizationTransformation linearTrans = new LinearizationTransformation();
         dynRegion = linearTrans.execute(dynRegion);
-
-        /*--------------- Discover Lustre Translation ---------------*/
-        if(contractDiscoveryOn)
-            DiscoverContract.discoverLusterContract(dynRegion);
 
         /*--------------- TO GREEN TRANSFORMATION ---------------*/
         dynRegion = AstToGreenVisitor.execute(dynRegion);

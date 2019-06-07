@@ -1,6 +1,5 @@
 package gov.nasa.jpf.symbc.veritesting.ast.visitors;
 
-import gov.nasa.jpf.symbc.veritesting.RangerDiscovery.LustreTranslation.EquationExprVisitor;
 import gov.nasa.jpf.symbc.veritesting.StaticRegionException;
 import gov.nasa.jpf.symbc.veritesting.ast.def.*;
 import za.ac.sun.cs.green.expr.*;
@@ -18,10 +17,6 @@ public class ExprVisitorAdapter<T>  {
 
     public ExprVisitorAdapter(ExprVisitor<T> theVisitor) {
         this.theVisitor = theVisitor;
-    }
-
-    public ExprVisitorAdapter(EquationExprVisitor theVisitor) {
-        this.theVisitor = (ExprVisitor<T>) theVisitor;
     }
 
     // doing a kind of gross thing since the visitor support I like is not
