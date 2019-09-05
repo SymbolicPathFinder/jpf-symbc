@@ -34,10 +34,10 @@ public class SwapSimple {
 			
 		}
 		
-		if (x > y) 
+		if (x >= y) 
 			assert false;
 		
-		System.out.println("Final values:");
+		System.out.println("Final values:"+Debug.getSolvedPC());
 		System.out.println("x: "+Debug.getSymbolicIntegerValue(x));
 		System.out.println("y: "+Debug.getSymbolicIntegerValue(y));
 		

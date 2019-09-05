@@ -285,10 +285,11 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                                 pa.solve(pc, solver);
                             } else
                                 pc.solve();
-
+                            
                             if (!PathCondition.flagSolved) {
                                 return;
                             }
+                           
 
                             // after the following statement is executed, the pc loses its solution
 
@@ -369,20 +370,20 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                              * pa.solve(pc,solver); } else pc.solve();
                              */
 
-                            /*
-                             * pcString = pc.toString(); pcPair = new Pair<String,String>(pcString,returnString);
-                             * MethodSummary methodSummary = allSummaries.get(longName); Vector<Pair> pcs =
-                             * methodSummary.getPathConditions(); if ((!pcs.contains(pcPair)) &&
-                             * (pcString.contains("SYM"))) { methodSummary.addPathCondition(pcPair); }
-                             * 
-                             * if(allSummaries.get(longName)!=null) // recursive call longName = longName +
-                             * methodSummary.hashCode(); // differentiate the key for recursive calls
-                             * allSummaries.put(longName,methodSummary); if (SymbolicInstructionFactory.debugMode) {
-                             * System.out.println("*************Summary***************");
-                             * System.out.println("PC is:"+pc.toString()); if(result!=null){
-                             * System.out.println("Return is:  "+result);
-                             * System.out.println("***********************************"); } }
-                             */ // YN
+                            
+                              String pcString = pc.toString(); pcPair = new Pair<String,String>(pcString,returnString);
+                              MethodSummary methodSummary = allSummaries.get(longName); Vector<Pair> pcs =
+                              methodSummary.getPathConditions(); if ((!pcs.contains(pcPair)) &&
+                              (pcString.contains("SYM"))) { methodSummary.addPathCondition(pcPair); }
+                              
+                              if(allSummaries.get(longName)!=null) // recursive call longName = longName +
+                              methodSummary.hashCode(); // differentiate the key for recursive calls
+                              allSummaries.put(longName,methodSummary); if (SymbolicInstructionFactory.debugMode) {
+                              System.out.println("*************Summary***************");
+                              System.out.println("PC is:"+pc.toString()); if(result!=null){
+                              System.out.println("Return is:  "+result);
+                              System.out.println("***********************************"); } }
+                              // YN
                         }
                     }
                 }
