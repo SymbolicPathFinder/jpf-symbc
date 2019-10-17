@@ -354,7 +354,11 @@ public class ProblemZ3 extends ProblemGeneral {
 
 	public Object lt(Object exp1, Object exp2){
 		try{
-			return  ctx.mkLt((ArithExpr)exp1,(ArithExpr)exp2);
+			if (useFpForReals) {
+			    return  ctx.mkFPLt((FPExpr)exp1,(FPExpr)exp2);
+			} else {
+				return  ctx.mkLt((ArithExpr)exp1,(ArithExpr)exp2);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error Z3: Exception caught in Z3 JNI: \n" + e);
@@ -405,7 +409,11 @@ public class ProblemZ3 extends ProblemGeneral {
 
 	public Object gt(Object exp1, Object exp2){
 		try{
-			return  ctx.mkGt((ArithExpr)exp1,(ArithExpr)exp2);
+			if (useFpForReals) {
+	            return  ctx.mkFPGt((FPExpr)exp1,(FPExpr)exp2);
+		    } else {
+			    return  ctx.mkGt((ArithExpr)exp1,(ArithExpr)exp2);
+		    }
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error Z3: Exception caught in Z3 JNI: \n" + e);
