@@ -35,12 +35,9 @@ public class I2C extends gov.nasa.jpf.jvm.bytecode.I2C {
 	  Expression sym_val = (Expression) sf.getOperandAttr();
 	  
 	  Instruction result = super.execute(th);
-	  // Java Ranger change begins to address wrong answer given for SV-COMP jbmc-regression/cast1 benchmark
 	  if (sym_val instanceof IntegerExpression) {
 	  	sym_val = new BinaryLinearIntegerExpression((IntegerExpression) sym_val, Operator.AND, new IntegerConstant(65535));
 	  }
-	  // Java Ranger change ends
-	  //DL:TBD: I think we should add a choice here to account for possible truncation.
 	  if (sym_val != null)
 		  sf.setOperandAttr(sym_val);
 	  return result;
