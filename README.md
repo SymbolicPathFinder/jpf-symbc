@@ -1,17 +1,16 @@
 Symbolic (Java) PathFinder:
 ---------------------------
 
-Created new branch that contains many updates to SPF;
-in particular, interfacing with Z3 is robust; 
-also SPF now has a "symcrete" mode that executes paths 
-triggered by concrete inputs and collects constraints along the paths
+
 
 This JPF extension provides symbolic execution for Java bytecode.
 It performs a non-standard interpretation of byte-codes.
-Currently, it allows symbolic execution on methods with arguments of basic types
-(int, long, double, boolean, etc.). Symbolic input globals and method
-pre-conditions are specified via user annotations (see symbc/examples and
-symbc/test).
+It allows symbolic execution on methods with arguments of basic types
+(int, long, double, boolean, etc.). It also supports symbolic strings, arrays, 
+and user-defined data structures.
+
+SPF now has a "symcrete" mode that executes paths 
+triggered by concrete inputs and collects constraints along the paths
 
 A paper describing Symbolic PathFinder appeared at ISSTA'08:
 
