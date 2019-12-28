@@ -64,8 +64,8 @@ public class ConcreteExecutionListener extends PropertyListenerAdapter {
 	public void instructionExecuted(VM vm, ThreadInfo currentThread, Instruction nextInstruction, Instruction executedInstruction) {
 
 		Instruction lastInsn =  executedInstruction;
-		MethodInfo mi = executedInstruction.getMethodInfo();
 		if(lastInsn != null && lastInsn instanceof JVMInvokeInstruction) {
+			MethodInfo mi =((JVMInvokeInstruction)lastInsn).getInvokedMethod();
 			boolean foundAnote = checkConcreteAnnotation(mi);
 			if(foundAnote) {
 				ThreadInfo ti = vm.getCurrentThread();
