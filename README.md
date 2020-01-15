@@ -28,7 +28,7 @@ Then please download jpf-core from here:
 https://github.com/yannicnoller/jpf-core/tree/0f2f2901cd0ae9833145c38fee57be03da90a64f
 
 And jpf-symbc from here:
-https://github.com/SymbolicPathFinder/jpf-symbc/tree/b64ab6a0c8dde218b34969b46ee526ece7ddee44
+https://github.com/SymbolicPathFinder/jpf-symbc
 
 Import them in Eclipse as 2 Java projects.
 Also create a .jpf dir in your home directory and create in it a file  called "site.properties" with the following content:
