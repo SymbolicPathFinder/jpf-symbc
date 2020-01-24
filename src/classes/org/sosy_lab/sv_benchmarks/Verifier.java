@@ -10,7 +10,15 @@ public final class Verifier {
   static int counter=0;
   
   public static void assume(boolean condition) {
-    Debug.assume(condition);
+    //Debug.assume(condition);
+	  if(condition) {
+		  //System.out.println("!!!!!!!!!assumption");
+		  return;
+	  }
+	  else{
+		  Verify.ignoreIf(true);
+		  System.out.println("!!!!!!!!!should ignore");
+	  }
   }
   
   public static boolean nondetBoolean() {
