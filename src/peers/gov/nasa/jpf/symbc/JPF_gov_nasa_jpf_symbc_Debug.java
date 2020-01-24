@@ -101,7 +101,17 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
         }
         return env.newString("");
     }
-
+    @MJI
+    public static int PC4Z3(MJIEnv env, int objRef) {
+    	PathCondition pc = getPC(env);
+        if (pc != null) {
+            pc.solve();
+            return env.newString(pc.prefix_notationPC4Z3());
+        }
+        return env.newString("");
+    }
+    
+    
     @MJI
     public static int getSymbolicIntegerValue(MJIEnv env, int objRef, int v) {
         Object[] attrs = env.getArgAttributes();
