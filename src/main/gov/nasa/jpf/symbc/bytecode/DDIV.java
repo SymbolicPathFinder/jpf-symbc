@@ -54,35 +54,22 @@ import gov.nasa.jpf.vm.Types;
  */
 public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
 
+	
+	
+	
     @Override
     public Instruction execute(ThreadInfo th) {
-    	//System.out.println("here");
+    	
         StackFrame sf = th.getModifiableTopFrame();
 
         RealExpression sym_v1 = (RealExpression) sf.getOperandAttr(1);
         double v1 = sf.peekDouble();
         RealExpression sym_v2 = (RealExpression) sf.getOperandAttr(3);
         double v2 = sf.peekDouble(2);
-        // super.execute should take care of if(v1==0) return th.createAndThrowException
-        // (BUT IT DOESN'T)...
-       // if (v1 == 0.0)
-         //   return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
+        //super.execute should take care of if(v1==0) return th.createAndThrowException
         if (sym_v1 == null) {
-            //Instruction next_insn = super.execute(th);
-        	sf.popDouble();
-            sf.popDouble();
-            
-            if (v1 == 0.0) {
-                //return ti.createAndThrowException("java.lang.ArithmeticException",
-                //                                  "division by zero");
-            	System.err.println("division by 0.0 NAN");
-            }
-
-            double r = v2 / v1;
-            
-            sf.pushDouble(r);
-            Instruction next_insn = getNext(th);
-            
+            Instruction next_insn = super.execute(th);
+        	
             if (sym_v2 != null) // result is symbolic expression
                 sf.setLongOperandAttr(sym_v2._div(v1));
             return next_insn;
@@ -91,9 +78,7 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
         // div by zero check affects path condition
         // sym_v1 is non-null and should be checked against zero
 
-        // div by zero check affects path condition
-        // sym_v1 is non-null and should be checked against zero
-
+        
         ChoiceGenerator<?> cg;
         boolean condition;
 
@@ -115,7 +100,14 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
             }
         }
 
-        super.execute(th); // pops v1, v2 and pushes r = v2 / v1;
+        
+        //super.execute(th); // pops v1, v2 and pushes r = v2 / v1;
+        sf.popDouble();
+        sf.popDouble();
+        if(v1==0)
+        	sf.pushDouble(0.0);
+        else
+        	sf.pushDouble(v2/v1);
 
         PathCondition pc;
         ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
@@ -128,12 +120,12 @@ public class DDIV extends gov.nasa.jpf.jvm.bytecode.DDIV {
         assert pc != null;
 
         if (condition) { // check div by zero
+        	
             pc._addDet(Comparator.EQ, sym_v1, 0);
             if (pc.simplify()) { // satisfiable
                 ((PCChoiceGenerator) cg).setCurrentPC(pc);
-                System.err.println("division by 0.0 NAN");
-                assert false;
-                return th.createAndThrowException("java.lang.ArithmeticException", "div by 0");
+                
+                return th.createAndThrowException("java.lang.ArithmeticException", "!!!div by 0");
             } else {
                 th.getVM().getSystemState().setIgnored(true);
                 return getNext(th);
