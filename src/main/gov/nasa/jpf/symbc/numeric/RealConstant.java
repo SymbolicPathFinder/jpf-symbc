@@ -3,16 +3,16 @@
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  *
- * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License, 
+ * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0. 
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
@@ -121,7 +121,7 @@ public class RealConstant extends RealExpression {
       return super._plus(e);
     }
   }
-  
+
   public RealExpression _div (double i) {
 	    assert (i!=0);
 		//simplify
@@ -139,14 +139,14 @@ public class RealConstant extends RealExpression {
 		}
 
 		if (e instanceof RealConstant) {
-	      assert(((RealConstant) e).value!=0);	
+	      assert(((RealConstant) e).value!=0);
 	      return new RealConstant(value / ((RealConstant) e).value);
 	    } else {
 	      return super._div(e);
 	    }
 	  }
 
-	public RealExpression _neg () 
+	public RealExpression _neg ()
 	{
 		if (value == 0)
 			return this;
@@ -168,9 +168,18 @@ public class RealConstant extends RealExpression {
 
   public String prefix_notation ()
 	{
-		return ""+value;
+    String stringValue = Double.toString(value);
+		if (stringValue.contains("E")) {
+			int exp = Integer.valueOf(stringValue.substring(stringValue.indexOf("E") + 1, stringValue.length()));
+			if (exp < 0) {
+				stringValue = String .format("%." + (stringValue.indexOf("E") - stringValue.indexOf(".") - 1 - exp) + "f", value);
+			} else {
+				stringValue = String.format("%." + Math.max(0, (stringValue.indexOf("E") - stringValue.indexOf(".") - 1 - exp)) + "f", value);
+			}
+		}
+		return stringValue;
 	}
-  
+
   public String stringPC () {
     return "CONST_" + value + "";
   }
@@ -178,7 +187,7 @@ public class RealConstant extends RealExpression {
   public double value () {
     return value;
   }
-  
+
   public double solution() {
   		return value;
   }
