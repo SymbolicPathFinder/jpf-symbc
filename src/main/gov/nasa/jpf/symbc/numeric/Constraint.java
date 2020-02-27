@@ -204,7 +204,7 @@ public abstract class Constraint implements Comparable<Constraint> {
 		else{
 			result = "(assert ("+ comp.toString() +" "+ left.prefix_notation() +" " + right.prefix_notation() +"))";
 		}
-		if(and!=null) result = "(and "+and.prefix_notation()+" "+result+")";
+		if(and!=null) result = result +"\n" + and.prefix_notationPC4Z3();
 		return result;
 	}
 
