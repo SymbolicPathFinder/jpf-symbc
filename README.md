@@ -39,6 +39,40 @@ jpf-symbc = ${user.home}/.../path-to-jpf-core-folder/jpf-symbc
 
 extensions=${jpf-core},${jpf-symbc}
 
+Importing Project in IntelliJ-IDEA
+-----
+
+<details>
+ 
+<summary>click here </summary>
+
+ **Importing jpf-core on IntelliJ Idea** 
+  1. Launch the New Project wizard. If no project is currently opened in IntelliJ IDEA, click **Import 		Project** on the welcome screen. Otherwise, select File > Open > Project from Existing Sources from the main menu.    
+    
+2. Choose the project root directory containing the build.gradle file. Click OK    
+    
+3. On the first page of the Import Project wizard, in Import Project from External model, select Gradle and click Next.    
+    
+4. On the next page of the Import Project wizard, specify Gradle project settings:  Check **Use auto-import** Check **Create separate module per source set** 
+5. Click Finish.    
+> Make sure that Use default gradle wrapper (recommended) is checked.    
+    
+    
+    
+ **Importing jpf-symbc on  IntelliJ Idea**
+ 
+6. After opening jpf-core select **File** > **Project Structure** > **Modules**.    
+     
+7. Click on **"+"** > Select **Import module from external model** > Select **Eclipse** and click **Next**.    
+    
+8. Select the root directory > In choose project code style select **default project code style** and click Finish.    
+    
+> Also make sure you have selected the correct JDK version.    
+    
+ You should be good to go now. 
+
+</details>
+
 
 You can then try to run some examples by selecting a .jpf file from the "examples" directory and then selecting a run configuration from the "Run" menu in Eclipse. 
 In particular you should select: "run-JPF-symbc" to run Symbolic PathFinder on your example (configuration "run-JPF-symbc-mac" is tailored for Mac).
