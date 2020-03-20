@@ -211,6 +211,15 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
     }
 
     @MJI
+    public static int getSymbolicRealValue4Z3(MJIEnv env, int objRef, double v) {
+        Object[] attrs = env.getArgAttributes();
+        RealExpression sym_arg = (RealExpression) attrs[0];
+        if (sym_arg != null)
+            return env.newString(sym_arg.prefix_notation());
+        else
+            return env.newString(Double.toString(v));
+    }
+    @MJI
     public static int getSymbolicBooleanValue(MJIEnv env, int objRef, boolean v) {
         Object[] attrs = env.getArgAttributes();
         IntegerExpression sym_arg = (IntegerExpression) attrs[0];

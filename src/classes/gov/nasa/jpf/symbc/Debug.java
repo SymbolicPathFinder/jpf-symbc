@@ -52,6 +52,7 @@ public class Debug {
     native public static String getSymbolicByteValue(byte v);
     native public static String getSymbolicCharValue(char v);
     native public static String getSymbolicRealValue(double v);
+    native public static String getSymbolicRealValue4Z3(double v);
     native public static String getSymbolicBooleanValue(boolean v);
     native public static String getSymbolicStringValue(String v);
     
