@@ -237,6 +237,101 @@ public abstract class ConstraintExpressionVisitor {
 	public void postVisit(SymbolicStringBuilder expr) {
 	}
 
+	
+	//Added by Carson so far - First case visitors 
+	public void preVisit(RealConstant realConst1, RealConstant realConst2) {
+	}
 
+	public void preVisit(RealConstant realConst, SymbolicReal symbReal) {
+	}
+	
+	public void preVisit(SymbolicReal symbReal, RealConstant realConst) {
+	}
+	
+	public void preVisit(SymbolicReal symbReal1, SymbolicReal symbReal2) {
+	}
+	
+	public void preVisit(BinaryRealExpression bRE, RealConstant realConst) {
+	}
+	
+	public void preVisit(BinaryRealExpression bRE, SymbolicReal symbReal) {
+	}
+	
+	public void preVisit(BinaryRealExpression bRE1, BinaryRealExpression bRE2) {
+	}
+	
+	public void preVisit(RealConstant realConst, BinaryRealExpression bRE) {
+	}
+	
+	public void preVisit(SymbolicReal symbReal, BinaryRealExpression bRE) {
+	}
+	
+	public void preVisit(MathRealExpression mRE1, MathRealExpression mRE2) {
+	}
+	
+	public void preVisit(MathRealExpression mRE, RealConstant realConst) {
+	}
+	
+	public void preVisit(MathRealExpression mRE, BinaryRealExpression bRE) {
+	}
+	
+	public void preVisit(MathRealExpression mRE, SymbolicReal symbReal) {
+	}
+	
+	public void preVisit(RealConstant realConst, MathRealExpression mRE) {
+	}
+	
+	public void preVisit(BinaryRealExpression bRE, MathRealExpression mRE) {
+	}
+	
+	public void preVisit(SymbolicReal symbReal, MathRealExpression mRE) {
+	}
+	
+	public void postVisit(RealConstant realConst1, RealConstant realConst2) {
+	}
 
+	public void postVisit(RealConstant realConst, SymbolicReal symbReal) {
+	}
+	
+	public void postVisit(SymbolicReal symbReal, RealConstant realConst) {
+	}
+	
+	public void postVisit(SymbolicReal symbReal1, SymbolicReal symbReal2) {
+	}
+	
+	public void postVisit(BinaryRealExpression bRE, RealConstant realConst) {
+	}
+	
+	public void postVisit(BinaryRealExpression bRE, SymbolicReal symbReal) {
+	}
+	
+	public void postVisit(BinaryRealExpression bRE1, BinaryRealExpression bRE2) {
+	}
+	
+	public void postVisit(RealConstant realConst, BinaryRealExpression bRE) {
+	}
+	
+	public void postVisit(SymbolicReal symbReal, BinaryRealExpression bRE) {
+	}
+	
+	public void postVisit(MathRealExpression mRE1, MathRealExpression mRE2) {
+	}
+	
+	public void postVisit(MathRealExpression mRE, RealConstant realConst) {
+	}
+	
+	public void postVisit(MathRealExpression mRE, BinaryRealExpression bRE) {
+	}
+	
+	public void postVisit(MathRealExpression mRE, SymbolicReal symbReal) {
+	}
+	
+	public void postVisit(RealConstant realConst, MathRealExpression mRE) {
+	}
+	
+	public void postVisit(BinaryRealExpression bRE, MathRealExpression mRE) {
+	}
+	
+	public void postVisit(SymbolicReal symbReal, MathRealExpression mRE) {
+	}
 }

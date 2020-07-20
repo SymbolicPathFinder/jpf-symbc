@@ -39,6 +39,9 @@ package gov.nasa.jpf.symbc.numeric;
 
 
 import java.util.Map;
+
+import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
+
 import java.util.LinkedList;
 
 
@@ -47,6 +50,7 @@ public abstract class Expression implements Comparable<Expression> {
     public abstract String stringPC();
     public abstract void getVarsVals(Map<String,Object> varsVals);
 	public abstract void accept(ConstraintExpressionVisitor visitor);
+	//public abstract void accept(ProblemGeneralVisitor visitor);
 	public String prefix_notation() {throw new RuntimeException("error printing");}
 	
 }

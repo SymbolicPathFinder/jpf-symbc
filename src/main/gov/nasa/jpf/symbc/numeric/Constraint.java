@@ -39,6 +39,9 @@ package gov.nasa.jpf.symbc.numeric;
 
 import java.util.Map;
 
+import gov.nasa.jpf.symbc.numeric.visitors.CollectVariableVisitor;
+import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
+
 public abstract class Constraint implements Comparable<Constraint> {
   private final Expression left;
 
@@ -170,10 +173,18 @@ public abstract class Constraint implements Comparable<Constraint> {
   
 //JacoGeldenhuys
 	public void accept(ConstraintExpressionVisitor visitor) {
-		visitor.preVisit(this);
-		left.accept(visitor);
-		right.accept(visitor);
-		visitor.postVisit(this);
+		visitor.preVisit(this); //PreVisit the visitor
+		left.accept(visitor);   //accept left
+		right.accept(visitor);  //accept right
+		visitor.postVisit(this);//PostVisit the visitor
+	}
+	
+	//Carson Smith
+	public void accept(ProblemGeneralVisitor visitor) {
+		visitor.preVisit(this); //This is the preVisit on the constraint
+//		left.accept(visitor);
+//		right.accept(visitor);
+		visitor.postVisit(this); //This is the postVisit on the constraint.
 	}
 
 	public String prefix_notation() {

@@ -55,6 +55,8 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
+import gov.nasa.jpf.symbc.numeric.solvers.SolverTranslator.Translator;
+import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -234,14 +236,17 @@ public class PCParser {
 
   // Converts RealExpression's into DP RealExp's
   static Object getExpression(RealExpression eRef) {
-    assert eRef != null;
-    assert !(eRef instanceof RealConstant);
+    assert eRef != null;                    //won't be needed
+    assert !(eRef instanceof RealConstant); //won't be needed
 
     if (eRef instanceof SymbolicReal) {
-      Object dp_var = symRealVar.get(eRef);
-      if (dp_var == null) {
-        dp_var = pb.makeRealVar(((SymbolicReal)eRef).getName(),
-            ((SymbolicReal)eRef)._min, ((SymbolicReal)eRef)._max);
+      //Gets a value with the eRef as a key from the symRealVar hashmap. This is a map between symbolic 
+      //real variables and DP variables.
+      Object dp_var = symRealVar.get(eRef); 
+      
+      if (dp_var == null) { //If nothing is found, I assume they'll be placing a value for it within the hashMap.
+    	                    //
+        dp_var = pb.makeRealVar(((SymbolicReal)eRef).getName(), ((SymbolicReal)eRef)._min, ((SymbolicReal)eRef)._max);
         symRealVar.put((SymbolicReal)eRef, dp_var);
       }
       return dp_var;
@@ -309,6 +314,7 @@ public class PCParser {
     }
 
     if(eRef instanceof MathRealExpression) {
+    	
       MathFunction funRef;
       RealExpression	e_arg1Ref;
       RealExpression	e_arg2Ref;
@@ -396,26 +402,37 @@ public class PCParser {
 
   static public boolean createDPRealConstraint(RealConstraint cRef) {
 
-    Comparator c_compRef = cRef.getComparator();
-    RealExpression c_leftRef = (RealExpression)cRef.getLeft();
-    RealExpression c_rightRef = (RealExpression)cRef.getRight();
+    Comparator c_compRef = cRef.getComparator();                  //Gets the comparator
+    RealExpression c_leftRef = (RealExpression)cRef.getLeft();    //Gets the left  expression
+    RealExpression c_rightRef = (RealExpression)cRef.getRight();  //Gets the right expression
 
-    switch(c_compRef){
+    switch(c_compRef){ //Switch on the operator..
       case EQ:
         if (c_leftRef instanceof RealConstant && c_rightRef instanceof RealConstant) {
-          if (!(((RealConstant) c_leftRef).value == ((RealConstant) c_rightRef).value))
-            return false;
-          else
-            return true;
-        }
-        else if (c_leftRef instanceof RealConstant) {
-          pb.post(pb.eq(((RealConstant)c_leftRef).value,getExpression(c_rightRef)));
-        }
-        else if (c_rightRef instanceof RealConstant) {
+          if (!(((RealConstant) c_leftRef).value == ((RealConstant) c_rightRef).value)) { //If the two real constant numbers are not equal
+        	  return false; //Return false since they aren't
+          } else {
+        	  return true; //Otherwise return true since they are.
+          }
+        } else if (c_leftRef instanceof RealConstant) { //Inherently, the right ref is not a constant.
+        	//pb is set in the parse() method.
+        	
+          pb.post(pb.eq(((RealConstant)c_leftRef).value,getExpression(c_rightRef))); //This getExpression() method is the key to understanding the functionality.
+          
+          //Down the line pb.eq() is running the relevent method of the solver it's involved with, whichever solver that may be. It's abstract.
+          //The response of them depends on a lot of factors. The fact of the matter is that 
+          //pb.post() "posts" the constraint to the solver, meaning it posts the inevitable result of the pb.eq() method 
+          //Which, by all means, should be a formatted constraint in the style the solver is expecting to receive.
+          //For something like Z3, this is a boolExpr whereas for Choco, this is a Constraint. Posting is clearly solver-specific.
+          //These should generally be boolean expressions or constraints of some nature due to the nature of the fact that they're constraints
+          //being added. 
+        } else if (c_rightRef instanceof RealConstant) {
+        			//c_leftRef in terms of the solver and then running the relevant pb.eq() of the solver
+        			//To compare equality. Really elegent already, but I can see the room for improvement.
           pb.post(pb.eq(getExpression(c_leftRef),((RealConstant)c_rightRef).value));
-        }
-        else
+        } else {
           pb.post(pb.eq(getExpression(c_leftRef),getExpression(c_rightRef)));
+        }
         break;
       case NE:
         if (c_leftRef instanceof RealConstant && c_rightRef instanceof RealConstant) {
@@ -498,7 +515,7 @@ public class PCParser {
           pb.post(pb.gt(getExpression(c_leftRef),getExpression(c_rightRef)));
         break;
     }
-    return true;
+    return true; //Return true by default since a break; was reached meaning something was posted to the solver.
   }
 
   //Added by Gideon, to handle CNF style constraints???
@@ -1087,17 +1104,37 @@ getExpression(stoex.value)), newae));
     } else {
       //For a non-incremental solver,
       //we submit the *entire* pc to the solver
-      while (cRef != null) {
-        if(addConstraint(cRef) == false) {
-          return null;
-        }
-        cRef = cRef.and;
-      }
+    	
+    	//By making a visitor and calling accept on each of the constraints for the non-incremental solver
+    	//I'm telling it to handle itself as stuff goes on.
+    	ProblemGeneralVisitor pgv = new ProblemGeneralVisitor(pb);
+    	while(cRef != null) {
+    		cRef.accept((ProblemGeneralVisitor)pgv);
+    		//TODO: the functionality of addConstraint() returning a boolean for failures is now missing.
+//    		if(!cRef.accept(pgv)) { //This doesn't work since I can't change method signatures of visitors.
+//    			return null;
+//    		}
+    		cRef = cRef.and;
+    	}
+    	//Old code for reference:
+//      while (cRef != null) {
+//        if(addConstraint(cRef) == false) {
+//          return null;
+//        }
+//        cRef = cRef.and;
+//      }
     }
 
     return pb;
   }
 
+//  public void accept(ConstraintExpressionVisitor visitor) {
+//	visitor.preVisit(this); //PreVisit the visitor
+//	left.accept(visitor);   //accept left
+//	right.accept(visitor);  //accept right
+//	visitor.postVisit(this);//PostVisit the visitor
+//  }
+  
   private static boolean addConstraint(Constraint cRef) {
     boolean constraintResult = true;
 

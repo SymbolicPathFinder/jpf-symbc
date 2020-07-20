@@ -1,59 +1,34 @@
-/*
- * Copyright (C) 2014, United States Government, as represented by the
- * Administrator of the National Aeronautics and Space Administration.
- * All rights reserved.
- *
- * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License, 
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0. 
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
- * limitations under the License.
- */
-
 package gov.nasa.jpf.symbc.numeric.solvers;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
-import za.ac.sun.cs.green.Instance;
-import za.ac.sun.cs.green.expr.Expression;
-import za.ac.sun.cs.green.expr.IntConstant;
-import za.ac.sun.cs.green.expr.IntVariable;
-import za.ac.sun.cs.green.expr.Operation;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.BinaryLinearIntegerExpression;
 import gov.nasa.jpf.symbc.numeric.Constraint;
-import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
+import gov.nasa.jpf.symbc.numeric.Expression;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
 
-public class SolverTranslator {
+public class ProblemGeneralTranslator {
 
-	private static Map<ConstraintSequence, Instance> instanceCache = new HashMap<ConstraintSequence, Instance>();
-
-	public static Instance createInstance(Constraint c) {
+	public static ProblemGeneral createInstance(Constraint c) {
 
 		Expression e = null;
 
 		while (c != null) {
 			Translator translator = new Translator(); //Makes a new visitor.
 			c.accept(translator);                     //This runs .accept() and eventually postVisit() on all of the expressions in the constraint
+			//At this point, there needs to be a fully created solver-specific constraint on the stack within translator.
+			//(for the first constraint that is)
+			
 			//expressions are added to the stack in Translator (symbolicReal or symbolicInt or SymbolicStrings only)
-			//Before line 50 is called, the operation has already been added because of line 47.
-			Expression tmp = translator.getExpression(); //This will get a peek() of the first operation added off the stack in Translator.
+			Object tmp = translator.getExpression(); //This will get a peek() of the first expression added off the stack in Translator.
 
 			if (e == null) {  //This is the first time through. so 'e' is this temp value created within translator
 				e = tmp;      //Though, this is kinda assuming that tmp will actually be something.
 			} else {
-				//This is like doing pb.eq() in that one method you looked at. Or is it post? I think eq() is the combine expression part of it.
-				//and this is pb.post()
+				//I need to make a generalized form of the operation here.
 				e = new Operation(Operation.Operator.AND, e, tmp);
 			}
 
@@ -64,61 +39,9 @@ public class SolverTranslator {
 		Instance greenPC = new Instance(SymbolicInstructionFactory.greenSolver, null, e);
 		return greenPC; //End goal is creating this.
 	}
-
-//	public static Instance createInstance(Constraint constraint) {
-//		Constraint c = constraint; // first constraint
-//		Constraint r = c.getTail(); // rest of constraint
-//		Instance p = null; // parent instance
-//		if (r != null) {
-//			p = instanceCache.get(new ConstraintSequence(r));
-//			if (p == null) {
-//				p = createInstance(r);
-////				instanceCache.put(r, p);
-//			}
-//		}
-//		Translator translator = new Translator();
-//		c.accept(translator);
-//		Instance i = new Instance(SymbolicInstructionFactory.greenSolver, p, translator.getExpression());
-//		instanceCache.put(new ConstraintSequence(constraint), i);
-//		return i;
-//	}
-
-	private final static class ConstraintSequence {
-
-		private final Constraint sequence;
-
-		public ConstraintSequence(Constraint sequence) {
-			this.sequence = sequence;
-		}
-
-		@Override
-		public boolean equals(Object object) {
-			Constraint z = ((ConstraintSequence) object).sequence;
-			Constraint s = sequence;
-			while ((s != null) && (z != null)) {
-				if (!s.equals(z)) {
-					return false;
-				}
-				s = s.getTail();
-				z = z.getTail();
-			}
-			return (s == null) && (z == null);
-		}
-
-		@Override
-		public int hashCode() {
-			int h = 0;
-			Constraint s = sequence;
-			while (s != null) {
-				h ^= s.hashCode();
-				s = s.getTail();
-			}
-			return h;
-		}
-
-	}
-
-	private final static class Translator extends ConstraintExpressionVisitor {
+	
+	
+	private final static class Translator extends ProblemGeneralVisitor {
 
 		private Stack<Expression> stack;
 
@@ -169,7 +92,7 @@ public class SolverTranslator {
 		}
 
 		@Override
-		public void postVisit(BinaryLinearIntegerExpression expression) { //How does this know for sure that order is maintained when it pops the top two?
+		public void postVisit(BinaryLinearIntegerExpression expression) {
 			Expression l;
 			Expression r;
 			switch (expression.getOp()) {
@@ -206,5 +129,4 @@ public class SolverTranslator {
 		}
 
 	}
-
 }
