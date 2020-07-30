@@ -179,13 +179,13 @@ public abstract class Constraint implements Comparable<Constraint> {
 		visitor.postVisit(this);//PostVisit the visitor
 	}
 	
-	//Carson Smith
-	public void accept(ProblemGeneralVisitor visitor) {
-		visitor.preVisit(this); //This is the preVisit on the constraint
-//		left.accept(visitor);
-//		right.accept(visitor);
-		visitor.postVisit(this); //This is the postVisit on the constraint.
-	}
+//	//Carson Smith
+//	public void accept(ProblemGeneralVisitor visitor) {
+//		visitor.preVisit(this); //This is the preVisit on the constraint
+////		left.accept(visitor);
+////		right.accept(visitor);
+//		visitor.postVisit(this); //This is the postVisit on the constraint.
+//	}
 
 	public String prefix_notation() {
 		//return left.toString() + comp.toString() + right.toString()

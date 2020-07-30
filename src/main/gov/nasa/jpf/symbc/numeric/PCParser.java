@@ -47,6 +47,7 @@ import gov.nasa.jpf.symbc.arrays.SelectExpression;
 import gov.nasa.jpf.symbc.arrays.StoreExpression;
 import gov.nasa.jpf.symbc.numeric.solvers.IncrementalListener;
 import gov.nasa.jpf.symbc.numeric.solvers.IncrementalSolver;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemChoco;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemCoral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
@@ -55,7 +56,6 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
-import gov.nasa.jpf.symbc.numeric.solvers.SolverTranslator.Translator;
 import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
 
 import java.util.ArrayList;
@@ -71,6 +71,7 @@ import java.util.Map.Entry;
 
 public class PCParser {
   static ProblemGeneral pb;
+  static ProblemGeneralVisitor pgv;
   static public Map<SymbolicReal, Object>	symRealVar =new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
   static Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>(); // a map between symbolic variables and DP variables
   //static Boolean result; // tells whether result is satisfiable or not
@@ -365,7 +366,7 @@ public class PCParser {
 
 
   static public boolean createDPMixedConstraint(MixedConstraint cRef) { // TODO
-
+	  //Might be automatic with how constraints are made.
     Comparator c_compRef = cRef.getComparator();
     RealExpression c_leftRef = (RealExpression)cRef.getLeft();
     IntegerExpression c_rightRef = (IntegerExpression)cRef.getRight();
@@ -715,7 +716,6 @@ public class PCParser {
 
     IntegerExpression c_leftRef = (IntegerExpression)cRef.getLeft();
     IntegerExpression c_rightRef = (IntegerExpression)cRef.getRight();
-
     switch(c_compRef){
       case EQ:
         if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
@@ -1090,6 +1090,9 @@ getExpression(stoex.value)), newae));
 
     Constraint cRef = pc.header;
 
+    pgv = new ProblemGeneralVisitor(pb);
+    //Every time we get into this method, we know that we have a constraint at the start, and then we want to run 
+    //This whole entire method is going to run for both the eq. and neq. of a given conditional.
     if(pb instanceof IncrementalSolver) {
       //If we use an incremental solver, then we push the context
       //*before* adding the constraint header
@@ -1107,9 +1110,9 @@ getExpression(stoex.value)), newae));
     	
     	//By making a visitor and calling accept on each of the constraints for the non-incremental solver
     	//I'm telling it to handle itself as stuff goes on.
-    	ProblemGeneralVisitor pgv = new ProblemGeneralVisitor(pb);
+    	pgv.clearVars();
     	while(cRef != null) {
-    		cRef.accept((ProblemGeneralVisitor)pgv);
+    		cRef.accept(pgv);
     		//TODO: the functionality of addConstraint() returning a boolean for failures is now missing.
 //    		if(!cRef.accept(pgv)) { //This doesn't work since I can't change method signatures of visitors.
 //    			return null;
@@ -1118,31 +1121,24 @@ getExpression(stoex.value)), newae));
     	}
     	//Old code for reference:
 //      while (cRef != null) {
+//    	 
 //        if(addConstraint(cRef) == false) {
 //          return null;
 //        }
 //        cRef = cRef.and;
 //      }
     }
-
     return pb;
   }
-
-//  public void accept(ConstraintExpressionVisitor visitor) {
-//	visitor.preVisit(this); //PreVisit the visitor
-//	left.accept(visitor);   //accept left
-//	right.accept(visitor);  //accept right
-//	visitor.postVisit(this);//PostVisit the visitor
-//  }
   
   private static boolean addConstraint(Constraint cRef) {
     boolean constraintResult = true;
 
-    if (cRef instanceof RealConstraint)
+    if (cRef instanceof RealConstraint) //Carson: Handled.
       constraintResult= createDPRealConstraint((RealConstraint)cRef);// create choco real constraint
-    else if (cRef instanceof LinearIntegerConstraint)
+    else if (cRef instanceof LinearIntegerConstraint) //Carson: Handled.
       constraintResult= createDPLinearIntegerConstraint((LinearIntegerConstraint)cRef);// create choco linear integer constraint
-    else if (cRef instanceof MixedConstraint)
+    else if (cRef instanceof MixedConstraint) //Carson: ?
       // System.out.println("Mixed Constraint");
       constraintResult= createDPMixedConstraint((MixedConstraint)cRef);
     else if (cRef instanceof LogicalORLinearIntegerConstraints) {

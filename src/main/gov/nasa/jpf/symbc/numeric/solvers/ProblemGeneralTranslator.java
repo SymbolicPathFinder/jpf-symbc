@@ -12,6 +12,7 @@ import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
 
 public class ProblemGeneralTranslator {
 
+	//Ignore this for now. This isn't being used.
 	public static ProblemGeneral createInstance(Constraint c) {
 
 		Expression e = null;

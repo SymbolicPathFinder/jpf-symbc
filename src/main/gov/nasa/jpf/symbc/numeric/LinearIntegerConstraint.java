@@ -61,5 +61,9 @@ public class LinearIntegerConstraint extends Constraint {
     @Override
     public LinearIntegerConstraint not() {
         return new LinearIntegerConstraint(getLeft(), getComparator().not(), getRight());
-    }    
+    }
+    
+//    public void accept() {
+//    	
+//    }
 }
