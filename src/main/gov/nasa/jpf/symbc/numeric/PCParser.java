@@ -1112,11 +1112,10 @@ getExpression(stoex.value)), newae));
     	//I'm telling it to handle itself as stuff goes on.
     	pgv.clearVars();
     	while(cRef != null) {
-    		cRef.accept(pgv);
     		//TODO: the functionality of addConstraint() returning a boolean for failures is now missing.
-//    		if(!cRef.accept(pgv)) { //This doesn't work since I can't change method signatures of visitors.
-//    			return null;
-//    		}
+    		if(!cRef.accept(pgv)) { //This doesn't work since I can't change method signatures of visitors.
+    			return null;
+    		}
     		cRef = cRef.and;
     	}
     	//Old code for reference:

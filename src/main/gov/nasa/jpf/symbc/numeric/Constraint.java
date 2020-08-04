@@ -171,7 +171,7 @@ public abstract class Constraint implements Comparable<Constraint> {
       return c;
   }
   
-//JacoGeldenhuys
+  	//JacoGeldenhuys - For use with GREEN
 	public void accept(ConstraintExpressionVisitor visitor) {
 		visitor.preVisit(this); //PreVisit the visitor
 		left.accept(visitor);   //accept left
@@ -179,13 +179,14 @@ public abstract class Constraint implements Comparable<Constraint> {
 		visitor.postVisit(this);//PostVisit the visitor
 	}
 	
-//	//Carson Smith
-//	public void accept(ProblemGeneralVisitor visitor) {
-//		visitor.preVisit(this); //This is the preVisit on the constraint
-////		left.accept(visitor);
-////		right.accept(visitor);
-//		visitor.postVisit(this); //This is the postVisit on the constraint.
-//	}
+	//Carson Smith - For use with GSoC changes.
+	public boolean accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this); //PreVisit the visitor -- Nothing happens here as of right now.
+		Object l = getLeft().accept(visitor);   //accept left -- eventually this needs to return with the solver's representation of the left, so it's an object.
+		Object r = getRight().accept(visitor);  //accept right -- eventually this needs to return with the solver's representation of the left, so it's an object.
+		boolean result = visitor.postVisit(l, this, r);//PostVisit the visitor
+		return result;
+	}
 
 	public String prefix_notation() {
 		//return left.toString() + comp.toString() + right.toString()

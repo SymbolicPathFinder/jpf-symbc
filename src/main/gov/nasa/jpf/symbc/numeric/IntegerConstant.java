@@ -39,6 +39,8 @@ package gov.nasa.jpf.symbc.numeric;
 
 import java.util.Map;
 
+import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
+
 import static gov.nasa.jpf.symbc.numeric.Operator.*;
 
 public class IntegerConstant extends LinearIntegerExpression {
@@ -307,6 +309,12 @@ public class IntegerConstant extends LinearIntegerExpression {
 	public void accept(ConstraintExpressionVisitor visitor) {
 		visitor.preVisit(this);
 		visitor.postVisit(this);
+	}
+	
+	//Carson Smith
+	public Object accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		return visitor.postVisit(this);
 	}
 
 	@Override

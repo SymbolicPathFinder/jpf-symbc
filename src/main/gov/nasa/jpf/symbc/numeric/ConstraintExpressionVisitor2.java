@@ -63,7 +63,7 @@ import gov.nasa.jpf.symbc.string.SymbolicStringBuilder;
  * 
  * @author Jaco Geldenhuys
  */
-public abstract class ConstraintExpressionVisitor {
+public abstract class ConstraintExpressionVisitor2 {
 
 	/*--- CONSTRAINT VISITOR ROUTINES ---*/
 
@@ -186,11 +186,11 @@ public abstract class ConstraintExpressionVisitor {
 	public void postVisit(BinaryLinearIntegerExpression expr) {
 	}
 
-	public void postVisit(IntegerConstant expr) {
-	}
+//	public void postVisit(IntegerConstant expr) {
+//	}
 
-	public void postVisit(SymbolicInteger expr) {
-	}
+//	public void postVisit(SymbolicInteger expr) {
+//	}
 
 	public void postVisit(NonLinearIntegerExpression expr) {
 	}
@@ -237,4 +237,54 @@ public abstract class ConstraintExpressionVisitor {
 	public void postVisit(SymbolicStringBuilder expr) {
 	}
 
+	
+	//Added by Carson so far - First case visitors 
+
+	//General Case
+	public boolean postVisit(Object l, Constraint constraint, Object r) {
+		return false;
+	}
+	
+	//These 4
+	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, IntegerConstant right) {
+		return false;
+	}
+	
+	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, Object right) {
+		return false;
+	}
+	
+	public boolean postVisit(Object left, LinearIntegerConstraint constraint, IntegerConstant right) {
+		return false;
+	}
+	
+	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Object right) {
+		return false;
+	}
+
+	//These 4
+	public Object postVisit(IntegerConstant left, BinaryLinearIntegerExpression expression, IntegerConstant right) {
+		return null;
+	}
+	
+	public Object postVisit(IntegerConstant left, BinaryLinearIntegerExpression expression, Object right) {
+		return null;
+	}
+	
+	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, IntegerConstant right) {
+		return null;
+	}
+
+	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, Object right) {
+		return null;
+	}
+	
+	public IntegerConstant postVisit(IntegerConstant expr) {
+		return null;
+	}
+	
+	public Object postVisit(SymbolicInteger expr) {
+		return null;
+	}
+	
 }

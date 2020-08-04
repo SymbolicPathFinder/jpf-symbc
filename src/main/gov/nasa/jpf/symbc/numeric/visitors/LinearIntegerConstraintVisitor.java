@@ -38,25 +38,20 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
 import gov.nasa.jpf.symbc.string.StringSymbolic;
 
-public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
+public class LinearIntegerConstraintVisitor extends ConstraintExpressionVisitor2 {
 
-	//Idea: Splitting constraints based on LinearIntegerConstraintsVisitor in it's own file. Make the visitor pattern itself more modular.
-	
-	//Idea: Change the methods for ProblemGeneral and the solvers to just accept Integer and Long data types. This would solve so many problems
-	//and make this class so, so much more simple.
+	//Splitting constraints based on LinearIntegerConstraints in it's own file. Make the visitor pattern itself more modular.
 	
 	//Incremental Solver.
 	//Static-ness of the class design. (something I'm definitely messing up.)
 	//Constraint differences.
 
-	//This week:
 	//Getting rid of the stack and moving to a return-type based structure for the visits.
 	//Regression
 	
-	//Things to review for now:
 	//Difference between BLIE and BNLIE and whether BLIE can handle those types of expressions if the solver can.
 	//Handling mixed/nonlinerConstraints/arrays all get complicated and I want to determine details.
-	//If I reformat these to just return Objects, I can technically avoid using a stack altogether, right? - In Progress
+	//If I reformat these to just return Objects, I can technically avoid using a stack altogether, right?
 	//Handling the returning true/false values of the constraints themselves. Maybe something like a return after successfully posting something so I can just use the way 
 	//PC parser uses to iterate through all the constraints.
 
@@ -81,7 +76,7 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	 * Initializes the internal stack and sets the pb object.
 	 * @param pb
 	 */
-	public ProblemGeneralVisitor(ProblemGeneral pb) {
+	public LinearIntegerConstraintVisitor(ProblemGeneral pb) {
 		stack = new Stack<Object>();
 		ProblemGeneralVisitor.pb = pb;
 	}
@@ -363,7 +358,7 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		}
 	}
 
-	//TODO: Establish if this is needed or not. It shouldn't be, right?
+	
 	public void postVisit(Constraint constraint) {
 		System.out.println("Error?");
 		System.out.println(constraint.getClass());
@@ -373,11 +368,12 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	
 	
 	
-	//These handle the constraint visits and return the resulting boolean value. These should be working as expected.
-	//Is there something about Overloading I'm not gtting?
+	//These handle the constraint visits and return the resulting 
 	
 	@Override
 	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, IntegerConstant right) {
+		//Object r = stack.pop();
+		//Object l = stack.pop();
 		int r2 = right.value();
 		int l2 = left.value();
 		switch (constraint.getComparator()) {
@@ -422,8 +418,11 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	}
 
 	@Override
-	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, Object right) {
-		Object r = right;
+	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, IntegerExpression right) {
+
+		//TODO: Get rid of the unneeded stack pop. Perhaps just don't even have an add to the stack for cases where it's a constant?
+		Object r = stack.pop();
+		//Object l = stack.pop();
 		int l2 = left.value();
 		switch (constraint.getComparator()) {
 		case EQ:
@@ -449,8 +448,10 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	}
 
 	@Override
-	public boolean postVisit(Object left, LinearIntegerConstraint constraint, IntegerConstant right) {
-		Object l = left;
+	public boolean postVisit(IntegerExpression left, LinearIntegerConstraint constraint, IntegerConstant right) {
+		//TODO: Get rid of the unneeded stack pop. Perhaps just don't even have an add to the stack for cases where it's a constant?
+		//Object r = stack.pop();
+		Object l = stack.pop();
 		int r2 = right.value();
 		switch (constraint.getComparator()) {
 		case EQ:
@@ -476,10 +477,10 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	}
 
 	@Override
-	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Object right) {
-		//TODO: clean up this pointless stuff below
-		Object r = right;
-		Object l = left;
+	public boolean postVisit(IntegerExpression left, LinearIntegerConstraint constraint, IntegerExpression right) {
+		//TODO: Get rid of the unneeded stack pop. Perhaps just don't even have an add to the stack for cases where it's a constant?
+		Object r = stack.pop();
+		Object l = stack.pop();
 		switch (constraint.getComparator()) {
 		case EQ:
 			pb.post(pb.eq(l, r));
@@ -503,7 +504,135 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		return true;
 	}
 
-	//TODO: This needs fixing.
+	//This will removed eventually.
+	@Override
+	public void postVisit(LinearIntegerConstraint constraint) {
+
+		//Problem = having these two as Objects prevents me from accessing Long or Double values as I need them,
+		//since the methods use primitive data type versions and I'm telling these to make objects, so they're
+		//falling under the wrong method. I could use a bunch of instanceof if statements here to accomplish it.
+		//I suppose I could also have a check for IntegerContant/RealConstant values and change them to what I want.
+		//Additionally, I could make more methods to overload and differentiate between return values and the like
+		//It would circumvent the need for a stack, but dramatically increase the number of methods I'd need to 
+		//write.
+
+		//So overall I have 3 different solution options here, but I'm not sure which direction I would want to go in.
+
+		//Once I solve the above issue, I'm fairly confident I'll have it working.
+
+		//postVisit(IntegerConstant ic, comparator c, Object r) methods like this would probably solve this.
+		Object r = stack.pop();
+		Object l = stack.pop();
+
+		switch (constraint.getComparator()) {
+		case EQ:
+			if(r instanceof IntegerConstant && l instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				int l2 = ((IntegerConstant) l).value();
+				//pb.post(pb.eq(l2, r2));
+				//This just needs a check for equality. I do not like this solution. I need to think about how
+				//To make this not terrible.
+			} else if(l instanceof IntegerConstant) {
+				int l2 = ((IntegerConstant) l).value();
+				pb.post(pb.eq(l2, r));
+			} else if(r instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				pb.post(pb.eq(l, r2));
+			} else {
+				pb.post(pb.eq(l, r));
+			}
+			break;
+		case NE:
+			if(r instanceof IntegerConstant && l instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				int l2 = ((IntegerConstant) l).value();
+				//pb.post(pb.eq(l2, r2));
+				//This just needs a check for equality. I do not like this solution. I need to think about how
+				//To make this not terrible.
+			} else if(l instanceof IntegerConstant) {
+				int l2 = ((IntegerConstant) l).value();
+				pb.post(pb.neq(l2, r));
+			} else if(r instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				pb.post(pb.neq(l, r2));
+			} else {
+				pb.post(pb.neq(l, r));
+			}
+			break;
+		case LT:
+			if(r instanceof IntegerConstant && l instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				int l2 = ((IntegerConstant) l).value();
+				//pb.post(pb.eq(l2, r2));
+				//This just needs a check for equality. I do not like this solution. I need to think about how
+				//To make this not terrible.
+			} else if(l instanceof IntegerConstant) {
+				int l2 = ((IntegerConstant) l).value();
+				pb.post(pb.lt(l2, r));
+			} else if(r instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				pb.post(pb.lt(l, r2));
+			} else {
+				pb.post(pb.lt(l, r));
+			}
+			break;
+		case LE:
+			if(r instanceof IntegerConstant && l instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				int l2 = ((IntegerConstant) l).value();
+				//pb.post(pb.eq(l2, r2));
+				//This just needs a check for equality. I do not like this solution. I need to think about how
+				//To make this not terrible.
+			} else if(l instanceof IntegerConstant) {
+				int l2 = ((IntegerConstant) l).value();
+				pb.post(pb.leq(l2, r));
+			} else if(r instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				pb.post(pb.leq(l, r2));
+			} else {
+				pb.post(pb.leq(l, r));
+			}
+			break;
+		case GT:
+			if(r instanceof IntegerConstant && l instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				int l2 = ((IntegerConstant) l).value();
+				//pb.post(pb.eq(l2, r2));
+				//This just needs a check for equality. I do not like this solution. I need to think about how
+				//To make this not terrible.
+			} else if(l instanceof IntegerConstant) {
+				int l2 = ((IntegerConstant) l).value();
+				pb.post(pb.gt(l2, r));
+			} else if(r instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				pb.post(pb.gt(l, r2));
+			} else {
+				pb.post(pb.gt(l, r));
+			}
+			break;
+		case GE:
+			if(r instanceof IntegerConstant && l instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				int l2 = ((IntegerConstant) l).value();
+				//pb.post(pb.eq(l2, r2));
+				//This just needs a check for equality. I do not like this solution. I need to think about how
+				//To make this not terrible.
+			} else if(l instanceof IntegerConstant) {
+				int l2 = ((IntegerConstant) l).value();
+				pb.post(pb.geq(l2, r));
+			} else if(r instanceof IntegerConstant) {
+				int r2 = ((IntegerConstant) r).value();
+				pb.post(pb.geq(l, r2));
+			} else {
+				pb.post(pb.geq(l, r));
+			}
+			break;
+		}
+
+	}
+
+
+
 	@Override
 	public void postVisit(BinaryNonLinearIntegerExpression expression) {
 		//For BNLIEs we need to make sure that the proper type of solver is being used to handle them.
@@ -624,82 +753,18 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		}
 	}
 
-	@Override
-	public Object postVisit(IntegerConstant left, BinaryLinearIntegerExpression expression, IntegerConstant right) {
-		throw new RuntimeException("## Error: this is not a symbolic expression");
-	}
-	
-	@Override
-	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, IntegerConstant r) {
-		long right = r.value;
-		switch (expression.getOp()) {
-		case PLUS:
-			return pb.plus(left, right);
-		case MINUS:
-			return pb.minus(left, right);
-		case MUL:
-			return pb.mult(left, right);
-		case DIV:
-			return pb.div(left, right);
-		case REM:
-			return pb.rem(left, right);
-		case AND:
-			return pb.and(left, right);
-		case OR:
-			return pb.or(left, right);
-		case XOR:
-			return pb.xor(left, right);
-		case SHIFTR:
-			return pb.shiftR(left, right);
-		case SHIFTUR:
-			return pb.shiftUR(left, right);
-		case SHIFTL:
-			return pb.shiftL(left, right);
-		default:
-			System.out.println("Error : unsupported operation " + expression.getOp());
-			//Let's add the rest later. This should work for now.
-			throw new RuntimeException();
-		}
-	}
-	
-	@Override
-	public Object postVisit(IntegerConstant l, BinaryLinearIntegerExpression expression, Object right) {
-		long left = l.value;
-		switch (expression.getOp()) {
-		case PLUS:
-			return pb.plus(left, right);
-		case MINUS:
-			return pb.minus(left, right);
-		case MUL:
-			return pb.mult(left, right);
-		case DIV:
-			return pb.div(left, right);
-		case REM:
-			return pb.rem(left, right);
-		case AND:
-			return pb.and(left, right);
-		case OR:
-			return pb.or(left, right);
-		case XOR:
-			return pb.xor(left, right);
-		case SHIFTR:
-			return pb.shiftR(left, right);
-		case SHIFTUR:
-			return pb.shiftUR(left, right);
-		case SHIFTL:
-			return pb.shiftL(left, right);
-		default:
-			System.out.println("Error : unsupported operation " + expression.getOp());
-			//Let's add the rest later. This should work for now.
-			throw new RuntimeException();
-		}
-	}
-	
-	@Override
+//	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, IntegerConstant right) {
+//		
+//	}
+//	public Object postVisit(IntegerConstant left, BinaryLinearIntegerExpression expression, Object right) {
+//		
+//	}
 	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, Object right) {
-		System.out.println(left.getClass());
-		System.out.println(right.getClass());
-		//TODO: Figure this shit out man. Look at PCParser and determine if this is needed or not.
+		
+		if(left instanceof IntegerConstant && right instanceof IntegerConstant) {
+			throw new RuntimeException("## Error: this is not a symbolic expression");
+		}
+		
 		switch (expression.getOp()) {
 		case PLUS:
 			return pb.plus(left, right);
@@ -708,14 +773,20 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		case MUL:
 			if (!(left instanceof IntegerConstant) && !(right instanceof IntegerConstant)) {
 				throw new RuntimeException("## Error: Binary Non Linear Operation");
+			} else {
+				return pb.mult(left, right);
 			}
 		case DIV:
 			if (!(left instanceof IntegerConstant) && !(right instanceof IntegerConstant)) {
 				throw new RuntimeException("## Error: Binary Non Linear Operation");
+			} else {
+				return pb.div(left, right);
 			}
 		case REM:
-			if (!(left instanceof IntegerConstant) && !(right instanceof IntegerConstant)) {
+			if (!(left instanceof IntegerConstant) && !(right instanceof IntegerConstant)) { //TODO: Is this needed?
 				throw new RuntimeException("## Error: Binary Non Linear Operation");
+			} else {
+				return pb.rem(left, right);
 			}
 		case AND:
 			return pb.and(left, right);
@@ -737,7 +808,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	}
 
 	@Override
-	public IntegerConstant postVisit(IntegerConstant integerConstant) {
+	public Object postVisit(IntegerConstant integerConstant) {
+		//Let's roll with this for now. Just adding the value to the stack.
 		return integerConstant;
 	}
 

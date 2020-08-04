@@ -63,7 +63,9 @@ public class LinearIntegerConstraint extends Constraint {
         return new LinearIntegerConstraint(getLeft(), getComparator().not(), getRight());
     }
     
-//    public void accept() {
-//    	
-//    }
+    //Carson Smith
+    public boolean accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this); //PreVisit the visitor
+		return visitor.postVisit(getLeft().accept(visitor), this, getRight().accept(visitor));//PostVisit the visitor
+	}
 }

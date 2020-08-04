@@ -175,6 +175,13 @@ public class SymbolicInteger extends LinearIntegerExpression
 		visitor.preVisit(this);
 		visitor.postVisit(this);
 	}
+    
+    //Carson Smith
+    @Override
+	public Object accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		return visitor.postVisit(this);
+	}
 
 	@Override
 	public int compareTo(Expression expr) {
