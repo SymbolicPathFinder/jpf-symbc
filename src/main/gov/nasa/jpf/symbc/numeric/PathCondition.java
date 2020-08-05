@@ -411,7 +411,8 @@ public class PathCondition implements Comparable<PathCondition> {
     }
 
     public String stringPC() {
-        return "constraint # = " + count + ((header == null) ? "" : "\n" + header.stringPC());
+        //return "constraint # = " + count + ((header == null) ? "" : "\n" + header.stringPC());
+    	return ((header == null) ? "" : "\n" + header.stringPC());
     }
 
     public String toString() {

@@ -39,7 +39,7 @@ package gov.nasa.jpf.symbc.numeric;
 
 public enum Comparator {
 
-   EQ(" = ") { public Comparator not() { return NE; }},
+   EQ(" == ") { public Comparator not() { return NE; }},
    NE(" != ") { public Comparator not() { return EQ; }},
    LT(" < ")  { public Comparator not() { return GE; }},
    LE(" <= ") { public Comparator not() { return GT; }},
