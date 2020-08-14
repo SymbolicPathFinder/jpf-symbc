@@ -237,12 +237,7 @@ public abstract class ConstraintExpressionVisitor2 {
 	}
 
 	
-	//Added by Carson so far - First case visitors 
-
-	//General Case
-//	public boolean postVisit(Object l, Constraint constraint, Object r) {
-//		return false;
-//	}
+	//Added by Carson so far - First case visitors
 	
 	//These 4
 	public boolean postVisit(Long left, LinearIntegerConstraint constraint, Long right) {
@@ -312,6 +307,7 @@ public abstract class ConstraintExpressionVisitor2 {
 		return null;
 	}
 	
+	//
 	public Object postVisit(Double left, BinaryRealExpression expression, Double right) {
 		return null;
 	}
@@ -349,12 +345,8 @@ public abstract class ConstraintExpressionVisitor2 {
 		return null;
 	}
 
-	
-//	public boolean postVisit(Object l, Constraint constraint, Object r) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
 
+	//
 	public boolean postVisit(Long left, NonLinearIntegerConstraint constraint, Long right) {
 		return false;
 	}
@@ -372,8 +364,19 @@ public abstract class ConstraintExpressionVisitor2 {
 	}
 
 	//
-	public boolean postVisit(Object leftR, MixedConstraint mixedConstraint, Object rightR) {
-		// TODO Auto-generated method stub
+	public boolean postVisit(SymbolicReal left, MixedConstraint mixedConstraint, SymbolicInteger right) {
+		return false;
+	}
+
+	public boolean postVisit(SymbolicReal left, MixedConstraint constraint, IntegerExpression right) {
+		return false;
+	}
+
+	public boolean postVisit(RealExpression left, MixedConstraint constraint, SymbolicInteger right) {
+		return false;
+	}
+
+	public boolean postVisit(RealExpression left, MixedConstraint constraint, IntegerExpression right) {
 		return false;
 	}
 }

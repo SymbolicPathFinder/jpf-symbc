@@ -47,6 +47,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	//Constraint differences.
 
 	//Regression
+	
+	//TODO: .accept(this) within the postVisit method. It'll make everything so much nicer.
 
 	//Thought: one main level accept() at the constraint level in postVisit(). It preVisits(this). It postVisits(this)
 	//In the postVisit(Constraint constraint) (Or other types of constraints)
@@ -857,7 +859,6 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		Object dp_var = symIntegerVar.get(symbInt);
 
 		if (dp_var == null) {
-			System.out.println(symbInt);
 			dp_var = pb.makeIntVar(((SymbolicInteger)symbInt).getName(),((SymbolicInteger)symbInt)._min, ((SymbolicInteger)symbInt)._max);
 			symIntegerVar.put((SymbolicInteger)symbInt, dp_var);
 		}
@@ -865,56 +866,62 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	}
 
 	//------------------------------------------------------------------------------------------------------------------------------------------
-	//TODO Stuff from here.
-
+	//MixedConstraint stuff.
 	@Override
-	public void postVisit(MixedConstraint constraint) {
-		//TODO: This case doesn't appear to be finished in PCParser. See: createDPMixedConstraint() in PCParser.java 
-		//Though, I would imagine that it's easy to do here given how everything is being changed just by formatting it out like the previous constraint
-		//postVisits.
-	}
-	
-	public boolean postVisit(Long left, MixedConstraint constraint, Object right) {
-		
-	}
-	
-	public boolean postVisit(Object left, MixedConstraint constraint, Double right) {
-		
-	}
-	
-	public boolean postVisit(Long left, MixedConstraint constraint, Double right) {
-		
+	public boolean postVisit(RealExpression left, MixedConstraint constraint, IntegerExpression right) {
+		assert(false); // should not be reachable. I kept the functionality as it was in PCParser, but I feel like throwing a RuntimeException is probably better.
+		return true; 
 	}
 	
 	@Override
-	public boolean postVisit(Object left, MixedConstraint constraint, Object right) {
-//		assert (constraint.getComparator() == Comparator.EQ);
-//		
-//		//With this, we know that the objects being returned for the MixedConstraint are exactly what we think they are.
-//		if (constraint.getLeft() instanceof SymbolicReal && constraint.getRight() instanceof SymbolicInteger) {
-//			pb.post(pb.mixed(left, right));
-//		} else if (constraint.getLeft() instanceof SymbolicReal) { // c_rightRef is an IntegerExpression
-//			Object tmpi = pb.makeIntVar(right + "_" + right.hashCode(),(int)(((SymbolicReal)constraint.getLeft())._min), (int)(((SymbolicReal)constraint.getLeft())._max));
-//			if (right instanceof Long) {
-//				pb.post(pb.eq(((Long)right).longValue(), tmpi));
-//			} else {
-//				pb.post(pb.eq(constraint.getLeft(), tmpi));
-//			}
-//			pb.post(pb.mixed(right,tmpi));
-//		} else if (constraint.getRight() instanceof SymbolicInteger) { // c_leftRef is a RealExpression
-//			Object tmpr = pb.makeRealVar(left + "_" + left.hashCode(), ((SymbolicInteger)right)._min, ((SymbolicInteger)right)._max);
-//			if(left instanceof RealConstant) {
-//				pb.post(pb.eq(tmpr, ((RealConstant)left).value));
-//			} else {
-//				pb.post(pb.eq(tmpr, left));
-//			}
-//			pb.post(pb.mixed(tmpr,right));
-//		} else {
-//			assert(false);
-//		}
-//		return true;
+	public boolean postVisit(RealExpression left, MixedConstraint constraint, SymbolicInteger right) {
+		assert (constraint.getComparator() == Comparator.EQ);
+
+		Object l = left.accept(this);
+		Object r = right.accept(this);
+		
+		Object tmpr = pb.makeRealVar(left + "_" + left.hashCode(), ((SymbolicInteger)right)._min, ((SymbolicInteger)right)._max);
+		if(left instanceof RealConstant) {
+			pb.post(pb.eq(tmpr, ((RealConstant)left).value));
+		} else {
+			pb.post(pb.eq(tmpr, l));
+		}
+		pb.post(pb.mixed(tmpr, r));
+		return true;
 	}
 
+	@Override
+	public boolean postVisit(SymbolicReal left, MixedConstraint constraint, IntegerExpression right) {
+		assert (constraint.getComparator() == Comparator.EQ);
+
+		Object l = left.accept(this);
+
+		Object tmpi = pb.makeIntVar(right + "_" + right.hashCode(),(int)(((SymbolicReal)left)._min), (int)(((SymbolicReal)left)._max));
+
+		if (right instanceof IntegerConstant) { //If the right value is a constant.
+			pb.post(pb.eq(((IntegerConstant)right).value,tmpi));
+		} else {
+			Object r = right.accept(this);
+			pb.post(pb.eq(r,tmpi));
+		}
+		pb.post(pb.mixed(l,tmpi));
+		return true;
+	}
+	
+	@Override
+	public boolean postVisit(SymbolicReal left, MixedConstraint constraint, SymbolicInteger right) {
+		assert (constraint.getComparator() == Comparator.EQ);
+
+		Object l = left.accept(this);
+		Object r = right.accept(this);
+
+		pb.post(pb.mixed(l, r));
+		
+		return true;
+	}
+
+	
+	//TODO: Stuff from here.
 	@Override 
 	public void postVisit(LogicalORLinearIntegerConstraints constraint) {
 		//TODO: I'll get to this. This appears to be there to handle CNF style constraints, whatever those are.

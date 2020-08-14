@@ -373,7 +373,9 @@ public class PCParser {
 	  //Get references to each of the relevent bits of information.
 	  
 	  assert (c_compRef == Comparator.EQ);
-	  //Assert that the comparator is the equals sign.
+	  //Assert that the comparator is the equals sign. THIS ACTUALLY MAKES SENSE.
+	  //This is essentially checking for situations where a value is doing like
+	  //3 == 3.0 or something. Since the other comparator operations don't seem to be supported.
 	  
 	  if (c_leftRef instanceof SymbolicReal && c_rightRef instanceof SymbolicInteger) {
 		  //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),(IntDomainVar)(getExpression(c_rightRef))));
@@ -390,16 +392,35 @@ public class PCParser {
 		  Object tmpi = pb.makeIntVar(c_rightRef + "_" + c_rightRef.hashCode(),(int)(((SymbolicReal)c_leftRef)._min), (int)(((SymbolicReal)c_leftRef)._max));
 		  //Right here, a new object is created. That is, a dp_var of sorts is created.
 		  //It calls pb.makeIntVar for the toString of c_rightRef, plus an underscore, plus the hash code. This created symbolic
-		  //Variable has a min and max of the symbolic left reference 
+		  //Variable has a min and max of the symbolic left reference. I honestly don't get why this is being created. It's a value for the symbolicReal
+		  //Being framed as a symbolic integer based on the bounds of the symbolic real.
 		  
-		  if (c_rightRef instanceof IntegerConstant) {
+		  if (c_rightRef instanceof IntegerConstant) { //If the right value is a constant.
 			  pb.post(pb.eq(((IntegerConstant)c_rightRef).value,tmpi));
+			  //It posts to the pb an equality constraint for the right value as an integer (primitive) and seeing if it evaluates equally to the 
+			  //symbollically created value with the integer-based bounds of the Symbolic real value for the left.
 		  } else {
+			  //But, if the right value is not a constant. The right value could contain all sorts of things. 
+			  //In that sense we just go out and grab the expression for the right value. This will be an Object in 
+			  //Whatever solver's language to represent the expression's value.
+			  //It then posts to the pb an equality constraint between the crafted c_rightRef value and tmpi, created above.
 			  pb.post(pb.eq(getExpression(c_rightRef),tmpi));
 		  }
+		  //Therefore, by the time it executes here, it should be creating the first of two constraints, namely, a constraint that 
+		  //ensure equality between whatever the right-hand side of the expression is and the temp symbolically created value based on the
+		  //symbolicReal's correlating SymbolicInt values.
+		  
 		  //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),tmpi));
 		  pb.post(pb.mixed(getExpression(c_leftRef),tmpi));
+		  
+		  //Finally, it posts a mixed constraint, whatever that may be, to the solver. This mixed constraint consists of 
+		  //the original c_leftRef value and the temp value. This is pretty much analogous to what occurs in the first overall
+		  //conditional for where both left and right are symbolic.
 
+		  
+		  //So, the things/values that need to be available are:
+		  //the pre-processing symbolic variables c_leftRef and c_rightRef
+		  
 	  }
 	  else if (c_rightRef instanceof SymbolicInteger) { // c_leftRef is a RealExpression
 		  Object tmpr = pb.makeRealVar(c_leftRef + "_" + c_leftRef.hashCode(), ((SymbolicInteger)c_rightRef)._min, ((SymbolicInteger)c_rightRef)._max);
