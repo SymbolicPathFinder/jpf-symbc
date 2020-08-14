@@ -365,40 +365,56 @@ public class PCParser {
   //}
 
 
-  static public boolean createDPMixedConstraint(MixedConstraint cRef) { // TODO
+  static public boolean createDPMixedConstraint(MixedConstraint cRef) { // TODO 
 	  //Might be automatic with how constraints are made.
-    Comparator c_compRef = cRef.getComparator();
-    RealExpression c_leftRef = (RealExpression)cRef.getLeft();
-    IntegerExpression c_rightRef = (IntegerExpression)cRef.getRight();
-    assert (c_compRef == Comparator.EQ);
+	  Comparator c_compRef = cRef.getComparator();
+	  RealExpression c_leftRef = (RealExpression)cRef.getLeft();
+	  IntegerExpression c_rightRef = (IntegerExpression)cRef.getRight();
+	  //Get references to each of the relevent bits of information.
+	  
+	  assert (c_compRef == Comparator.EQ);
+	  //Assert that the comparator is the equals sign.
+	  
+	  if (c_leftRef instanceof SymbolicReal && c_rightRef instanceof SymbolicInteger) {
+		  //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),(IntDomainVar)(getExpression(c_rightRef))));
+		  pb.post(pb.mixed(getExpression(c_leftRef),getExpression(c_rightRef)));
+		  
+		  //If the left and right values are both Symbolic, it will call getExpression to get the dp_var of said values. a pb.mixed 
+		  //constraint will then be posted to pb.
+	  }
+	  else if (c_leftRef instanceof SymbolicReal) { // c_rightRef is an IntegerExpression
+		  
+		  //However, under this condition, the left ref is Symbolic, but the right ref is an expression. That is, it is not Symbolic.
+		  //In this case, right could be a BLIE, BNLIE, or a constant, it isn't known which it is at this point.
+		  
+		  Object tmpi = pb.makeIntVar(c_rightRef + "_" + c_rightRef.hashCode(),(int)(((SymbolicReal)c_leftRef)._min), (int)(((SymbolicReal)c_leftRef)._max));
+		  //Right here, a new object is created. That is, a dp_var of sorts is created.
+		  //It calls pb.makeIntVar for the toString of c_rightRef, plus an underscore, plus the hash code. This created symbolic
+		  //Variable has a min and max of the symbolic left reference 
+		  
+		  if (c_rightRef instanceof IntegerConstant) {
+			  pb.post(pb.eq(((IntegerConstant)c_rightRef).value,tmpi));
+		  } else {
+			  pb.post(pb.eq(getExpression(c_rightRef),tmpi));
+		  }
+		  //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),tmpi));
+		  pb.post(pb.mixed(getExpression(c_leftRef),tmpi));
 
-    if (c_leftRef instanceof SymbolicReal && c_rightRef instanceof SymbolicInteger) {
-      //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),(IntDomainVar)(getExpression(c_rightRef))));
-      pb.post(pb.mixed(getExpression(c_leftRef),getExpression(c_rightRef)));
-    }
-    else if (c_leftRef instanceof SymbolicReal) { // c_rightRef is an IntegerExpression
-      Object tmpi = pb.makeIntVar(c_rightRef + "_" + c_rightRef.hashCode(),(int)(((SymbolicReal)c_leftRef)._min), (int)(((SymbolicReal)c_leftRef)._max));
-      if (c_rightRef instanceof IntegerConstant)
-        pb.post(pb.eq(((IntegerConstant)c_rightRef).value,tmpi));
-      else
-        pb.post(pb.eq(getExpression(c_rightRef),tmpi));
-      //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),tmpi));
-      pb.post(pb.mixed(getExpression(c_leftRef),tmpi));
+	  }
+	  else if (c_rightRef instanceof SymbolicInteger) { // c_leftRef is a RealExpression
+		  Object tmpr = pb.makeRealVar(c_leftRef + "_" + c_leftRef.hashCode(), ((SymbolicInteger)c_rightRef)._min, ((SymbolicInteger)c_rightRef)._max);
+		  if(c_leftRef instanceof RealConstant) {
+			  pb.post(pb.eq(tmpr, ((RealConstant)c_leftRef).value));
+		  } else {
+			  pb.post(pb.eq(tmpr, getExpression(c_leftRef)));
+		  }
+		  //pb.post(new MixedEqXY(tmpr,(IntDomainVar)(getExpression(c_rightRef))));
+		  pb.post(pb.mixed(tmpr,getExpression(c_rightRef)));
+	  } else {
+		  assert(false); // should not be reachable
+	  }
 
-    }
-    else if (c_rightRef instanceof SymbolicInteger) { // c_leftRef is a RealExpression
-      Object tmpr = pb.makeRealVar(c_leftRef + "_" + c_leftRef.hashCode(), ((SymbolicInteger)c_rightRef)._min, ((SymbolicInteger)c_rightRef)._max);
-      if(c_leftRef instanceof RealConstant)
-        pb.post(pb.eq(tmpr, ((RealConstant)c_leftRef).value));
-      else
-        pb.post(pb.eq(tmpr, getExpression(c_leftRef)));
-      //pb.post(new MixedEqXY(tmpr,(IntDomainVar)(getExpression(c_rightRef))));
-      pb.post(pb.mixed(tmpr,getExpression(c_rightRef)));
-    }
-    else
-      assert(false); // should not be reachable
-
-    return true;
+	  return true;
   }
 
   static public boolean createDPRealConstraint(RealConstraint cRef) {

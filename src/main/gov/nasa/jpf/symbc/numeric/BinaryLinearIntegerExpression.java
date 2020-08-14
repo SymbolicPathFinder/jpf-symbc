@@ -68,6 +68,7 @@ public class BinaryLinearIntegerExpression extends LinearIntegerExpression
 		visitor.preVisit(this);
 		Object lexpr = left.accept(visitor);
 		Object rexpr = right.accept(visitor);
+		System.out.println("hello");
 		return visitor.postVisit(lexpr, this, rexpr);
 	}
 

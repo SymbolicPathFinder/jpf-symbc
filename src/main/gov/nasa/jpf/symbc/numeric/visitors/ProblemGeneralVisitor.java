@@ -1,10 +1,7 @@
 package gov.nasa.jpf.symbc.numeric.visitors;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 
 import gov.nasa.jpf.symbc.numeric.BinaryLinearIntegerExpression;
 import gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression;
@@ -41,39 +38,37 @@ import gov.nasa.jpf.symbc.string.StringSymbolic;
 public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	//Idea: Splitting constraints based on LinearIntegerConstraintsVisitor in it's own file. Make the visitor pattern itself more modular.
-	
+
 	//Idea: Change the methods for ProblemGeneral and the solvers to just accept Integer and Long data types. This would solve so many problems
 	//and make this class so, so much more simple.
-	
+
 	//Incremental Solver.
 	//Static-ness of the class design. (something I'm definitely messing up.)
 	//Constraint differences.
 
-	//This week:
-	//Getting rid of the stack and moving to a return-type based structure for the visits.
 	//Regression
-	
-	//Things to review for now:
-	//Difference between BLIE and BNLIE and whether BLIE can handle those types of expressions if the solver can.
-	//Handling mixed/nonlinerConstraints/arrays all get complicated and I want to determine details.
-	//If I reformat these to just return Objects, I can technically avoid using a stack altogether, right? - In Progress
-	//Handling the returning true/false values of the constraints themselves. Maybe something like a return after successfully posting something so I can just use the way 
-	//PC parser uses to iterate through all the constraints.
 
-	/**
-	 * 
-	 */
+	//Thought: one main level accept() at the constraint level in postVisit(). It preVisits(this). It postVisits(this)
+	//In the postVisit(Constraint constraint) (Or other types of constraints)
+	//it then... 
+	//accept(left)
+	//accept(right) (from within the postVisit method.)
+	//Ultimate returns of those are then just used elsewhere.
+	//I will need to look at what this accomplishes for the sake of simplicity.
+
+	//postVisit(constraint.getLeft());
+	//postVisit(constraint.getRight());
+
+	//TODO:
+	//Handling mixed/nonlinerConstraints
+	//Correcting names to visit() instead of postVisit() so the readability of accept() statements improves.
+	//Stack vs. No Stack - Which do I use and why? Stack feels generally better for many reasons.
+	//No stack has prettier accept() methods that make more sense. (These can be cleaned up with a new idea I've had just as I write this)
+	//On the other hand, no stack gets rid of many, many ugly instanceof statements.
+
 	static public Map<SymbolicReal, Object>	symRealVar = new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
 	static Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>();
 
-	/**
-	 * 
-	 */
-	private Stack<Object> stack;
-
-	/**
-	 * 
-	 */
 	static ProblemGeneral pb;
 
 	/**
@@ -82,7 +77,6 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	 * @param pb
 	 */
 	public ProblemGeneralVisitor(ProblemGeneral pb) {
-		stack = new Stack<Object>();
 		ProblemGeneralVisitor.pb = pb;
 	}
 
@@ -99,359 +93,44 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		return symIntegerVar;
 	}
 
-	//	These next 5 methods, postVisits for RealConstraint, BinaryRealExpression, RealConstant, SymbolicReal, and MathRealExpression
-	//	Work by taking into consideration the work that is originally being done in PCParser.java's createDPRealConstraint(RealConstraint)
-	//	Method for constraints. Some functionality may be mirrored from future work that I do on this.
-
-
-	//Idea: Make a true/false for BNLIE supported pb's and just check that.
-
-	@Override
-	public void postVisit(RealConstraint constraint) {
-
-		Object r = stack.pop();
-		Object l = stack.pop();
-
-		switch (constraint.getComparator()) {
-		case EQ:
-			if(r instanceof RealConstant && l instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				double l2 = ((RealConstant) l).value();
-				//pb.post(pb.eq(l2, r2));
-				//This just needs a check for equality. I do not like this solution. I need to think about how
-				//To make this not terrible.
-			} else if(l instanceof RealConstant) {
-				double l2 = ((RealConstant) l).value();
-				pb.post(pb.eq(l2, r));
-			} else if(r instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				pb.post(pb.eq(l, r2));
-			} else {
-				pb.post(pb.eq(l, r));
+	//------------------------------------------------------------------------------------------------------------------------------------------
+	//RealConstraint methods
+	public boolean postVisit(Object left, RealConstraint constraint, Object right) {
+		if(left instanceof Double && right instanceof Double) {
+			return postVisit(((Double) left), constraint, ((Double) right));
+		} else if(left instanceof Double) {
+			return postVisit(((Double) left), constraint, right);
+		} else if(right instanceof Double) {
+			return postVisit(left, constraint, ((Double) right));
+		} else {
+			switch (constraint.getComparator()) {
+			case EQ:
+				pb.post(pb.eq(left, right));
+				break;
+			case NE:
+				pb.post(pb.neq(left, right));
+				break;
+			case LT:
+				pb.post(pb.lt(left, right));
+				break;
+			case LE:
+				pb.post(pb.leq(left, right));
+				break;
+			case GT:
+				pb.post(pb.gt(left, right));
+				break;
+			case GE:
+				pb.post(pb.geq(left, right));
+				break;
 			}
-			break;
-		case NE:
-			if(r instanceof RealConstant && l instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				double l2 = ((RealConstant) l).value();
-				//pb.post(pb.eq(l2, r2));
-				//This just needs a check for equality. I do not like this solution. I need to think about how
-				//To make this not terrible.
-			} else if(l instanceof RealConstant) {
-				double l2 = ((RealConstant) l).value();
-				pb.post(pb.neq(l2, r));
-			} else if(r instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				pb.post(pb.neq(l, r2));
-			} else {
-				pb.post(pb.neq(l, r));
-			}
-			break;
-		case LT:
-			if(r instanceof RealConstant && l instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				double l2 = ((RealConstant) l).value();
-				//pb.post(pb.eq(l2, r2));
-				//This just needs a check for equality. I do not like this solution. I need to think about how
-				//To make this not terrible.
-			} else if(l instanceof RealConstant) {
-				double l2 = ((RealConstant) l).value();
-				pb.post(pb.lt(l2, r));
-			} else if(r instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				pb.post(pb.lt(l, r2));
-			} else {
-				pb.post(pb.lt(l, r));
-			}
-			break;
-		case LE:
-			if(r instanceof RealConstant && l instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				double l2 = ((RealConstant) l).value();
-				//pb.post(pb.eq(l2, r2));
-				//This just needs a check for equality. I do not like this solution. I need to think about how
-				//To make this not terrible.
-			} else if(l instanceof RealConstant) {
-				double l2 = ((RealConstant) l).value();
-				pb.post(pb.leq(l2, r));
-			} else if(r instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				pb.post(pb.leq(l, r2));
-			} else {
-				pb.post(pb.leq(l, r));
-			}
-			break;
-		case GT:
-			if(r instanceof RealConstant && l instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				double l2 = ((RealConstant) l).value();
-				//pb.post(pb.eq(l2, r2));
-				//This just needs a check for equality. I do not like this solution. I need to think about how
-				//To make this not terrible.
-			} else if(l instanceof RealConstant) {
-				double l2 = ((RealConstant) l).value();
-				pb.post(pb.gt(l2, r));
-			} else if(r instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				pb.post(pb.gt(l, r2));
-			} else {
-				pb.post(pb.gt(l, r));
-			}
-			break;
-		case GE:
-			if(r instanceof RealConstant && l instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				double l2 = ((RealConstant) l).value();
-				//pb.post(pb.eq(l2, r2));
-				//This just needs a check for equality. I do not like this solution. I need to think about how
-				//To make this not terrible.
-			} else if(l instanceof RealConstant) {
-				double l2 = ((RealConstant) l).value();
-				pb.post(pb.geq(l2, r));
-			} else if(r instanceof RealConstant) {
-				double r2 = ((RealConstant) r).value();
-				pb.post(pb.geq(l, r2));
-			} else {
-				pb.post(pb.geq(l, r));
-			}
-			break;
+			return true;
 		}
 	}
 
-	/**
-	 * This does the heavy lifting for BinaryRealExpression.
-	 */
 	@Override
-	public void postVisit(BinaryRealExpression expression) {
-
-		Object l;
-		Object r;
-		switch (expression.getOp()) {
-		case PLUS:
-			r = stack.pop();
-			l = stack.pop();
-			if (l instanceof Double && r instanceof Double) {
-				throw new RuntimeException("## Error: this is not a symbolic expression");
-			} else {
-				stack.push(pb.plus(l, r));
-			}
-			break;
-		case MINUS:
-			r = stack.pop();
-			l = stack.pop();
-			if (l instanceof Double && r instanceof Double) {
-				throw new RuntimeException("## Error: this is not a symbolic expression");
-			} else {
-				stack.push(pb.minus(l, r));
-			}
-			break;
-		case MUL:
-			r = stack.pop();
-			l = stack.pop();
-			if (l instanceof Double && r instanceof Double) {
-				throw new RuntimeException("## Error: this is not a symbolic expression");
-			} else {
-				stack.push(pb.mult(l, r));
-			}
-			break;
-		case DIV:
-			r = stack.pop();
-			l = stack.pop();
-			if (l instanceof Double && r instanceof Double) {
-				throw new RuntimeException("## Error: this is not a symbolic expression");
-			} else {
-				stack.push(pb.div(l, r));
-			}
-			break;
-		case AND:
-			r = stack.pop();
-			l = stack.pop();
-			if (l instanceof Double && r instanceof Double) {
-				throw new RuntimeException("## Error: this is not a symbolic expression");
-			} else {
-				stack.push(pb.and(l, r));
-			}
-			break;
-		default:
-			System.out.println("ProblemGeneralTranslator : unsupported operation " + expression.getOp());
-			throw new RuntimeException();
-		}
-	}
-
-	/**
-	 * This is adding the double value to the stack
-	 */
-	@Override
-	public void postVisit(RealConstant realConstant) {
-		//Let's roll with this for now. Just adding the value to the stack.
-		stack.add(realConstant);
-	}
-
-	/**
-	 * This is adding the dp_var for the SymbolicReal to the stack.
-	 */
-	@Override
-	public void postVisit(SymbolicReal symbReal) {
-		assert(symbReal._min>=Double.MIN_VALUE && symbReal._max<=Double.MAX_VALUE);
-		Object dp_var = symRealVar.get(symbReal);
-
-		if (dp_var == null) {
-			dp_var = pb.makeRealVar(symbReal.getName(), symbReal._min, symbReal._max);
-			symRealVar.put(symbReal, dp_var);
-		}
-
-		stack.add(dp_var);
-	}
-
-	/**
-	 * This is adding the result of various mathExpressions to the stack.
-	 */
-	@Override
-	public void postVisit(MathRealExpression mathRealExpr) {
-
-		Object	l;
-		Object	r;
-		switch(mathRealExpr.op){
-		case SIN:
-			l = stack.pop();
-			stack.push(pb.sin(l));
-			break;
-		case COS:
-			l = stack.pop();
-			stack.push(pb.cos(l));
-			break;
-		case EXP:
-			l = stack.pop();
-			stack.push(pb.exp(l));
-			break;
-		case ASIN:
-			l = stack.pop();
-			stack.push(pb.asin(l));
-			break;
-		case ACOS:
-			l = stack.pop();
-			stack.push(pb.acos(l));
-			break;
-		case ATAN:
-			l = stack.pop();
-			stack.push(pb.atan(l));
-			break;
-		case LOG:
-			l = stack.pop();
-			stack.push(pb.log(l));
-			break;
-		case TAN:
-			l = stack.pop();
-			stack.push(pb.tan(l));
-			break;
-		case SQRT:
-			l = stack.pop();
-			stack.push(pb.sqrt(l));
-			break;
-		case POW:
-			r = stack.pop();
-			l = stack.pop();
-			stack.push(pb.power(l, r));
-			break;
-		case ATAN2:
-			r = stack.pop();
-			l = stack.pop();
-			stack.push(pb.atan2(l, r));
-			break;
-		default:
-			throw new RuntimeException("## Error: Expression " + mathRealExpr);
-		}
-	}
-
-	//TODO: Establish if this is needed or not. It shouldn't be, right?
-	public void postVisit(Constraint constraint) {
-		System.out.println("Error?");
-		System.out.println(constraint.getClass());
-	}
-	
-	
-	
-	
-	
-	//These handle the constraint visits and return the resulting boolean value. These should be working as expected.
-	//Is there something about Overloading I'm not gtting?
-	
-	@Override
-	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, IntegerConstant right) {
-		int r2 = right.value();
-		int l2 = left.value();
-		switch (constraint.getComparator()) {
-		case EQ:
-			if(!(l2 == r2)) {
-				return false;
-			} else {
-				return true;
-			}
-		case NE:
-			if(!(l2 != r2)) {
-				return false;
-			} else {
-				return true;
-			}
-		case LT:
-			if(!(l2 < r2)) {
-				return false;
-			} else {
-				return true;
-			}
-		case LE:
-			if(!(l2 <= r2)) {
-				return false;
-			} else {
-				return true;
-			}
-		case GT:
-			if(!(l2 > r2)) {
-				return false;
-			} else {
-				return true;
-			}
-		case GE:
-			if(!(l2 >= r2)) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-		return false; //Should be unreachable.
-	}
-
-	@Override
-	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, Object right) {
-		Object r = right;
-		int l2 = left.value();
-		switch (constraint.getComparator()) {
-		case EQ:
-			pb.post(pb.eq(l2, r));
-			break;
-		case NE:
-			pb.post(pb.neq(l2, r));
-			break;
-		case LT:
-			pb.post(pb.lt(l2, r));
-			break;
-		case LE:
-			pb.post(pb.leq(l2, r));
-			break;
-		case GT:
-			pb.post(pb.gt(l2, r));
-			break;
-		case GE:
-			pb.post(pb.geq(l2, r));
-			break;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean postVisit(Object left, LinearIntegerConstraint constraint, IntegerConstant right) {
+	public boolean postVisit(Object left, RealConstraint constraint, Double right) {
 		Object l = left;
-		int r2 = right.value();
+		double r2 = right.doubleValue();
 		switch (constraint.getComparator()) {
 		case EQ:
 			pb.post(pb.eq(l, r2));
@@ -476,296 +155,717 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	}
 
 	@Override
-	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Object right) {
-		//TODO: clean up this pointless stuff below
+	public boolean postVisit(Double left, RealConstraint constraint, Object right) {
 		Object r = right;
-		Object l = left;
+		double l2 = left.doubleValue();
 		switch (constraint.getComparator()) {
 		case EQ:
-			pb.post(pb.eq(l, r));
+			pb.post(pb.eq(l2, r));
 			break;
 		case NE:
-			pb.post(pb.neq(l, r));
+			pb.post(pb.neq(l2, r));
 			break;
 		case LT:
-			pb.post(pb.lt(l, r));
+			pb.post(pb.lt(l2, r));
 			break;
 		case LE:
-			pb.post(pb.leq(l, r));
+			pb.post(pb.leq(l2, r));
 			break;
 		case GT:
-			pb.post(pb.gt(l, r));
+			pb.post(pb.gt(l2, r));
 			break;
 		case GE:
-			pb.post(pb.geq(l, r));
+			pb.post(pb.geq(l2, r));
 			break;
 		}
 		return true;
 	}
 
-	//TODO: This needs fixing.
 	@Override
-	public void postVisit(BinaryNonLinearIntegerExpression expression) {
-		//For BNLIEs we need to make sure that the proper type of solver is being used to handle them.
-		if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector ||
-				pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
-			Object l; 
-			Object r;
-			//Is this checking for l and r instanceof really only doable here? The only other solution I can think of is by making many, many more visitors.
-			switch (expression.op) {
-			case PLUS:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.plus(l, r));
-				}
-				break;
-			case MINUS:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.minus(l, r));
-				}
-				break;
-			case MUL:
-
-				//We don't need the second case in this situation since it's already inherently one of the correct solver types.
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) { //This satisfies the first of the conditions.
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.mult(l, r));
-				}
-				break;
-			case DIV:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.div(l, r));
-				}
-				break;
-			case REM:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.rem(l, r));
-				}
-				break;
-			case AND:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.and(l, r));
-				}
-				break;
-			case OR:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.or(l, r));
-				}
-				break;
-			case XOR:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.xor(l, r));
-				}
-				break;
-			case SHIFTR:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.shiftR(l, r));
-				}
-				break;
-			case SHIFTUR:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.shiftUR(l, r));
-				}
-				break;
-			case SHIFTL:
-				r = stack.pop();
-				l = stack.pop();
-				if (l instanceof Long && r instanceof Long) {
-					throw new RuntimeException("## Error: this is not a symbolic expression");
-				} else {
-					stack.push(pb.shiftL(l, r));
-				}
-				break;
-			default:
-				System.out.println("ProblemGeneralTranslator : unsupported operation " + expression.op);
-				//Let's add the rest later. This should work for now.
-				throw new RuntimeException();
+	public boolean postVisit(Double left, RealConstraint constraint, Double right) {
+		double r2 = right.doubleValue();
+		double l2 = left.doubleValue();
+		switch (constraint.getComparator()) {
+		case EQ:
+			if(!(l2 == r2)) {
+				return false;
 			}
-		} else {
-			//Throw exception.
+			break;
+		case NE:
+			if(!(l2 != r2)) {
+				return false;
+			}
+			break;
+		case LT:
+			if(!(l2 < r2)) {
+				return false;
+			}
+			break;
+		case LE:
+			if(!(l2 <= r2)) {
+				return false;
+			}
+			break;
+		case GT:
+			if(!(l2 > r2)) {
+				return false;
+			}
+			break;
+		case GE:
+			if(!(l2 >= r2)) {
+				return false;
+			}
+			break;
 		}
+		return true;
 	}
 
+	//BRE methods
 	@Override
-	public Object postVisit(IntegerConstant left, BinaryLinearIntegerExpression expression, IntegerConstant right) {
+	public Object postVisit(Double lExpr, BinaryRealExpression expression, Double rExpr) {
 		throw new RuntimeException("## Error: this is not a symbolic expression");
 	}
-	
+
 	@Override
-	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, IntegerConstant r) {
-		long right = r.value;
+	public Object postVisit(Double lExpr, BinaryRealExpression expression, Object rExpr) {
+		Double lExpr2 = lExpr.doubleValue();
 		switch (expression.getOp()) {
 		case PLUS:
-			return pb.plus(left, right);
+			return pb.plus(lExpr2, rExpr);
 		case MINUS:
-			return pb.minus(left, right);
+			return pb.minus(lExpr2, rExpr);
 		case MUL:
-			return pb.mult(left, right);
+			return pb.mult(lExpr2, rExpr);
 		case DIV:
-			return pb.div(left, right);
-		case REM:
-			return pb.rem(left, right);
+			return pb.div(lExpr2, rExpr);
 		case AND:
-			return pb.and(left, right);
-		case OR:
-			return pb.or(left, right);
-		case XOR:
-			return pb.xor(left, right);
-		case SHIFTR:
-			return pb.shiftR(left, right);
-		case SHIFTUR:
-			return pb.shiftUR(left, right);
-		case SHIFTL:
-			return pb.shiftL(left, right);
+			return pb.and(lExpr2, rExpr);
 		default:
-			System.out.println("Error : unsupported operation " + expression.getOp());
-			//Let's add the rest later. This should work for now.
-			throw new RuntimeException();
-		}
-	}
-	
-	@Override
-	public Object postVisit(IntegerConstant l, BinaryLinearIntegerExpression expression, Object right) {
-		long left = l.value;
-		switch (expression.getOp()) {
-		case PLUS:
-			return pb.plus(left, right);
-		case MINUS:
-			return pb.minus(left, right);
-		case MUL:
-			return pb.mult(left, right);
-		case DIV:
-			return pb.div(left, right);
-		case REM:
-			return pb.rem(left, right);
-		case AND:
-			return pb.and(left, right);
-		case OR:
-			return pb.or(left, right);
-		case XOR:
-			return pb.xor(left, right);
-		case SHIFTR:
-			return pb.shiftR(left, right);
-		case SHIFTUR:
-			return pb.shiftUR(left, right);
-		case SHIFTL:
-			return pb.shiftL(left, right);
-		default:
-			System.out.println("Error : unsupported operation " + expression.getOp());
-			//Let's add the rest later. This should work for now.
-			throw new RuntimeException();
-		}
-	}
-	
-	@Override
-	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, Object right) {
-		System.out.println(left.getClass());
-		System.out.println(right.getClass());
-		//TODO: Figure this shit out man. Look at PCParser and determine if this is needed or not.
-		switch (expression.getOp()) {
-		case PLUS:
-			return pb.plus(left, right);
-		case MINUS:
-			return pb.minus(left, right);
-		case MUL:
-			if (!(left instanceof IntegerConstant) && !(right instanceof IntegerConstant)) {
-				throw new RuntimeException("## Error: Binary Non Linear Operation");
-			}
-		case DIV:
-			if (!(left instanceof IntegerConstant) && !(right instanceof IntegerConstant)) {
-				throw new RuntimeException("## Error: Binary Non Linear Operation");
-			}
-		case REM:
-			if (!(left instanceof IntegerConstant) && !(right instanceof IntegerConstant)) {
-				throw new RuntimeException("## Error: Binary Non Linear Operation");
-			}
-		case AND:
-			return pb.and(left, right);
-		case OR:
-			return pb.or(left, right);
-		case XOR:
-			return pb.xor(left, right);
-		case SHIFTR:
-			return pb.shiftR(left, right);
-		case SHIFTUR:
-			return pb.shiftUR(left, right);
-		case SHIFTL:
-			return pb.shiftL(left, right);
-		default:
-			System.out.println("Error : unsupported operation " + expression.getOp());
-			//Let's add the rest later. This should work for now.
+			System.out.println("Unsupported operation " + expression.getOp());
 			throw new RuntimeException();
 		}
 	}
 
 	@Override
-	public IntegerConstant postVisit(IntegerConstant integerConstant) {
-		return integerConstant;
+	public Object postVisit(Object lExpr, BinaryRealExpression expression, Double rExpr) {
+		Double rExpr2 = rExpr.doubleValue();
+		switch (expression.getOp()) {
+		case PLUS:
+			return pb.plus(lExpr, rExpr2);
+		case MINUS:
+			return pb.minus(lExpr, rExpr2);
+		case MUL:
+			return pb.mult(lExpr, rExpr2);
+		case DIV:
+			return pb.div(lExpr, rExpr2);
+		case AND:
+			return pb.and(lExpr, rExpr2);
+		default:
+			System.out.println("Unsupported operation " + expression.getOp());
+			throw new RuntimeException();
+		}
 	}
 
+	@Override
+	public Object postVisit(Object lExpr, BinaryRealExpression expression, Object rExpr) {
+		if(lExpr instanceof Double && rExpr instanceof Double) {
+			return postVisit(((Double) lExpr), expression, ((Double) rExpr));
+		} else if(lExpr instanceof Double) {
+			return postVisit(((Double) lExpr), expression, rExpr);
+		} else if(rExpr instanceof Double) {
+			return postVisit(lExpr, expression, ((Double) rExpr));
+		} else {
+			switch (expression.getOp()) {
+			case PLUS:
+				return pb.plus(lExpr, rExpr);
+			case MINUS:
+				return pb.minus(lExpr, rExpr);
+			case MUL:
+				return pb.mult(lExpr, rExpr);
+			case DIV:
+				return pb.div(lExpr, rExpr);
+			case AND:
+				return pb.and(lExpr, rExpr);
+			default:
+				System.out.println("Unsupported operation " + expression.getOp());
+				throw new RuntimeException();
+			}
+		}
+	}
+
+	//Constant method
+	@Override
+	public Double postVisit(RealConstant realConstant) {
+		Double value = realConstant.value;
+		return value;
+	}
+
+	//SymReal method
+	@Override
+	public Object postVisit(SymbolicReal symbReal) {
+		assert(symbReal._min>=Double.MIN_VALUE && symbReal._max<=Double.MAX_VALUE);
+		Object dp_var = symRealVar.get(symbReal);
+
+		if (dp_var == null) {
+			dp_var = pb.makeRealVar(symbReal.getName(), symbReal._min, symbReal._max);
+			symRealVar.put(symbReal, dp_var);
+		}
+		return dp_var;
+	}
+
+	//MathRealExpression method - Needs further testing since I use null values for rightExpr a lot.
+	@Override
+	public Object postVisit(Object leftExpr, MathRealExpression mathRealExpr, Object rightExpr) {
+		switch(mathRealExpr.op){
+		case SIN:
+			assert rightExpr == null;
+			return pb.sin(leftExpr);
+		case COS:
+			assert rightExpr == null;
+			return pb.cos(leftExpr);
+		case EXP:
+			assert rightExpr == null;
+			return pb.exp(leftExpr);
+		case ASIN:
+			assert rightExpr == null;
+			return pb.asin(leftExpr);
+		case ACOS:
+			assert rightExpr == null;
+			return pb.acos(leftExpr);
+		case ATAN:
+			assert rightExpr == null;
+			return pb.atan(leftExpr);
+		case LOG:
+			assert rightExpr == null;
+			return pb.log(leftExpr);
+		case TAN:
+			assert rightExpr == null;
+			return pb.tan(leftExpr);
+		case SQRT:
+			assert rightExpr == null;
+			return pb.sqrt(leftExpr);
+		case POW:
+			if(leftExpr instanceof Double) {
+				return pb.power(((Double)leftExpr).doubleValue(), rightExpr);
+			} else if(rightExpr instanceof Double) {
+				return pb.power(leftExpr, ((Double)rightExpr).doubleValue());
+			} else {
+				return pb.power(leftExpr, rightExpr);
+			}
+		case ATAN2:
+			if(leftExpr instanceof Double) {
+				return pb.atan2(((Double)leftExpr).doubleValue(), rightExpr);
+			} else if(rightExpr instanceof Double) {
+				return pb.atan2(leftExpr, ((Double)rightExpr).doubleValue());
+			} else {
+				return pb.atan2(leftExpr, rightExpr);
+			}
+		default:
+			throw new RuntimeException("## Error: Expression " + mathRealExpr);
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------------------------------------------------
+	//LinearIntegerConstraint Methods
+	@Override
+	public boolean postVisit(Long left, LinearIntegerConstraint constraint, Long right) {
+		long r2 = right.longValue();
+		long l2 = left.longValue();
+		switch (constraint.getComparator()) {
+		case EQ:
+			if(!(l2 == r2)) {
+				return false;
+			}
+			break;
+		case NE:
+			if(!(l2 != r2)) {
+				return false;
+			}
+			break;
+		case LT:
+			if(!(l2 < r2)) {
+				return false;
+			}
+			break;
+		case LE:
+			if(!(l2 <= r2)) {
+				return false;
+			}
+			break;
+		case GT:
+			if(!(l2 > r2)) {
+				return false;
+			}
+			break;
+		case GE:
+			if(!(l2 >= r2)) {
+				return false;
+			}
+			break;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean postVisit(Long left, LinearIntegerConstraint constraint, Object right) {
+		long left2 = left.longValue();
+		switch (constraint.getComparator()) {
+		case EQ:
+			pb.post(pb.eq(left2, right));
+			break;
+		case NE:
+			pb.post(pb.neq(left2, right));
+			break;
+		case LT:
+			pb.post(pb.lt(left2, right));
+			break;
+		case LE:
+			pb.post(pb.leq(left2, right));
+			break;
+		case GT:
+			pb.post(pb.gt(left2, right));
+			break;
+		case GE:
+			pb.post(pb.geq(left2, right));
+			break;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Long right) {
+		long right2 = right.longValue();
+		switch (constraint.getComparator()) {
+		case EQ:
+			pb.post(pb.eq(left, right2));
+			break;
+		case NE:
+			pb.post(pb.neq(left, right2));
+			break;
+		case LT:
+			pb.post(pb.lt(left, right2));
+			break;
+		case LE:
+			pb.post(pb.leq(left, right2));
+			break;
+		case GT:
+			pb.post(pb.gt(left, right2));
+			break;
+		case GE:
+			pb.post(pb.geq(left, right2));
+			break;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Object right) {
+		if(left instanceof Long && right instanceof Long) {
+			return postVisit(((Long) left), constraint, ((Long) right));
+		} else if(left instanceof Long) {
+			return postVisit(((Long) left), constraint, right);
+		} else if(right instanceof Long) {
+			return postVisit(left, constraint, ((Long) right));
+		} else {
+			switch (constraint.getComparator()) {
+			case EQ:
+				pb.post(pb.eq(left, right));
+				break;
+			case NE:
+				pb.post(pb.neq(left, right));
+				break;
+			case LT:
+				pb.post(pb.lt(left, right));
+				break;
+			case LE:
+				pb.post(pb.leq(left, right));
+				break;
+			case GT:
+				pb.post(pb.gt(left, right));
+				break;
+			case GE:
+				pb.post(pb.geq(left, right));
+				break;
+			}
+			return true;
+		}
+	}
+
+	//NonLinearIntegerConstraint Methods
+	@Override
+	public boolean postVisit(Long left, NonLinearIntegerConstraint constraint, Long right) {
+		long r2 = right.longValue();
+		long l2 = left.longValue();
+		switch (constraint.getComparator()) {
+		case EQ:
+			if(!(l2 == r2)) {
+				return false;
+			}
+			break;
+		case NE:
+			if(!(l2 != r2)) {
+				return false;
+			}
+			break;
+		case LT:
+			if(!(l2 < r2)) {
+				return false;
+			}
+			break;
+		case LE:
+			if(!(l2 <= r2)) {
+				return false;
+			}
+			break;
+		case GT:
+			if(!(l2 > r2)) {
+				return false;
+			}
+			break;
+		case GE:
+			if(!(l2 >= r2)) {
+				return false;
+			}
+			break;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean postVisit(Long left, NonLinearIntegerConstraint constraint, Object right) {
+		long left2 = left.longValue();
+		switch (constraint.getComparator()) {
+		case EQ:
+			pb.post(pb.eq(left2, right));
+			break;
+		case NE:
+			pb.post(pb.neq(left2, right));
+			break;
+		case LT:
+			pb.post(pb.lt(left2, right));
+			break;
+		case LE:
+			pb.post(pb.leq(left2, right));
+			break;
+		case GT:
+			pb.post(pb.gt(left2, right));
+			break;
+		case GE:
+			pb.post(pb.geq(left2, right));
+			break;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean postVisit(Object left, NonLinearIntegerConstraint constraint, Long right) {
+		long right2 = right.longValue();
+		switch (constraint.getComparator()) {
+		case EQ:
+			pb.post(pb.eq(left, right2));
+			break;
+		case NE:
+			pb.post(pb.neq(left, right2));
+			break;
+		case LT:
+			pb.post(pb.lt(left, right2));
+			break;
+		case LE:
+			pb.post(pb.leq(left, right2));
+			break;
+		case GT:
+			pb.post(pb.gt(left, right2));
+			break;
+		case GE:
+			pb.post(pb.geq(left, right2));
+			break;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean postVisit(Object left, NonLinearIntegerConstraint constraint, Object right) {
+		if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || 
+				pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
+			if(left instanceof Long && right instanceof Long) {
+				return postVisit(((Long) left), constraint, ((Long) right));
+			} else if(left instanceof Long) {
+				return postVisit(((Long) left), constraint, right);
+			} else if(right instanceof Long) {
+				return postVisit(left, constraint, ((Long) right));
+			} else {
+				switch (constraint.getComparator()) {
+				case EQ:
+					pb.post(pb.eq(left, right));
+					break;
+				case NE:
+					pb.post(pb.neq(left, right));
+					break;
+				case LT:
+					pb.post(pb.lt(left, right));
+					break;
+				case LE:
+					pb.post(pb.leq(left, right));
+					break;
+				case GT:
+					pb.post(pb.gt(left, right));
+					break;
+				case GE:
+					pb.post(pb.geq(left, right));
+					break;
+				}
+				return true;
+			}
+		} else {
+			throw new RuntimeException("## Error: Non Linear Integer Constraint not handled " + constraint);
+		}
+	}
+	
+	//Methods for BLIES
+	@Override
+	public Object postVisit(Long lExpr, BinaryLinearIntegerExpression expression, Long rExpr) {
+		throw new RuntimeException("## Error: this is not a symbolic expression");
+	}
+
+	@Override
+	public Object postVisit(Object lExpr, BinaryLinearIntegerExpression expression, Long rExpr) {
+		long rExpr2 = rExpr.longValue();
+		switch (expression.getOp()) {
+		case PLUS:
+			return pb.plus(lExpr, rExpr2);
+		case MINUS:
+			return pb.minus(lExpr, rExpr2);
+		case MUL:
+			return pb.mult(lExpr, rExpr2);
+		case DIV:
+			return pb.div(lExpr, rExpr2);
+		case REM:
+			return pb.rem(lExpr, rExpr2);
+		case AND:
+			return pb.and(lExpr, rExpr2);
+		case OR:
+			return pb.or(lExpr, rExpr2);
+		case XOR:
+			return pb.xor(lExpr, rExpr2);
+		case SHIFTR:
+			return pb.shiftR(lExpr, rExpr2);
+		case SHIFTUR:
+			return pb.shiftUR(lExpr, rExpr2);
+		case SHIFTL:
+			return pb.shiftL(lExpr, rExpr2);
+		default:
+			System.out.println("Error : unsupported operation " + expression.getOp());
+			throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public Object postVisit(Long lExpr, BinaryLinearIntegerExpression expression, Object rExpr) {
+		long lExpr2 = lExpr.longValue();
+		switch (expression.getOp()) {
+		case PLUS:
+			return pb.plus(lExpr2, rExpr);
+		case MINUS:
+			return pb.minus(lExpr2, rExpr);
+		case MUL:
+			return pb.mult(lExpr2, rExpr);
+		case DIV:
+			return pb.div(lExpr2, rExpr);
+		case REM:
+			return pb.rem(lExpr2, rExpr);
+		case AND:
+			return pb.and(lExpr2, rExpr);
+		case OR:
+			return pb.or(lExpr2, rExpr);
+		case XOR:
+			return pb.xor(lExpr2, rExpr);
+		case SHIFTR:
+			return pb.shiftR(lExpr2, rExpr);
+		case SHIFTUR:
+			return pb.shiftUR(lExpr2, rExpr);
+		case SHIFTL:
+			return pb.shiftL(lExpr2, rExpr);
+		default:
+			System.out.println("Error : unsupported operation " + expression.getOp());
+			throw new RuntimeException();
+		}
+	}
+
+	@Override
+	public Object postVisit(Object lExpr, BinaryLinearIntegerExpression expression, Object rExpr) {
+		if(lExpr instanceof Long && rExpr instanceof Long) {
+			return postVisit(((Long) lExpr), expression, ((Long) rExpr));
+		} else if(lExpr instanceof Long) {
+			return postVisit(((Long) lExpr), expression, rExpr);
+		} else if(rExpr instanceof Long) {
+			return postVisit(lExpr, expression, ((Long) rExpr));
+		} else {
+			switch (expression.getOp()) {
+			case PLUS:
+				return pb.plus(lExpr, rExpr);
+			case MINUS:
+				return pb.minus(lExpr, rExpr);
+			case MUL:
+				throw new RuntimeException("## Error: Binary Non Linear Operation");
+			case DIV:
+				throw new RuntimeException("## Error: Binary Non Linear Operation");
+			case REM:
+				throw new RuntimeException("## Error: Binary Non Linear Operation");
+			case AND:
+				return pb.and(lExpr, rExpr);
+			case OR:
+				return pb.or(lExpr, rExpr);
+			case XOR:
+				return pb.xor(lExpr, rExpr);
+			case SHIFTR:
+				return pb.shiftR(lExpr, rExpr);
+			case SHIFTUR:
+				return pb.shiftUR(lExpr, rExpr);
+			case SHIFTL:
+				return pb.shiftL(lExpr, rExpr);
+			default:
+				throw new RuntimeException("Error : unsupported operation " + expression.getOp());
+			}
+		}
+	}
+
+	//Methods for BNLIES
+	@Override
+	public Object postVisit(Long lExpr, BinaryNonLinearIntegerExpression expression, Long rExpr) {
+		throw new RuntimeException("## Error: this is not a symbolic expression");
+	}
+
+	@Override
+	public Object postVisit(Object lExpr, BinaryNonLinearIntegerExpression expression, Long rExpr) {
+		long rExpr2 = rExpr.longValue();
+		switch (expression.op) {
+		case PLUS:
+			return pb.plus(lExpr, rExpr2);
+		case MINUS:
+			return pb.minus(lExpr, rExpr2);
+		case MUL:
+			return pb.mult(lExpr, rExpr2);
+		case DIV:
+			return pb.div(lExpr, rExpr2);
+		case REM:
+			return pb.rem(lExpr, rExpr2);
+		case AND:
+			return pb.and(lExpr, rExpr2);
+		case OR:
+			return pb.or(lExpr, rExpr2);
+		case XOR:
+			return pb.xor(lExpr, rExpr2);
+		case SHIFTR:
+			return pb.shiftR(lExpr, rExpr2);
+		case SHIFTUR:
+			return pb.shiftUR(lExpr, rExpr2);
+		case SHIFTL:
+			return pb.shiftL(lExpr, rExpr2);
+		default:
+			throw new RuntimeException("Error : unsupported operation " + expression.op);
+		}
+	}
+
+	@Override
+	public Object postVisit(Long lExpr, BinaryNonLinearIntegerExpression expression, Object rExpr) {
+		long lExpr2 = lExpr.longValue();
+		switch (expression.op) {
+		case PLUS:
+			return pb.plus(lExpr2, rExpr);
+		case MINUS:
+			return pb.minus(lExpr2, rExpr);
+		case MUL:
+			return pb.mult(lExpr2, rExpr);
+		case DIV:
+			return pb.div(lExpr2, rExpr);
+		case REM:
+			return pb.rem(lExpr2, rExpr);
+		case AND:
+			return pb.and(lExpr2, rExpr);
+		case OR:
+			return pb.or(lExpr2, rExpr);
+		case XOR:
+			return pb.xor(lExpr2, rExpr);
+		case SHIFTR:
+			return pb.shiftR(lExpr2, rExpr);
+		case SHIFTUR:
+			return pb.shiftUR(lExpr2, rExpr);
+		case SHIFTL:
+			return pb.shiftL(lExpr2, rExpr);
+		default:
+			throw new RuntimeException("Error : unsupported operation " + expression.op);
+		}
+	}
+
+	@Override
+	public Object postVisit(Object lExpr, BinaryNonLinearIntegerExpression expression, Object rExpr) {
+		//TODO: Get rid of this terrible instanceof statement for solver types.
+		//Make a true/false for BNLIE supported pb's and just check that.
+		if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector ||
+				pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
+			if(lExpr instanceof Long && rExpr instanceof Long) {
+				return postVisit(((Long) lExpr), expression, ((Long) rExpr));
+			} else if(lExpr instanceof Long) {
+				return postVisit(((Long) lExpr), expression, rExpr);
+			} else if(rExpr instanceof Long) {
+				return postVisit(lExpr, expression, ((Long) rExpr));
+			} else {
+				switch (expression.op) {
+				case PLUS:
+					return pb.plus(lExpr, rExpr);
+				case MINUS:
+					return pb.minus(lExpr, rExpr);
+				case MUL:
+					return pb.mult(lExpr, rExpr);
+				case DIV:
+					return pb.div(lExpr, rExpr);
+				case REM:
+					return pb.rem(lExpr, rExpr);
+				case AND:
+					return pb.and(lExpr, rExpr);
+				case OR:
+					return pb.or(lExpr, rExpr);
+				case XOR:
+					return pb.xor(lExpr, rExpr);
+				case SHIFTR:
+					return pb.shiftR(lExpr, rExpr);
+				case SHIFTUR:
+					return pb.shiftUR(lExpr, rExpr);
+				case SHIFTL:
+					return pb.shiftL(lExpr, rExpr);
+				default:
+					throw new RuntimeException("Error : unsupported operation " + expression.op);
+				}
+			}
+		} else {
+			//It's not a solver that can solveBinaryNonLinearIntegerExpressions.
+			throw new RuntimeException("Selected solver type cannot solve BinaryNonLinearIntegerExpressions");
+		}
+	}
+
+	//Integer Method
+	@Override
+	public Long postVisit(IntegerConstant integerConstant) {
+		Long value = integerConstant.value;
+		return value;
+	}
+
+	//SymbInt Method
 	@Override
 	public Object postVisit(SymbolicInteger symbInt) {
 		assert(symbInt._min >= Integer.MIN_VALUE && symbInt._max <= Integer.MAX_VALUE);
 		Object dp_var = symIntegerVar.get(symbInt);
 
 		if (dp_var == null) {
+			System.out.println(symbInt);
 			dp_var = pb.makeIntVar(((SymbolicInteger)symbInt).getName(),((SymbolicInteger)symbInt)._min, ((SymbolicInteger)symbInt)._max);
 			symIntegerVar.put((SymbolicInteger)symbInt, dp_var);
 		}
 		return dp_var;
 	}
-	
-//	@Override
-//	public void postVisit(SymbolicInteger symbInt) {
-//		assert(symbInt._min >= Integer.MIN_VALUE && symbInt._max <= Integer.MAX_VALUE);
-//		Object dp_var = symIntegerVar.get(symbInt);
-//
-//		if (dp_var == null) {
-//			dp_var = pb.makeIntVar(((SymbolicInteger)symbInt).getName(),((SymbolicInteger)symbInt)._min, ((SymbolicInteger)symbInt)._max);
-//			symIntegerVar.put((SymbolicInteger)symbInt, dp_var);
-//		}
-//		stack.add(dp_var);
-//	}
 
-
+	//------------------------------------------------------------------------------------------------------------------------------------------
+	//TODO Stuff from here.
 
 	@Override
 	public void postVisit(MixedConstraint constraint) {
@@ -773,66 +873,51 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		//Though, I would imagine that it's easy to do here given how everything is being changed just by formatting it out like the previous constraint
 		//postVisits.
 	}
+	
+	public boolean postVisit(Long left, MixedConstraint constraint, Object right) {
+		
+	}
+	
+	public boolean postVisit(Object left, MixedConstraint constraint, Double right) {
+		
+	}
+	
+	public boolean postVisit(Long left, MixedConstraint constraint, Double right) {
+		
+	}
+	
+	@Override
+	public boolean postVisit(Object left, MixedConstraint constraint, Object right) {
+//		assert (constraint.getComparator() == Comparator.EQ);
+//		
+//		//With this, we know that the objects being returned for the MixedConstraint are exactly what we think they are.
+//		if (constraint.getLeft() instanceof SymbolicReal && constraint.getRight() instanceof SymbolicInteger) {
+//			pb.post(pb.mixed(left, right));
+//		} else if (constraint.getLeft() instanceof SymbolicReal) { // c_rightRef is an IntegerExpression
+//			Object tmpi = pb.makeIntVar(right + "_" + right.hashCode(),(int)(((SymbolicReal)constraint.getLeft())._min), (int)(((SymbolicReal)constraint.getLeft())._max));
+//			if (right instanceof Long) {
+//				pb.post(pb.eq(((Long)right).longValue(), tmpi));
+//			} else {
+//				pb.post(pb.eq(constraint.getLeft(), tmpi));
+//			}
+//			pb.post(pb.mixed(right,tmpi));
+//		} else if (constraint.getRight() instanceof SymbolicInteger) { // c_leftRef is a RealExpression
+//			Object tmpr = pb.makeRealVar(left + "_" + left.hashCode(), ((SymbolicInteger)right)._min, ((SymbolicInteger)right)._max);
+//			if(left instanceof RealConstant) {
+//				pb.post(pb.eq(tmpr, ((RealConstant)left).value));
+//			} else {
+//				pb.post(pb.eq(tmpr, left));
+//			}
+//			pb.post(pb.mixed(tmpr,right));
+//		} else {
+//			assert(false);
+//		}
+//		return true;
+	}
 
 	@Override 
 	public void postVisit(LogicalORLinearIntegerConstraints constraint) {
 		//TODO: I'll get to this. This appears to be there to handle CNF style constraints, whatever those are.
 	}
 
-	@Override
-	public void postVisit(NonLinearIntegerConstraint constraint) {
-
-		//TODO: for NonLinearIntegerConstraint's accept method I used super() to fulfil the goal I was going for to check the left and right. Not sure if that was the correct way to go about it.
-		//Spoiler alert: it's not.
-
-		//Spoiler spoiler alert. Since this is extended from Constraint.java, it should just end up using the accept() method there instead of the terrible one I made for it.
-
-		if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || 
-				pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
-			//Insert how createDPNonLinearIntegerConstraint works here.
-			//This is identical to RealConstraint, so can I just make one general case method for Constraints? I don't think that's the way to do it, but I'm not 100% on that.
-			Object l;
-			Object r;
-			switch (constraint.getComparator()) {
-			case EQ:
-				r = stack.pop();
-				l = stack.pop();
-				pb.post(pb.eq(l, r));
-				break;
-			case NE:
-				r = stack.pop();
-				l = stack.pop();
-				pb.post(pb.neq(l, r));
-				break;
-			case LT:
-				r = stack.pop();
-				l = stack.pop();
-				pb.post(pb.lt(l, r));
-				break;
-			case LE:
-				r = stack.pop();
-				l = stack.pop();
-				pb.post(pb.leq(l, r));
-				break;
-			case GT:
-				r = stack.pop();
-				l = stack.pop();
-				pb.post(pb.gt(l, r));
-				break;
-			case GE:
-				r = stack.pop();
-				l = stack.pop();
-				pb.post(pb.geq(l, r));
-				break;
-			}
-		} else {
-			throw new RuntimeException("## Error: Non Linear Integer Constraint not handled " + constraint);
-		}
-	}
-
-	@Override
-	public boolean postVisit(Object l, Constraint constraint, Object r) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

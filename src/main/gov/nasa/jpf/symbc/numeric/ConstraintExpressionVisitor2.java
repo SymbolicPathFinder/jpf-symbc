@@ -210,17 +210,16 @@ public abstract class ConstraintExpressionVisitor2 {
 	public void postVisit(FunctionExpression expr) {
 	}
 
-	public void postVisit(MathRealExpression expr) {
-	}
 
-	public void postVisit(RealConstant expr) {
-	}
+
+//	public void postVisit(RealConstant expr) {
+//	}
 
 	public void postVisit(SpecialRealExpression expr) {
 	}
 
-	public void postVisit(SymbolicReal expr) {
-	}
+//	public void postVisit(SymbolicReal expr) {
+//	}
 
 	public void postVisit(StringExpression expr) {
 	}
@@ -241,20 +240,20 @@ public abstract class ConstraintExpressionVisitor2 {
 	//Added by Carson so far - First case visitors 
 
 	//General Case
-	public boolean postVisit(Object l, Constraint constraint, Object r) {
-		return false;
-	}
+//	public boolean postVisit(Object l, Constraint constraint, Object r) {
+//		return false;
+//	}
 	
 	//These 4
-	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, IntegerConstant right) {
+	public boolean postVisit(Long left, LinearIntegerConstraint constraint, Long right) {
 		return false;
 	}
 	
-	public boolean postVisit(IntegerConstant left, LinearIntegerConstraint constraint, Object right) {
+	public boolean postVisit(Long left, LinearIntegerConstraint constraint, Object right) {
 		return false;
 	}
 	
-	public boolean postVisit(Object left, LinearIntegerConstraint constraint, IntegerConstant right) {
+	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Long right) {
 		return false;
 	}
 	
@@ -263,23 +262,74 @@ public abstract class ConstraintExpressionVisitor2 {
 	}
 
 	//These 4
-	public Object postVisit(IntegerConstant left, BinaryLinearIntegerExpression expression, IntegerConstant right) {
+	public boolean postVisit(Double left, RealConstraint constraint, Double right) {
+		return false;
+	}
+	
+	public boolean postVisit(Double left, RealConstraint constraint, Object right) {
+		return false;
+	}
+	
+	public boolean postVisit(Object left, RealConstraint constraint, Double right) {
+		return false;
+	}
+	
+	public boolean postVisit(Object left, RealConstraint constraint, Object right) {
+		return false;
+	}
+	
+	//These 4
+	public Object postVisit(Long left, BinaryLinearIntegerExpression expression, Long right) {
 		return null;
 	}
 	
-	public Object postVisit(IntegerConstant left, BinaryLinearIntegerExpression expression, Object right) {
+	public Object postVisit(Long left, BinaryLinearIntegerExpression expression, Object right) {
 		return null;
 	}
 	
-	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, IntegerConstant right) {
+	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, Long right) {
 		return null;
 	}
 
 	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, Object right) {
+		 return null;
+	}
+	
+	//These 4
+	public Object postVisit(Long left, BinaryNonLinearIntegerExpression expression, Long right) {
 		return null;
 	}
 	
-	public IntegerConstant postVisit(IntegerConstant expr) {
+	public Object postVisit(Long left, BinaryNonLinearIntegerExpression expression, Object right) {
+		return null;
+	}
+	
+	public Object postVisit(Object left, BinaryNonLinearIntegerExpression expression, Long right) {
+		return null;
+	}
+
+	public Object postVisit(Object left, BinaryNonLinearIntegerExpression expression, Object right) {
+		return null;
+	}
+	
+	public Object postVisit(Double left, BinaryRealExpression expression, Double right) {
+		return null;
+	}
+	
+	public Object postVisit(Double left, BinaryRealExpression expression, Object right) {
+		return null;
+	}
+	
+	public Object postVisit(Object left, BinaryRealExpression expression, Double right) {
+		return null;
+	}
+
+	public Object postVisit(Object left, BinaryRealExpression expression, Object right) {
+		return null;
+	}
+	
+	
+	public Long postVisit(IntegerConstant expr) {
 		return null;
 	}
 	
@@ -287,4 +337,43 @@ public abstract class ConstraintExpressionVisitor2 {
 		return null;
 	}
 	
+	public Double postVisit(RealConstant expr) {
+		return null;
+	}
+	
+	public Object postVisit(SymbolicReal expr) {
+		return null;
+	}
+	
+	public Object postVisit(Object leftExpr, MathRealExpression mathRealExpr, Object rightExpr) {
+		return null;
+	}
+
+	
+//	public boolean postVisit(Object l, Constraint constraint, Object r) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
+
+	public boolean postVisit(Long left, NonLinearIntegerConstraint constraint, Long right) {
+		return false;
+	}
+	
+	public boolean postVisit(Object left, NonLinearIntegerConstraint constraint, Long right) {
+		return false;
+	}
+	
+	public boolean postVisit(Long left, NonLinearIntegerConstraint constraint, Object right) {
+		return false;
+	}
+	
+	public boolean postVisit(Object left, NonLinearIntegerConstraint constraint, Object right) {
+		return false;
+	}
+
+	//
+	public boolean postVisit(Object leftR, MixedConstraint mixedConstraint, Object rightR) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
