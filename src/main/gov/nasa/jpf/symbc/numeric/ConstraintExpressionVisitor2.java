@@ -379,4 +379,9 @@ public abstract class ConstraintExpressionVisitor2 {
 	public boolean postVisit(RealExpression left, MixedConstraint constraint, IntegerExpression right) {
 		return false;
 	}
+
+//	public boolean postVisit(Object l, Constraint constraint, Object r) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
 }

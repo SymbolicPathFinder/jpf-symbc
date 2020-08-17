@@ -213,8 +213,8 @@ public class RealConstant extends RealExpression {
 
 	@Override
 	public Object accept(ConstraintExpressionVisitor2 visitor) {
-		// TODO Auto-generated method stub
-		return null;
+		visitor.preVisit(this);
+		return visitor.postVisit(this);
 	}
 
 }

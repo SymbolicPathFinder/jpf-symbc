@@ -98,6 +98,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	//------------------------------------------------------------------------------------------------------------------------------------------
 	//RealConstraint methods
 	public boolean postVisit(Object left, RealConstraint constraint, Object right) {
+//		System.out.println(constraint);
+//		System.out.println("ORO");
 		if(left instanceof Double && right instanceof Double) {
 			return postVisit(((Double) left), constraint, ((Double) right));
 		} else if(left instanceof Double) {
@@ -131,6 +133,10 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	@Override
 	public boolean postVisit(Object left, RealConstraint constraint, Double right) {
+//		System.out.println(constraint);
+//		System.out.println(left.getClass());
+//		System.out.println(right.getClass());
+//		System.out.println("ORD");
 		Object l = left;
 		double r2 = right.doubleValue();
 		switch (constraint.getComparator()) {
@@ -158,6 +164,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	@Override
 	public boolean postVisit(Double left, RealConstraint constraint, Object right) {
+//		System.out.println(constraint);
+//		System.out.println("DRO");
 		Object r = right;
 		double l2 = left.doubleValue();
 		switch (constraint.getComparator()) {
@@ -185,6 +193,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	@Override
 	public boolean postVisit(Double left, RealConstraint constraint, Double right) {
+//		System.out.println(constraint);
+//		System.out.println("DRD");
 		double r2 = right.doubleValue();
 		double l2 = left.doubleValue();
 		switch (constraint.getComparator()) {
@@ -230,7 +240,7 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	@Override
 	public Object postVisit(Double lExpr, BinaryRealExpression expression, Object rExpr) {
-		Double lExpr2 = lExpr.doubleValue();
+		double lExpr2 = lExpr.doubleValue();
 		switch (expression.getOp()) {
 		case PLUS:
 			return pb.plus(lExpr2, rExpr);
@@ -250,7 +260,7 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	@Override
 	public Object postVisit(Object lExpr, BinaryRealExpression expression, Double rExpr) {
-		Double rExpr2 = rExpr.doubleValue();
+		double rExpr2 = rExpr.doubleValue();
 		switch (expression.getOp()) {
 		case PLUS:
 			return pb.plus(lExpr, rExpr2);
@@ -305,12 +315,18 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	//SymReal method
 	@Override
 	public Object postVisit(SymbolicReal symbReal) {
-		assert(symbReal._min>=Double.MIN_VALUE && symbReal._max<=Double.MAX_VALUE);
+//		System.out.println("Stuff here:");
+//		System.out.println(symbReal._min >= Double.MIN_VALUE);
+//		System.out.println(symbReal._max);
+//		System.out.println(Double.MIN_VALUE);
+//		System.out.println(Double.MAX_VALUE);
+//		System.out.println("---------");
+		//assert(symbReal._min >= Double.MIN_VALUE && symbReal._max <= Double.MAX_VALUE);
 		Object dp_var = symRealVar.get(symbReal);
 
 		if (dp_var == null) {
-			dp_var = pb.makeRealVar(symbReal.getName(), symbReal._min, symbReal._max);
-			symRealVar.put(symbReal, dp_var);
+			dp_var = pb.makeRealVar(((SymbolicReal)symbReal).getName(), ((SymbolicReal)symbReal)._min, ((SymbolicReal)symbReal)._max);
+			symRealVar.put((SymbolicReal)symbReal, dp_var);
 		}
 		return dp_var;
 	}
@@ -864,13 +880,21 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		}
 		return dp_var;
 	}
-
+	
 	//------------------------------------------------------------------------------------------------------------------------------------------
 	//MixedConstraint stuff.
 	@Override
 	public boolean postVisit(RealExpression left, MixedConstraint constraint, IntegerExpression right) {
-		assert(false); // should not be reachable. I kept the functionality as it was in PCParser, but I feel like throwing a RuntimeException is probably better.
-		return true; 
+		if(left instanceof SymbolicReal && right instanceof SymbolicInteger) {
+			return postVisit(((SymbolicReal) left), constraint, ((SymbolicInteger) right));
+		} else if(left instanceof SymbolicReal) {
+			return postVisit(((SymbolicReal) left), constraint, right);
+		} else if(right instanceof SymbolicInteger) {
+			return postVisit(left, constraint, ((SymbolicInteger) right));
+		} else {
+			assert(false); // should not be reachable. I kept the functionality as it was in PCParser, but I feel like throwing a RuntimeException is probably better.
+			return true;
+		}
 	}
 	
 	@Override

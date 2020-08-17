@@ -1138,15 +1138,22 @@ getExpression(stoex.value)), newae));
 
       //Note that for an incremental solver
       //we only add the constraint header
-      if(addConstraint(cRef) == false) {
-        return null;
-      }
+    	pgv.clearVars();
+    	if(!cRef.accept(pgv)) { //This doesn't work since I can't change method signatures of visitors.
+			return null;
+		}
+    	//Old code below
+//      if(addConstraint(cRef) == false) {
+//        return null;
+//      }
     } else {
       //For a non-incremental solver,
       //we submit the *entire* pc to the solver
     	
     	//By making a visitor and calling accept on each of the constraints for the non-incremental solver
     	//I'm telling it to handle itself as stuff goes on.
+
+    	
     	pgv.clearVars();
     	while(cRef != null) {
     		//TODO: the functionality of addConstraint() returning a boolean for failures is now missing.
@@ -1155,6 +1162,8 @@ getExpression(stoex.value)), newae));
     		}
     		cRef = cRef.and;
     	}
+    	
+    	
     	//Old code for reference:
 //      while (cRef != null) {
 //    	 

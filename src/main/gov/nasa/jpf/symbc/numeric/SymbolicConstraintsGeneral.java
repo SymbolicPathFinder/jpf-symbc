@@ -218,7 +218,7 @@ public class SymbolicConstraintsGeneral {
         	
         	//Carson: Changed this
         	Set<Entry<SymbolicReal, Object>> sym_realvar_mappings = ProblemGeneralVisitor.getSymRealVar().entrySet();
-        	//Set<Entry<SymbolicReal, Object>> sym_realvar_mappings = PCParser.symRealVar.entrySet();
+//        	Set<Entry<SymbolicReal, Object>> sym_realvar_mappings = PCParser.symRealVar.entrySet();
         	
             Iterator<Entry<SymbolicReal, Object>> i_real = sym_realvar_mappings.iterator();
             // first set inf / sup values
@@ -232,7 +232,7 @@ public class SymbolicConstraintsGeneral {
 
             try {
             	//Carson: Changed this
-                //sym_realvar_mappings = PCParser.symRealVar.entrySet();
+//                sym_realvar_mappings = PCParser.symRealVar.entrySet();
             	sym_realvar_mappings = ProblemGeneralVisitor.getSymRealVar().entrySet();
                 i_real = sym_realvar_mappings.iterator();
                 while (i_real.hasNext()) {
@@ -244,14 +244,14 @@ public class SymbolicConstraintsGeneral {
             } catch (Exception exp) {
             	//Carson: Changed this
                 this.catchBody(ProblemGeneralVisitor.getSymRealVar(), pb, pc);
-            	//this.catchBody(PCParser.symRealVar, pb, pc);
+//            	this.catchBody(PCParser.symRealVar, pb, pc);
             } // end catch
 
             // compute solutions for integer variables
             
             //Carson: Changed this
             Set<Entry<SymbolicInteger, Object>> sym_intvar_mappings = ProblemGeneralVisitor.getSymIntVar().entrySet();
-            //Set<Entry<SymbolicInteger, Object>> sym_intvar_mappings = PCParser.symIntegerVar.entrySet();
+//            Set<Entry<SymbolicInteger, Object>> sym_intvar_mappings = PCParser.symIntegerVar.entrySet();
             Iterator<Entry<SymbolicInteger, Object>> i_int = sym_intvar_mappings.iterator();
             // try {
             while (i_int.hasNext()) {
