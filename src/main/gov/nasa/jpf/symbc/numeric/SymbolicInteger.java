@@ -180,7 +180,9 @@ public class SymbolicInteger extends LinearIntegerExpression
     @Override
 	public Object accept(ConstraintExpressionVisitor2 visitor) {
 		visitor.preVisit(this);
-		return visitor.postVisit(this);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 
 	@Override

@@ -178,8 +178,9 @@ public class SymbolicReal extends RealExpression {
 	@Override
 	public Object accept(ConstraintExpressionVisitor2 visitor) {
 		visitor.preVisit(this);
-		Object l = visitor.postVisit(this);
-		return l;
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 
 	@Override

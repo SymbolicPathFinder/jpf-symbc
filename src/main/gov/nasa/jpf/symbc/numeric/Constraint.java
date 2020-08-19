@@ -173,27 +173,17 @@ public abstract class Constraint implements Comparable<Constraint> {
   
   	//JacoGeldenhuys - For use with GREEN
 	public void accept(ConstraintExpressionVisitor visitor) {
-		visitor.preVisit(this); //PreVisit the visitor
-		left.accept(visitor);   //accept left
-		right.accept(visitor);  //accept right
-		visitor.postVisit(this);//PostVisit the visitor
+		visitor.preVisit(this);
+		left.accept(visitor);
+		right.accept(visitor);
+		visitor.postVisit(this);
 	}
+	
 	//	Carson Smith - For use with GSoC changes.
 	public boolean accept(ConstraintExpressionVisitor2 visitor) {
-		visitor.preVisit(this); //PreVisit the visitor -- Nothing happens here as of right now.
-//		System.out.println("---");
-//		System.out.println(getRight());
-//		System.out.println(getLeft());
-//		System.out.println("---");
-		Object l = getLeft().accept(visitor);   //accept left -- eventually this needs to return with the solver's representation of the left, so it's an object.
-		Object r = getRight().accept(visitor);  //accept right -- eventually this needs to return with the solver's representation of the left, so it's an object.
-//		System.out.println("---");
-//		System.out.println(l);
-//		System.out.println(r);
-//		System.out.println("-------");
-		boolean result = visitor.postVisit(l, this, r);//PostVisit the visitor
-//		System.out.println(result);
-//		System.out.println("-------");
+		visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
 		return result;
 	}
 

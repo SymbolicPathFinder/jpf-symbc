@@ -65,18 +65,10 @@ public class RealConstraint extends Constraint {
     
     @Override
     public boolean accept(ConstraintExpressionVisitor2 visitor) {
-		visitor.preVisit(this); //PreVisit the visitor1
-//		System.out.println(this);
-//		System.out.println("Constraint above");
-//		System.out.println("Left expr: " + getLeft());
-//		System.out.println("Left expr class: " + getLeft().getClass());
-//		System.out.println("Right expr: " + getRight());
-//		System.out.println("Right expr class: " + getRight().getClass());
-		Object l = getLeft().accept(visitor);
-		Object r = getRight().accept(visitor);
-//		System.out.println(l.getClass());
-//		System.out.println(r.getClass());
-		return visitor.postVisit(l, this, r);//PostVisit the visitor
+		visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
  
 }

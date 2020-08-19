@@ -66,6 +66,8 @@ public class MixedConstraint extends Constraint {
 	@Override
 	public boolean accept(ConstraintExpressionVisitor2 visitor) {
 		visitor.preVisit(this);
-		return visitor.postVisit(getLeft(), this, getRight());
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 }

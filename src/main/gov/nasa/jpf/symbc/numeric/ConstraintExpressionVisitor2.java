@@ -18,6 +18,8 @@
 
 package gov.nasa.jpf.symbc.numeric;
 
+import gov.nasa.jpf.symbc.arrays.ArrayConstraint;
+import gov.nasa.jpf.symbc.arrays.RealArrayConstraint;
 import gov.nasa.jpf.symbc.concolic.FunctionExpression;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialIntegerExpression;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
@@ -186,11 +188,11 @@ public abstract class ConstraintExpressionVisitor2 {
 	public void postVisit(BinaryLinearIntegerExpression expr) {
 	}
 
-//	public void postVisit(IntegerConstant expr) {
-//	}
+	public void postVisit(IntegerConstant expr) {
+	}
 
-//	public void postVisit(SymbolicInteger expr) {
-//	}
+	public void postVisit(SymbolicInteger expr) {
+	}
 
 	public void postVisit(NonLinearIntegerExpression expr) {
 	}
@@ -210,16 +212,14 @@ public abstract class ConstraintExpressionVisitor2 {
 	public void postVisit(FunctionExpression expr) {
 	}
 
-
-
-//	public void postVisit(RealConstant expr) {
-//	}
+	public void postVisit(RealConstant expr) {
+	}
 
 	public void postVisit(SpecialRealExpression expr) {
 	}
 
-//	public void postVisit(SymbolicReal expr) {
-//	}
+	public void postVisit(SymbolicReal expr) {
+	}
 
 	public void postVisit(StringExpression expr) {
 	}
@@ -236,152 +236,73 @@ public abstract class ConstraintExpressionVisitor2 {
 	public void postVisit(SymbolicStringBuilder expr) {
 	}
 
+	//VISIT METHODS
 	
-	//Added by Carson so far - First case visitors
-	
-	//These 4
-	public boolean postVisit(Long left, LinearIntegerConstraint constraint, Long right) {
+	//Constraints
+	public boolean visit(Constraint constraint) {
 		return false;
 	}
 	
-	public boolean postVisit(Long left, LinearIntegerConstraint constraint, Object right) {
+	public boolean visit(LinearIntegerConstraint constraint) {
 		return false;
 	}
 	
-	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Long right) {
+	public boolean visit(NonLinearIntegerConstraint constraint) {
 		return false;
 	}
 	
-	public boolean postVisit(Object left, LinearIntegerConstraint constraint, Object right) {
+	public boolean visit(RealConstraint constraint) {
 		return false;
 	}
+	
+	public boolean visit(MixedConstraint constraint) {
+		return false;
+	}
+	
+	public boolean visit(LogicalORLinearIntegerConstraints constraint) {
+		return false;
+	}
+	
+	public boolean visit(ArrayConstraint constraint) {
+		return false;
+	}
+	
+	public boolean visit(RealArrayConstraint constraint) {
+		return false;
+	}
+	
+	//Expressions
 
-	//These 4
-	public boolean postVisit(Double left, RealConstraint constraint, Double right) {
-		return false;
-	}
-	
-	public boolean postVisit(Double left, RealConstraint constraint, Object right) {
-		return false;
-	}
-	
-	public boolean postVisit(Object left, RealConstraint constraint, Double right) {
-		return false;
-	}
-	
-	public boolean postVisit(Object left, RealConstraint constraint, Object right) {
-		return false;
-	}
-	
-	//These 4
-	public Object postVisit(Long left, BinaryLinearIntegerExpression expression, Long right) {
+	public Long visit(IntegerConstant expr) {
 		return null;
 	}
 	
-	public Object postVisit(Long left, BinaryLinearIntegerExpression expression, Object right) {
+	public Object visit(SymbolicInteger expr) {
 		return null;
 	}
 	
-	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, Long right) {
-		return null;
-	}
-
-	public Object postVisit(Object left, BinaryLinearIntegerExpression expression, Object right) {
-		 return null;
-	}
-	
-	//These 4
-	public Object postVisit(Long left, BinaryNonLinearIntegerExpression expression, Long right) {
+	public Double visit(RealConstant expr) {
 		return null;
 	}
 	
-	public Object postVisit(Long left, BinaryNonLinearIntegerExpression expression, Object right) {
+	public Object visit(SymbolicReal expr) {
 		return null;
 	}
 	
-	public Object postVisit(Object left, BinaryNonLinearIntegerExpression expression, Long right) {
+	public Object visit(MathRealExpression expr) {
+		return null;
+	}
+	
+	public Object visit(BinaryLinearIntegerExpression expression) {
 		return null;
 	}
 
-	public Object postVisit(Object left, BinaryNonLinearIntegerExpression expression, Object right) {
-		return null;
-	}
-	
-	//
-	public Object postVisit(Double left, BinaryRealExpression expression, Double right) {
-		return null;
-	}
-	
-	public Object postVisit(Double left, BinaryRealExpression expression, Object right) {
-		return null;
-	}
-	
-	public Object postVisit(Object left, BinaryRealExpression expression, Double right) {
+	public Object visit(BinaryNonLinearIntegerExpression expression) {
 		return null;
 	}
 
-	public Object postVisit(Object left, BinaryRealExpression expression, Object right) {
-		return null;
-	}
-	
-	
-	public Long postVisit(IntegerConstant expr) {
-		return null;
-	}
-	
-	public Object postVisit(SymbolicInteger expr) {
-		return null;
-	}
-	
-	public Double postVisit(RealConstant expr) {
-		return null;
-	}
-	
-	public Object postVisit(SymbolicReal expr) {
-		return null;
-	}
-	
-	public Object postVisit(Object leftExpr, MathRealExpression mathRealExpr, Object rightExpr) {
-		return null;
-	}
-
-
-	//
-	public boolean postVisit(Long left, NonLinearIntegerConstraint constraint, Long right) {
-		return false;
-	}
-	
-	public boolean postVisit(Object left, NonLinearIntegerConstraint constraint, Long right) {
-		return false;
-	}
-	
-	public boolean postVisit(Long left, NonLinearIntegerConstraint constraint, Object right) {
-		return false;
-	}
-	
-	public boolean postVisit(Object left, NonLinearIntegerConstraint constraint, Object right) {
+	public Object visit(BinaryRealExpression expression) {
 		return false;
 	}
 
-	//
-	public boolean postVisit(SymbolicReal left, MixedConstraint mixedConstraint, SymbolicInteger right) {
-		return false;
-	}
-
-	public boolean postVisit(SymbolicReal left, MixedConstraint constraint, IntegerExpression right) {
-		return false;
-	}
-
-	public boolean postVisit(RealExpression left, MixedConstraint constraint, SymbolicInteger right) {
-		return false;
-	}
-
-	public boolean postVisit(RealExpression left, MixedConstraint constraint, IntegerExpression right) {
-		return false;
-	}
-
-//	public boolean postVisit(Object l, Constraint constraint, Object r) {
-//		// TODO Auto-generated method stub
-//		return false;
-//	}
 }

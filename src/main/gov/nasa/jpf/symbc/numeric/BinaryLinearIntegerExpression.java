@@ -39,8 +39,6 @@ package gov.nasa.jpf.symbc.numeric;
 
 import java.util.Map;
 
-import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
-
 public class BinaryLinearIntegerExpression extends LinearIntegerExpression
 {
 	IntegerExpression left;
@@ -66,9 +64,9 @@ public class BinaryLinearIntegerExpression extends LinearIntegerExpression
 	@Override
 	public Object accept(ConstraintExpressionVisitor2 visitor) {
 		visitor.preVisit(this);
-		Object lexpr = left.accept(visitor);
-		Object rexpr = right.accept(visitor);
-		return visitor.postVisit(lexpr, this, rexpr);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 
 	@Override

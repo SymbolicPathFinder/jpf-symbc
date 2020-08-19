@@ -66,11 +66,9 @@ public class LinearIntegerConstraint extends Constraint {
     //Carson Smith
     @Override
     public boolean accept(ConstraintExpressionVisitor2 visitor) {
-		visitor.preVisit(this); //PreVisit the visitor
-		//visitor.visit(left, this, right);
-		//visitor.postVisit(this);
-		Object l = getLeft().accept(visitor);
-		Object r = getRight().accept(visitor);
-		return visitor.postVisit(l, this, r);//PostVisit the visitor
+    	visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 }

@@ -314,7 +314,9 @@ public class IntegerConstant extends LinearIntegerExpression {
 	//Carson Smith
 	public Object accept(ConstraintExpressionVisitor2 visitor) {
 		visitor.preVisit(this);
-		return (Long) visitor.postVisit(this);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 
 	@Override

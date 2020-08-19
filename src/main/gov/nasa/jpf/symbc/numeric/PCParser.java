@@ -558,192 +558,195 @@ public class PCParser {
 
   //Added by Gideon, to handle CNF style constraints???
   static public boolean createDPLinearOrIntegerConstraint (LogicalORLinearIntegerConstraints c) {
-    List<Object> orList = new ArrayList<Object>();
 
-    for (LinearIntegerConstraint cRef: c.getList()) {
-      Comparator c_compRef = cRef.getComparator();
-      IntegerExpression c_leftRef = (IntegerExpression)cRef.getLeft();
-      IntegerExpression c_rightRef = (IntegerExpression)cRef.getRight();
-      //Removed all return false: why?
-      switch(c_compRef){
-        case EQ:
-          if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value == ((IntegerConstant) c_rightRef).value)
-              return true;
-          }
-          else if (c_leftRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_rightRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar, part1));
-            Object cc = pb.eq(((IntegerConstant)c_leftRef).value, tempVar);
-            orList.add(cc);
-          }
-          else if (c_rightRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_leftRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
-            pb.post(pb.eq(tempVar, part1)); tempVars++;
-            orList.add(pb.eq(tempVar,((IntegerConstant)c_rightRef).value));
-          }
-          else {
-            Object part1 = getExpression(c_leftRef);
-            Object part2 = getExpression(c_rightRef);
-            Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar1, part1));
-            pb.post(pb.eq(tempVar2, part2));
-            orList.add(pb.eq(tempVar1,tempVar2));
-          }
-          break;
-        case NE:
-          if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value != ((IntegerConstant) c_rightRef).value)
-              return true;
-          }
-          else if (c_leftRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_rightRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar, part1));
-            Object cc = pb.neq(((IntegerConstant)c_leftRef).value, tempVar);
-            orList.add(cc);
-          }
-          else if (c_rightRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_leftRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
-            pb.post(pb.eq(tempVar, part1)); tempVars++;
-            orList.add(pb.neq(tempVar,((IntegerConstant)c_rightRef).value));
-          }
-          else {
-            Object part1 = getExpression(c_leftRef);
-            Object part2 = getExpression(c_rightRef);
-            Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar1, part1));
-            pb.post(pb.eq(tempVar2, part2));
-            orList.add(pb.neq(tempVar1,tempVar2));
-          }
-          break;
-        case LT:
-          if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value < ((IntegerConstant) c_rightRef).value)
-              return true;
-          }
-          else if (c_leftRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_rightRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar, part1));
-            Object cc = pb.lt(((IntegerConstant)c_leftRef).value, tempVar);
-            orList.add(cc);
-          }
-          else if (c_rightRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_leftRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
-            pb.post(pb.eq(tempVar, part1)); tempVars++;
-            orList.add(pb.lt(tempVar,((IntegerConstant)c_rightRef).value));
-          }
-          else {
-            Object part1 = getExpression(c_leftRef);
-            Object part2 = getExpression(c_rightRef);
-            Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar1, part1));
-            pb.post(pb.eq(tempVar2, part2));
-            orList.add(pb.lt(tempVar1,tempVar2));
-          }
-          break;
-        case GE:
-          if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value >= ((IntegerConstant) c_rightRef).value)
-              return true;
-          }
-          else if (c_leftRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_rightRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar, part1));
-            Object cc = pb.geq(((IntegerConstant)c_leftRef).value, tempVar);
-            orList.add(cc);
-          }
-          else if (c_rightRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_leftRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
-            pb.post(pb.eq(tempVar, part1)); tempVars++;
-            orList.add(pb.geq(tempVar,((IntegerConstant)c_rightRef).value));
-          }
-          else {
-            Object part1 = getExpression(c_leftRef);
-            Object part2 = getExpression(c_rightRef);
-            Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar1, part1));
-            pb.post(pb.eq(tempVar2, part2));
-            orList.add(pb.geq(tempVar1,tempVar2));
-          }
-          break;
-        case LE:
-          if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value <= ((IntegerConstant) c_rightRef).value)
-              return true;
-          }
-          else if (c_leftRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_rightRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar, part1));
-            Object cc = pb.leq(((IntegerConstant)c_leftRef).value, tempVar);
-            orList.add(cc);
-          }
-          else if (c_rightRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_leftRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
-            pb.post(pb.eq(tempVar, part1)); tempVars++;
-            orList.add(pb.leq(tempVar,((IntegerConstant)c_rightRef).value));
-          }
-          else {
-            Object part1 = getExpression(c_leftRef);
-            Object part2 = getExpression(c_rightRef);
-            Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar1, part1));
-            pb.post(pb.eq(tempVar2, part2));
-            orList.add(pb.leq(tempVar1,tempVar2));
-          }
-          break;
-        case GT:
-          if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
-            if (((IntegerConstant) c_leftRef).value > ((IntegerConstant) c_rightRef).value)
-              return true;
-          }
-          else if (c_leftRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_rightRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar, part1));
-            Object cc = pb.gt(((IntegerConstant)c_leftRef).value, tempVar);
-            orList.add(cc);
-          }
-          else if (c_rightRef instanceof IntegerConstant) {
-            Object part1 = getExpression(c_leftRef);
-            Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
-            pb.post(pb.eq(tempVar, part1)); tempVars++;
-            orList.add(pb.gt(tempVar,((IntegerConstant)c_rightRef).value));
-          }
-          else {
-            Object part1 = getExpression(c_leftRef);
-            Object part2 = getExpression(c_rightRef);
-            Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
-            pb.post(pb.eq(tempVar1, part1));
-            pb.post(pb.eq(tempVar2, part2));
-            orList.add(pb.gt(tempVar1,tempVar2));
-          }
-          break;
-      }
-    }
-    //System.out.println("[SymbolicConstraintsGeneral] orList: " + orList.toString());
-    if (orList.size() == 0) return true;
-    Object constraint_array[] = new Object[orList.size()];
-    orList.toArray(constraint_array);
+	  //List of objects
+	  List<Object> orList = new ArrayList<Object>();
 
-    pb.postLogicalOR(constraint_array);
+	  for (LinearIntegerConstraint cRef: c.getList()) {
+		  Comparator c_compRef = cRef.getComparator();
+		  IntegerExpression c_leftRef = (IntegerExpression)cRef.getLeft();
+		  IntegerExpression c_rightRef = (IntegerExpression)cRef.getRight();
+		  //Removed all return false: why?
+		  switch(c_compRef){
+		  case EQ:
+			  if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
+				  if (((IntegerConstant) c_leftRef).value == ((IntegerConstant) c_rightRef).value)
+					  return true;
+			  }
+			  else if (c_leftRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_rightRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); 
+				  tempVars++;
+				  pb.post(pb.eq(tempVar, part1));
+				  Object cc = pb.eq(((IntegerConstant)c_leftRef).value, tempVar);
+				  orList.add(cc);
+			  }
+			  else if (c_rightRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_leftRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
+				  pb.post(pb.eq(tempVar, part1)); tempVars++;
+				  orList.add(pb.eq(tempVar,((IntegerConstant)c_rightRef).value));
+			  }
+			  else {
+				  Object part1 = getExpression(c_leftRef);
+				  Object part2 = getExpression(c_rightRef);
+				  Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar1, part1));
+				  pb.post(pb.eq(tempVar2, part2));
+				  orList.add(pb.eq(tempVar1,tempVar2));
+			  }
+			  break;
+		  case NE:
+			  if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
+				  if (((IntegerConstant) c_leftRef).value != ((IntegerConstant) c_rightRef).value)
+					  return true;
+			  }
+			  else if (c_leftRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_rightRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar, part1));
+				  Object cc = pb.neq(((IntegerConstant)c_leftRef).value, tempVar);
+				  orList.add(cc);
+			  }
+			  else if (c_rightRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_leftRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
+				  pb.post(pb.eq(tempVar, part1)); tempVars++;
+				  orList.add(pb.neq(tempVar,((IntegerConstant)c_rightRef).value));
+			  }
+			  else {
+				  Object part1 = getExpression(c_leftRef);
+				  Object part2 = getExpression(c_rightRef);
+				  Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar1, part1));
+				  pb.post(pb.eq(tempVar2, part2));
+				  orList.add(pb.neq(tempVar1,tempVar2));
+			  }
+			  break;
+		  case LT:
+			  if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
+				  if (((IntegerConstant) c_leftRef).value < ((IntegerConstant) c_rightRef).value)
+					  return true;
+			  }
+			  else if (c_leftRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_rightRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar, part1));
+				  Object cc = pb.lt(((IntegerConstant)c_leftRef).value, tempVar);
+				  orList.add(cc);
+			  }
+			  else if (c_rightRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_leftRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
+				  pb.post(pb.eq(tempVar, part1)); tempVars++;
+				  orList.add(pb.lt(tempVar,((IntegerConstant)c_rightRef).value));
+			  }
+			  else {
+				  Object part1 = getExpression(c_leftRef);
+				  Object part2 = getExpression(c_rightRef);
+				  Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar1, part1));
+				  pb.post(pb.eq(tempVar2, part2));
+				  orList.add(pb.lt(tempVar1,tempVar2));
+			  }
+			  break;
+		  case GE:
+			  if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
+				  if (((IntegerConstant) c_leftRef).value >= ((IntegerConstant) c_rightRef).value)
+					  return true;
+			  }
+			  else if (c_leftRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_rightRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar, part1));
+				  Object cc = pb.geq(((IntegerConstant)c_leftRef).value, tempVar);
+				  orList.add(cc);
+			  }
+			  else if (c_rightRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_leftRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
+				  pb.post(pb.eq(tempVar, part1)); tempVars++;
+				  orList.add(pb.geq(tempVar,((IntegerConstant)c_rightRef).value));
+			  }
+			  else {
+				  Object part1 = getExpression(c_leftRef);
+				  Object part2 = getExpression(c_rightRef);
+				  Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar1, part1));
+				  pb.post(pb.eq(tempVar2, part2));
+				  orList.add(pb.geq(tempVar1,tempVar2));
+			  }
+			  break;
+		  case LE:
+			  if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
+				  if (((IntegerConstant) c_leftRef).value <= ((IntegerConstant) c_rightRef).value)
+					  return true;
+			  }
+			  else if (c_leftRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_rightRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar, part1));
+				  Object cc = pb.leq(((IntegerConstant)c_leftRef).value, tempVar);
+				  orList.add(cc);
+			  }
+			  else if (c_rightRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_leftRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
+				  pb.post(pb.eq(tempVar, part1)); tempVars++;
+				  orList.add(pb.leq(tempVar,((IntegerConstant)c_rightRef).value));
+			  }
+			  else {
+				  Object part1 = getExpression(c_leftRef);
+				  Object part2 = getExpression(c_rightRef);
+				  Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar1, part1));
+				  pb.post(pb.eq(tempVar2, part2));
+				  orList.add(pb.leq(tempVar1,tempVar2));
+			  }
+			  break;
+		  case GT:
+			  if (c_leftRef instanceof IntegerConstant && c_rightRef instanceof IntegerConstant) {
+				  if (((IntegerConstant) c_leftRef).value > ((IntegerConstant) c_rightRef).value)
+					  return true;
+			  }
+			  else if (c_leftRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_rightRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar, part1));
+				  Object cc = pb.gt(((IntegerConstant)c_leftRef).value, tempVar);
+				  orList.add(cc);
+			  }
+			  else if (c_rightRef instanceof IntegerConstant) {
+				  Object part1 = getExpression(c_leftRef);
+				  Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
+				  pb.post(pb.eq(tempVar, part1)); tempVars++;
+				  orList.add(pb.gt(tempVar,((IntegerConstant)c_rightRef).value));
+			  }
+			  else {
+				  Object part1 = getExpression(c_leftRef);
+				  Object part2 = getExpression(c_rightRef);
+				  Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  Object tempVar2 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); tempVars++;
+				  pb.post(pb.eq(tempVar1, part1));
+				  pb.post(pb.eq(tempVar2, part2));
+				  orList.add(pb.gt(tempVar1,tempVar2));
+			  }
+			  break;
+		  }
+	  }
+	  //System.out.println("[SymbolicConstraintsGeneral] orList: " + orList.toString());
+	  if (orList.size() == 0) return true;
+	  Object constraint_array[] = new Object[orList.size()];
+	  orList.toArray(constraint_array);
 
-    return true;
+	  pb.postLogicalOR(constraint_array);
+
+	  return true;
 
   }
 
@@ -986,11 +989,12 @@ public class PCParser {
 
         switch(c_compRef) {
         case EQ:
-
+        	//In the 
             if (selex != null && sel_right != null) {
                 // The array constraint is a select
                 ArrayExpression ae = (ArrayExpression) selex.arrayExpression;
                 pb.post(pb.eq(pb.select(pb.makeArrayVar(ae.getName()),
+                  
                   (selex.indexExpression instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)selex.indexExpression).value) :
 getExpression(selex.indexExpression)),
                   (sel_right instanceof IntegerConstant) ? pb.makeIntConst(((IntegerConstant)sel_right).value) :
@@ -1120,6 +1124,7 @@ getExpression(stoex.value)), newae));
     pb=pbtosolve;
 
 
+    //I can probably get rid of these.
     symRealVar = new HashMap<SymbolicReal,Object>();
     symIntegerVar = new HashMap<SymbolicInteger,Object>();
     //result = null;
@@ -1162,7 +1167,7 @@ getExpression(stoex.value)), newae));
     		}
     		cRef = cRef.and;
     	}
-    	
+    	tempVars = pgv.getTempVars();
     	
     	//Old code for reference:
 //      while (cRef != null) {

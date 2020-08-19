@@ -172,20 +172,10 @@ public class MathRealExpression extends RealExpression
 	
 	@Override
 	public Object accept(ConstraintExpressionVisitor2 visitor) {
-		//TODO: Test this.
-		
 		visitor.preVisit(this);
-		
-		Object res1 = null;
-		Object res2 = null;
-		
-		if (arg1 != null) {
-			res1 = arg1.accept(visitor);
-		}
-		if (arg2 != null) {
-			res2 = arg2.accept(visitor);
-		}
-		return visitor.postVisit(res1, this, res2);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 
 	@Override

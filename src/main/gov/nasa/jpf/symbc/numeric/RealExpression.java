@@ -40,6 +40,8 @@ package gov.nasa.jpf.symbc.numeric;
 //import java.util.*;
 import static gov.nasa.jpf.symbc.numeric.Operator.*;
 
+import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
+
 public abstract class RealExpression extends Expression {
 
 	public RealExpression _minus_reverse (double i) 
@@ -106,4 +108,6 @@ public abstract class RealExpression extends Expression {
 		//System.out.println("Expression Solution request Error: " + this);
 		//return -666;
 	}
+
+	public abstract Object accept(ConstraintExpressionVisitor2 visitor);
 }

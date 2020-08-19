@@ -126,8 +126,8 @@ public class BinaryRealExpression extends RealExpression
 	@Override
 	public Object accept(ConstraintExpressionVisitor2 visitor) {
 		visitor.preVisit(this);
-		Object lexpr = left.accept(visitor);
-		Object rexpr = right.accept(visitor);
-		return visitor.postVisit(lexpr, this, rexpr);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
 	}
 }
