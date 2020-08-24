@@ -246,7 +246,6 @@ public class PCParser {
       Object dp_var = symRealVar.get(eRef); 
       
       if (dp_var == null) { //If nothing is found, I assume they'll be placing a value for it within the hashMap.
-    	                    //
         dp_var = pb.makeRealVar(((SymbolicReal)eRef).getName(), ((SymbolicReal)eRef)._min, ((SymbolicReal)eRef)._max);
         symRealVar.put((SymbolicReal)eRef, dp_var);
       }
@@ -366,63 +365,27 @@ public class PCParser {
 
 
   static public boolean createDPMixedConstraint(MixedConstraint cRef) { // TODO 
-	  //Might be automatic with how constraints are made.
 	  Comparator c_compRef = cRef.getComparator();
 	  RealExpression c_leftRef = (RealExpression)cRef.getLeft();
 	  IntegerExpression c_rightRef = (IntegerExpression)cRef.getRight();
-	  //Get references to each of the relevent bits of information.
-	  
+
 	  assert (c_compRef == Comparator.EQ);
-	  //Assert that the comparator is the equals sign. THIS ACTUALLY MAKES SENSE.
-	  //This is essentially checking for situations where a value is doing like
-	  //3 == 3.0 or something. Since the other comparator operations don't seem to be supported.
-	  
+
 	  if (c_leftRef instanceof SymbolicReal && c_rightRef instanceof SymbolicInteger) {
 		  //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),(IntDomainVar)(getExpression(c_rightRef))));
 		  pb.post(pb.mixed(getExpression(c_leftRef),getExpression(c_rightRef)));
-		  
-		  //If the left and right values are both Symbolic, it will call getExpression to get the dp_var of said values. a pb.mixed 
-		  //constraint will then be posted to pb.
 	  }
-	  else if (c_leftRef instanceof SymbolicReal) { // c_rightRef is an IntegerExpression
-		  
-		  //However, under this condition, the left ref is Symbolic, but the right ref is an expression. That is, it is not Symbolic.
-		  //In this case, right could be a BLIE, BNLIE, or a constant, it isn't known which it is at this point.
-		  
-		  Object tmpi = pb.makeIntVar(c_rightRef + "_" + c_rightRef.hashCode(),(int)(((SymbolicReal)c_leftRef)._min), (int)(((SymbolicReal)c_leftRef)._max));
-		  //Right here, a new object is created. That is, a dp_var of sorts is created.
-		  //It calls pb.makeIntVar for the toString of c_rightRef, plus an underscore, plus the hash code. This created symbolic
-		  //Variable has a min and max of the symbolic left reference. I honestly don't get why this is being created. It's a value for the symbolicReal
-		  //Being framed as a symbolic integer based on the bounds of the symbolic real.
-		  
-		  if (c_rightRef instanceof IntegerConstant) { //If the right value is a constant.
+	  else if (c_leftRef instanceof SymbolicReal) {
+		  Object tmpi = pb.makeIntVar(c_rightRef + "_" + c_rightRef.hashCode(),(int)(((SymbolicReal)c_leftRef)._min), (int)(((SymbolicReal)c_leftRef)._max)); 
+		  if (c_rightRef instanceof IntegerConstant) {
 			  pb.post(pb.eq(((IntegerConstant)c_rightRef).value,tmpi));
-			  //It posts to the pb an equality constraint for the right value as an integer (primitive) and seeing if it evaluates equally to the 
-			  //symbollically created value with the integer-based bounds of the Symbolic real value for the left.
 		  } else {
-			  //But, if the right value is not a constant. The right value could contain all sorts of things. 
-			  //In that sense we just go out and grab the expression for the right value. This will be an Object in 
-			  //Whatever solver's language to represent the expression's value.
-			  //It then posts to the pb an equality constraint between the crafted c_rightRef value and tmpi, created above.
 			  pb.post(pb.eq(getExpression(c_rightRef),tmpi));
 		  }
-		  //Therefore, by the time it executes here, it should be creating the first of two constraints, namely, a constraint that 
-		  //ensure equality between whatever the right-hand side of the expression is and the temp symbolically created value based on the
-		  //symbolicReal's correlating SymbolicInt values.
-		  
 		  //pb.post(new MixedEqXY((RealVar)(getExpression(c_leftRef)),tmpi));
 		  pb.post(pb.mixed(getExpression(c_leftRef),tmpi));
-		  
-		  //Finally, it posts a mixed constraint, whatever that may be, to the solver. This mixed constraint consists of 
-		  //the original c_leftRef value and the temp value. This is pretty much analogous to what occurs in the first overall
-		  //conditional for where both left and right are symbolic.
-
-		  
-		  //So, the things/values that need to be available are:
-		  //the pre-processing symbolic variables c_leftRef and c_rightRef
-		  
 	  }
-	  else if (c_rightRef instanceof SymbolicInteger) { // c_leftRef is a RealExpression
+	  else if (c_rightRef instanceof SymbolicInteger) {
 		  Object tmpr = pb.makeRealVar(c_leftRef + "_" + c_leftRef.hashCode(), ((SymbolicInteger)c_rightRef)._min, ((SymbolicInteger)c_rightRef)._max);
 		  if(c_leftRef instanceof RealConstant) {
 			  pb.post(pb.eq(tmpr, ((RealConstant)c_leftRef).value));
@@ -440,33 +403,21 @@ public class PCParser {
 
   static public boolean createDPRealConstraint(RealConstraint cRef) {
 
-    Comparator c_compRef = cRef.getComparator();                  //Gets the comparator
-    RealExpression c_leftRef = (RealExpression)cRef.getLeft();    //Gets the left  expression
-    RealExpression c_rightRef = (RealExpression)cRef.getRight();  //Gets the right expression
+    Comparator c_compRef = cRef.getComparator();
+    RealExpression c_leftRef = (RealExpression)cRef.getLeft();
+    RealExpression c_rightRef = (RealExpression)cRef.getRight();
 
-    switch(c_compRef){ //Switch on the operator..
+    switch(c_compRef){
       case EQ:
         if (c_leftRef instanceof RealConstant && c_rightRef instanceof RealConstant) {
-          if (!(((RealConstant) c_leftRef).value == ((RealConstant) c_rightRef).value)) { //If the two real constant numbers are not equal
-        	  return false; //Return false since they aren't
+          if (!(((RealConstant) c_leftRef).value == ((RealConstant) c_rightRef).value)) {
+        	  return false;
           } else {
-        	  return true; //Otherwise return true since they are.
+        	  return true;
           }
-        } else if (c_leftRef instanceof RealConstant) { //Inherently, the right ref is not a constant.
-        	//pb is set in the parse() method.
-        	
-          pb.post(pb.eq(((RealConstant)c_leftRef).value,getExpression(c_rightRef))); //This getExpression() method is the key to understanding the functionality.
-          
-          //Down the line pb.eq() is running the relevent method of the solver it's involved with, whichever solver that may be. It's abstract.
-          //The response of them depends on a lot of factors. The fact of the matter is that 
-          //pb.post() "posts" the constraint to the solver, meaning it posts the inevitable result of the pb.eq() method 
-          //Which, by all means, should be a formatted constraint in the style the solver is expecting to receive.
-          //For something like Z3, this is a boolExpr whereas for Choco, this is a Constraint. Posting is clearly solver-specific.
-          //These should generally be boolean expressions or constraints of some nature due to the nature of the fact that they're constraints
-          //being added. 
+        } else if (c_leftRef instanceof RealConstant) {
+          pb.post(pb.eq(((RealConstant)c_leftRef).value,getExpression(c_rightRef)));
         } else if (c_rightRef instanceof RealConstant) {
-        			//c_leftRef in terms of the solver and then running the relevant pb.eq() of the solver
-        			//To compare equality. Really elegent already, but I can see the room for improvement.
           pb.post(pb.eq(getExpression(c_leftRef),((RealConstant)c_rightRef).value));
         } else {
           pb.post(pb.eq(getExpression(c_leftRef),getExpression(c_rightRef)));
@@ -553,13 +504,11 @@ public class PCParser {
           pb.post(pb.gt(getExpression(c_leftRef),getExpression(c_rightRef)));
         break;
     }
-    return true; //Return true by default since a break; was reached meaning something was posted to the solver.
+    return true;
   }
 
   //Added by Gideon, to handle CNF style constraints???
   static public boolean createDPLinearOrIntegerConstraint (LogicalORLinearIntegerConstraints c) {
-
-	  //List of objects
 	  List<Object> orList = new ArrayList<Object>();
 
 	  for (LinearIntegerConstraint cRef: c.getList()) {
@@ -1118,7 +1067,7 @@ getExpression(stoex.value)), newae));
    * 
    * @param pc PathCondition
    * @param pbtosolve ProblemGeneral
-   * @return the merged ProblemGener al object; NULL if problem is unsat
+   * @return the merged ProblemGeneral object; NULL if problem is unsat
    */
   public static ProblemGeneral parse(PathCondition pc, ProblemGeneral pbtosolve) {
     pb=pbtosolve;
@@ -1155,21 +1104,18 @@ getExpression(stoex.value)), newae));
       //For a non-incremental solver,
       //we submit the *entire* pc to the solver
     	
-    	//By making a visitor and calling accept on each of the constraints for the non-incremental solver
-    	//I'm telling it to handle itself as stuff goes on.
-
     	
     	pgv.clearVars();
     	while(cRef != null) {
-    		//TODO: the functionality of addConstraint() returning a boolean for failures is now missing.
-    		if(!cRef.accept(pgv)) { //This doesn't work since I can't change method signatures of visitors.
+    		if(!cRef.accept(pgv)) {
     			return null;
     		}
     		cRef = cRef.and;
     	}
     	tempVars = pgv.getTempVars();
     	
-    	//Old code for reference:
+    	//Old code for reference: (Uncomment this and comment the code above in order 
+    	//to get things working with the old functionality.)
 //      while (cRef != null) {
 //    	 
 //        if(addConstraint(cRef) == false) {
@@ -1184,12 +1130,11 @@ getExpression(stoex.value)), newae));
   private static boolean addConstraint(Constraint cRef) {
     boolean constraintResult = true;
 
-    if (cRef instanceof RealConstraint) //Carson: Handled.
+    if (cRef instanceof RealConstraint)
       constraintResult= createDPRealConstraint((RealConstraint)cRef);// create choco real constraint
-    else if (cRef instanceof LinearIntegerConstraint) //Carson: Handled.
+    else if (cRef instanceof LinearIntegerConstraint) 
       constraintResult= createDPLinearIntegerConstraint((LinearIntegerConstraint)cRef);// create choco linear integer constraint
-    else if (cRef instanceof MixedConstraint) //Carson: ?
-      // System.out.println("Mixed Constraint");
+    else if (cRef instanceof MixedConstraint)
       constraintResult= createDPMixedConstraint((MixedConstraint)cRef);
     else if (cRef instanceof LogicalORLinearIntegerConstraints) {
       //if (!(pb instanceof ProblemChoco)) {

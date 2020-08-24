@@ -18,41 +18,48 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
-import gov.nasa.jpf.symbc.numeric.LinearIntegerConstraint;
+import gov.nasa.jpf.symbc.numeric.NonLinearIntegerConstraint;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemCoral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
 
-/**
- * This class represents a visitor for LinearIntegerConstraints. The expected functionality is that
- * FINISH THIS
- * 
- * @author Carson Smith
- */
-public class LinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
+public class NonLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 
-	public LinearIntegerConstraintVisitor(ProblemGeneral pb) {
+	public NonLinearIntegerConstraintVisitor(ProblemGeneral pb) {
 		super(pb);
 	}
-
-	//LinearIntegerConstraint visitor
+	
 	@Override
-	public boolean visit(LinearIntegerConstraint constraint) {
+	public boolean visit(NonLinearIntegerConstraint constraint) {
+		//TODO: Get rid of this terrible instanceof statement for solver types.
+		//Make a true/false for NLIC supported pb's and just check that.
+		if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || 
+				pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
 
-		Object lExpr = constraint.getLeft().accept(this);
-		Object rExpr = constraint.getRight().accept(this);
+			Object lExpr = constraint.getLeft().accept(this);
+			Object rExpr = constraint.getRight().accept(this);
 
-		if(lExpr instanceof Long && rExpr instanceof Long) {
-			return parseLIC_LL(((Long) lExpr), constraint, ((Long) rExpr));
-		} else if(lExpr instanceof Long) {
-			return parseLIC_LO(((Long) lExpr), constraint, rExpr);
-		} else if(rExpr instanceof Long) {
-			return parseLIC_OL(lExpr, constraint, ((Long) rExpr));
+			if(lExpr instanceof Long && rExpr instanceof Long) {
+				return parseNLIC_LL(((Long) lExpr), constraint, ((Long) rExpr));
+			} else if(lExpr instanceof Long) {
+				return parseNLIC_LO(((Long) lExpr), constraint, rExpr);
+			} else if(rExpr instanceof Long) {
+				return parseNLIC_OL(lExpr, constraint, ((Long) rExpr));
+			} else {
+				return parseNLIC_OO(lExpr, constraint, rExpr);
+			}
+
 		} else {
-			return parseLIC_OO(lExpr, constraint, rExpr);
+			throw new RuntimeException("## Error: Non Linear Integer Constraint not handled " + constraint);
 		}
 	}
 
-	//LinearIntegerConstraint Parsing Methods
-	public boolean parseLIC_LL(Long left, LinearIntegerConstraint constraint, Long right) {
+	//NonLinearIntegerConstraint Parsing Methods
+	public boolean parseNLIC_LL(Long left, NonLinearIntegerConstraint constraint, Long right) {
 		long r2 = right.longValue();
 		long l2 = left.longValue();
 		switch (constraint.getComparator()) {
@@ -90,7 +97,7 @@ public class LinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseLIC_LO(Long left, LinearIntegerConstraint constraint, Object right) {
+	public boolean parseNLIC_LO(Long left, NonLinearIntegerConstraint constraint, Object right) {
 		long left2 = left.longValue();
 		switch (constraint.getComparator()) {
 		case EQ:
@@ -115,7 +122,7 @@ public class LinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseLIC_OL(Object left, LinearIntegerConstraint constraint, Long right) {
+	public boolean parseNLIC_OL(Object left, NonLinearIntegerConstraint constraint, Long right) {
 		long right2 = right.longValue();
 		switch (constraint.getComparator()) {
 		case EQ:
@@ -140,7 +147,7 @@ public class LinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseLIC_OO(Object left, LinearIntegerConstraint constraint, Object right) {
+	public boolean parseNLIC_OO(Object left, NonLinearIntegerConstraint constraint, Object right) {
 		switch (constraint.getComparator()) {
 		case EQ:
 			pb.post(pb.eq(left, right));

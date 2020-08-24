@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2014, United States Government, as represented by the
+ * Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
+ *
+ * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License, 
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ *        http://www.apache.org/licenses/LICENSE-2.0. 
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+
 package gov.nasa.jpf.symbc.numeric.visitors;
 
 import java.util.ArrayList;
@@ -16,21 +34,15 @@ import gov.nasa.jpf.symbc.numeric.BinaryLinearIntegerExpression;
 import gov.nasa.jpf.symbc.numeric.BinaryNonLinearIntegerExpression;
 import gov.nasa.jpf.symbc.numeric.BinaryRealExpression;
 import gov.nasa.jpf.symbc.numeric.Comparator;
-import gov.nasa.jpf.symbc.numeric.Constraint;
-import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
 import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor2;
-import gov.nasa.jpf.symbc.numeric.Expression;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.LinearIntegerConstraint;
 import gov.nasa.jpf.symbc.numeric.LogicalORLinearIntegerConstraints;
-import gov.nasa.jpf.symbc.numeric.MathFunction;
 import gov.nasa.jpf.symbc.numeric.MathRealExpression;
 import gov.nasa.jpf.symbc.numeric.MinMax;
 import gov.nasa.jpf.symbc.numeric.MixedConstraint;
 import gov.nasa.jpf.symbc.numeric.NonLinearIntegerConstraint;
-import gov.nasa.jpf.symbc.numeric.Operator;
-import gov.nasa.jpf.symbc.numeric.PCParser;
 import gov.nasa.jpf.symbc.numeric.RealConstant;
 import gov.nasa.jpf.symbc.numeric.RealConstraint;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
@@ -43,14 +55,23 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
-import gov.nasa.jpf.symbc.string.StringSymbolic;
 
+/**
+ * This class does the general parsing for the various types of expressions parsed within the PCParser class.
+ * Extend from this class with a type of constraint, where you create visit() methods to handle passing various
+ * different types of constraints to the solver. This class extends from ConstraintExpressionVisitor2, which
+ * itself extends from ConstraintExpressionVisitor, where preVisit() and postVisit() methods were created for 
+ * each of the different classes.
+ * 
+ * @author Carson Smith
+ */
 public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	//Idea: Splitting constraints based on LinearIntegerConstraintsVisitor in it's own file. Make the visitor pattern itself more modular.
 
 	//They would decend from a common abstract ProblemGeneral Solver class where general case methods for handling the different 
-	//constraints would be, but the methods would be overridden in the solver 
+	//constraints would be, but the methods would be overridden in the solver. Expression methods are all in an asbstract class. Further different types
+	//of constraint solvers are in the other types of solvers that extend and override from that.
 
 	//Static-ness of the class design (regarding tempVars and how this class will work with PCParser in the end)
 
@@ -62,6 +83,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	//Do stuff in visit()...
 	//Return pb in postVisit() so accept() methods are better looking? I could avoid returning a boolean in general by having a global
 	//value that gets returned for constraints. For the Objects though, I'd need to use a stack.
+	
+	//How to handle tempvars outside of PCParser.
 
 	static public Map<SymbolicReal, Object>	symRealVar = new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
 	static Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>();
@@ -1260,11 +1283,11 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 			Object right = constraint.getRight();
 			if (left instanceof SelectExpression) {
 				parseRAC_Select(((SelectExpression) left), constraint, ((RealExpression) right));
-	        } else if (left instanceof RealStoreExpression) {
-	        	parseRAC_Store(((RealStoreExpression) left), constraint, ((ArrayExpression) right));
-	        } else {
-	           throw new RuntimeException("RealArrayConstraint is not select or store");
-	        }
+			} else if (left instanceof RealStoreExpression) {
+				parseRAC_Store(((RealStoreExpression) left), constraint, ((ArrayExpression) right));
+			} else {
+				throw new RuntimeException("RealArrayConstraint is not select or store");
+			}
 			return true;
 		} else {
 			throw new RuntimeException("## Error : Real Array constraints only handled by z3. Try specifying a z3 instance as symbolic.dp");	
@@ -1275,13 +1298,13 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	private void parseRAC_Select(SelectExpression selex, RealArrayConstraint rac, RealExpression sel_right) {
 		assert selex != null;
 		assert sel_right != null;
-		
-        ArrayExpression ae = selex.arrayExpression;
-        Object selexRef = selex.indexExpression.accept(this);  //Visit the selex
+
+		ArrayExpression ae = selex.arrayExpression;
+		Object selexRef = selex.indexExpression.accept(this);  //Visit the selex
 		Object sel_rightRef = sel_right.accept(this);          //Visit the sel_right
 		switch(rac.getComparator()) {
-        case EQ:
-        	if(selexRef instanceof Long) {
+		case EQ:
+			if(selexRef instanceof Long) {
 				selexRef = pb.makeIntConst(((Long)selexRef).longValue());
 			}
 
@@ -1290,28 +1313,28 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 			}
 
 			pb.post(pb.eq(pb.realSelect(pb.makeRealArrayVar(ae.getName()), selexRef), sel_rightRef));
-        	break;
-        case NE:
-            pb.post(pb.neq(pb.select(pb.makeRealArrayVar(ae.getName()), selexRef), sel_rightRef));
-        	break;
-        default:
-        	throw new RuntimeException("RealArrayConstraint - Unsupported comparator");
+			break;
+		case NE:
+			pb.post(pb.neq(pb.select(pb.makeRealArrayVar(ae.getName()), selexRef), sel_rightRef));
+			break;
+		default:
+			throw new RuntimeException("RealArrayConstraint - Unsupported comparator");
 		}
-		
+
 	}
-	
+
 	private void parseRAC_Store(RealStoreExpression stoex, RealArrayConstraint rac, ArrayExpression sto_right) {
 		assert stoex != null;
 		assert sto_right != null;
-		
+
 		ArrayExpression ae = stoex.arrayExpression;
-        ArrayExpression newae = sto_right;
-        Object stoexRef = stoex.indexExpression.accept(this);  //Visit the stoex
+		ArrayExpression newae = sto_right;
+		Object stoexRef = stoex.indexExpression.accept(this);  //Visit the stoex
 		Object stoexValRef = stoex.value.accept(this);         //Visit the stoex value
-        
+
 		switch(rac.getComparator()) {
-        case EQ:
-        	if(stoexRef instanceof Long) {
+		case EQ:
+			if(stoexRef instanceof Long) {
 				stoexRef = pb.makeIntConst(((Long)stoexRef).longValue());
 			}
 
@@ -1320,13 +1343,13 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 			}
 
 			pb.post(pb.eq(pb.realStore(pb.makeRealArrayVar(ae.getName()), stoexRef, stoexValRef), pb.makeArrayVar(newae.getName())));
-        	
-        	break;
-        case NE:
-        	pb.post(pb.neq(pb.realStore(pb.makeRealArrayVar(ae.getName()), stoexRef, stoexValRef), newae));
-        	break;
-        default:
-        	throw new RuntimeException("RealArrayConstraint - Unsupported comparator");
+
+			break;
+		case NE:
+			pb.post(pb.neq(pb.realStore(pb.makeRealArrayVar(ae.getName()), stoexRef, stoexValRef), newae));
+			break;
+		default:
+			throw new RuntimeException("RealArrayConstraint - Unsupported comparator");
 		}
 	}
 }
