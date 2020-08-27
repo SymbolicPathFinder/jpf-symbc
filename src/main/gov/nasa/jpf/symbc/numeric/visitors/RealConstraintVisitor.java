@@ -18,8 +18,12 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
+import java.util.Map;
+
 import gov.nasa.jpf.symbc.numeric.RealConstraint;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
+import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
 public class RealConstraintVisitor extends ProblemGeneralVisitor {
@@ -50,7 +54,7 @@ public class RealConstraintVisitor extends ProblemGeneralVisitor {
 	}
 
 	//RealConstraint Parsing Methods
-	public boolean parseRC_OO(Object left, RealConstraint constraint, Object right) {
+	private boolean parseRC_OO(Object left, RealConstraint constraint, Object right) {
 		switch (constraint.getComparator()) {
 		case EQ:
 			pb.post(pb.eq(left, right));
@@ -74,7 +78,7 @@ public class RealConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseRC_OD(Object left, RealConstraint constraint, Double right) {
+	private boolean parseRC_OD(Object left, RealConstraint constraint, Double right) {
 		Object l = left;
 		double r2 = right.doubleValue();
 		switch (constraint.getComparator()) {
@@ -100,7 +104,7 @@ public class RealConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseRC_DO(Double left, RealConstraint constraint, Object right) {
+	private boolean parseRC_DO(Double left, RealConstraint constraint, Object right) {
 		Object r = right;
 		double l2 = left.doubleValue();
 		switch (constraint.getComparator()) {
@@ -126,7 +130,7 @@ public class RealConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseRC_DD(Double left, RealConstraint constraint, Double right) {
+	private boolean parseRC_DD(Double left, RealConstraint constraint, Double right) {
 		double r2 = right.doubleValue();
 		double l2 = left.doubleValue();
 		switch (constraint.getComparator()) {

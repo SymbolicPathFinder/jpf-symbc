@@ -43,26 +43,22 @@ public class SolverTranslator {
 		Expression e = null;
 
 		while (c != null) {
-			Translator translator = new Translator(); //Makes a new visitor.
-			c.accept(translator);                     //This runs .accept() and eventually postVisit() on all of the expressions in the constraint
-			//expressions are added to the stack in Translator (symbolicReal or symbolicInt or SymbolicStrings only)
-			//Before line 50 is called, the operation has already been added because of line 47.
-			Expression tmp = translator.getExpression(); //This will get a peek() of the first operation added off the stack in Translator.
+			Translator translator = new Translator();
+			c.accept(translator);
+			
+			Expression tmp = translator.getExpression();
 
-			if (e == null) {  //This is the first time through. so 'e' is this temp value created within translator
-				e = tmp;      //Though, this is kinda assuming that tmp will actually be something.
+			if (e == null) {
+				e = tmp;
 			} else {
-				//This is like doing pb.eq() in that one method you looked at. Or is it post? I think eq() is the combine expression part of it.
-				//and this is pb.post()
 				e = new Operation(Operation.Operator.AND, e, tmp);
 			}
 
 			c = c.and;
 		}
 
-		//I think Instance is an instance of the solver for Green. The goal for me is to create an instance for a problemGeneral.
 		Instance greenPC = new Instance(SymbolicInstructionFactory.greenSolver, null, e);
-		return greenPC; //End goal is creating this.
+		return greenPC;
 	}
 
 //	public static Instance createInstance(Constraint constraint) {
@@ -131,7 +127,7 @@ public class SolverTranslator {
 		}
 
 		@Override
-		public void postVisit(Constraint constraint) { //This is called at the end of Constraint's accept() method
+		public void postVisit(Constraint constraint) {
 			Expression l;
 			Expression r;
 			switch (constraint.getComparator()) {
@@ -169,7 +165,7 @@ public class SolverTranslator {
 		}
 
 		@Override
-		public void postVisit(BinaryLinearIntegerExpression expression) { //How does this know for sure that order is maintained when it pops the top two?
+		public void postVisit(BinaryLinearIntegerExpression expression) {
 			Expression l;
 			Expression r;
 			switch (expression.getOp()) {

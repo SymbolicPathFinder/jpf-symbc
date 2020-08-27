@@ -17,11 +17,15 @@
  */
 package gov.nasa.jpf.symbc.numeric.visitors;
 
+import java.util.Map;
+
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
 import gov.nasa.jpf.symbc.arrays.RealArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.RealStoreExpression;
 import gov.nasa.jpf.symbc.arrays.SelectExpression;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
+import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;

@@ -26,7 +26,7 @@ public class FloatTest extends InvokeTest {
   // (x <= 1.1f)
   protected static String PC2 = "x_1_SYMREAL < CONST_1.100000023841858";
   protected static String PC10 = "x_1_SYMREAL > CONST_1.100000023841858";
-  protected static String PC3 = "CONST_1.100000023841858 == x_1_SYMREAL";
+  protected static String PC3 = "CONST_1.100000023841858 = x_1_SYMREAL";
   protected static String PC11 = "(x_1_SYMREAL + y_2_SYMREAL) < CONST_30.0";
   protected static String PC12 = "y_2_SYMREAL < CONST_30.0";
   //
@@ -37,10 +37,10 @@ public class FloatTest extends InvokeTest {
   // [((z := x+y) < 30.0f) && (x == 1.1f)] || [(x < 1.1f) && ((z := x+y) < 30.0f)] ||
   // [(x < 1.1f) && ((z := x+y) == 30.0f)] || [(x == 1.1f) && ((z := x+y) == 30.0f)] ||
   // [(x > 1.1f) && ((z := y) < 30.0f)] || [(x > 1.1f) && ((z := y) == 30.0f)]
-  protected static String PC6 = "CONST_30.0 == (x_1_SYMREAL + y_2_SYMREAL)";
+  protected static String PC6 = "CONST_30.0 = (x_1_SYMREAL + y_2_SYMREAL)";
   protected static String PC7 = "(x_1_SYMREAL + y_2_SYMREAL) < CONST_30.0";
   protected static String PC8 = "y_2_SYMREAL < CONST_30.0";
-  protected static String PC9 = "CONST_30.0 == y_2_SYMREAL";
+  protected static String PC9 = "CONST_30.0 = y_2_SYMREAL";
 
   protected static void testFloat(float x, float y) {
     String pc = "";
@@ -60,8 +60,8 @@ public class FloatTest extends InvokeTest {
               + joinPC(PC5, pc), TestUtils.getPathCondition());
       z = 91.0f;
     } else {
-      assert (pcMatches(joinPC(PC11, pc)) || pcMatches(joinPC(PC12, pc))) : makePCAssertString(
-              "TestFloatSpecial1.testFloat1 z <= 30.0f", "one of\n" + joinPC(PC11, pc) + "\nor\n" + joinPC(PC12, pc)
+      assert (pcMatches(joinPC(PC11, pc)) || pcMatches(joinPC(PC6, pc)) || pcMatches(joinPC(PC9, pc)) || pcMatches(joinPC(PC12, pc))) : makePCAssertString(
+              "TestFloatSpecial1.testFloat1 z <= 30.0f", "one of\n" + joinPC(PC11, pc) + "\nor\n" + joinPC(PC12, pc) + "\nor\n" + joinPC(PC6, pc) + "\nor\n" + joinPC(PC9, pc)
               ,
               TestUtils.getPathCondition());
     }

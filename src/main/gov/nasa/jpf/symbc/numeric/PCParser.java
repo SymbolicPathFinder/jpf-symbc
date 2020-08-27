@@ -56,7 +56,14 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
+import gov.nasa.jpf.symbc.numeric.visitors.ArrayConstraintVisitor;
+import gov.nasa.jpf.symbc.numeric.visitors.LinearIntegerConstraintVisitor;
+import gov.nasa.jpf.symbc.numeric.visitors.LogicalORLinearIntegerConstraintVisitor;
+import gov.nasa.jpf.symbc.numeric.visitors.MixedConstraintVisitor;
+import gov.nasa.jpf.symbc.numeric.visitors.NonLinearIntegerConstraintVisitor;
 import gov.nasa.jpf.symbc.numeric.visitors.ProblemGeneralVisitor;
+import gov.nasa.jpf.symbc.numeric.visitors.RealArrayConstraintVisitor;
+import gov.nasa.jpf.symbc.numeric.visitors.RealConstraintVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,14 +79,14 @@ import java.util.Map.Entry;
 public class PCParser {
   static ProblemGeneral pb;
   static ProblemGeneralVisitor pgv;
-  static public Map<SymbolicReal, Object>	symRealVar =new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
-  static Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>(); // a map between symbolic variables and DP variables
+  static public Map<SymbolicReal, Object>	symRealVar = new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
+  static public Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>(); // a map between symbolic variables and DP variables
   //static Boolean result; // tells whether result is satisfiable or not
   static int tempVars = 0; //Used to construct "or" clauses
-
+  
 
   
-  //	 Converts IntegerExpression's into DP's IntExp's
+  //Converts IntegerExpression's into DP's IntExp's
   static Object getExpression(IntegerExpression eRef) {
     assert eRef != null;
     assert !(eRef instanceof IntegerConstant);
@@ -234,8 +241,7 @@ public class PCParser {
 
   }
 
-
-  // Converts RealExpression's into DP RealExp's
+  //Converts RealExpression's into DP RealExp's
   static Object getExpression(RealExpression eRef) {
     assert eRef != null;                    //won't be needed
     assert !(eRef instanceof RealConstant); //won't be needed
@@ -353,16 +359,6 @@ public class PCParser {
 
     throw new RuntimeException("## Error: Expression " + eRef);
   }
-
-  //public Map<SymbolicReal, Object> getSymRealVar() {
-  //return symRealVar;
-  //}
-
-
-  //public Map<SymbolicInteger, Object> getSymIntegerVar() {
-  //return symIntegerVar;
-  //}
-
 
   static public boolean createDPMixedConstraint(MixedConstraint cRef) { // TODO 
 	  Comparator c_compRef = cRef.getComparator();
@@ -510,7 +506,7 @@ public class PCParser {
   //Added by Gideon, to handle CNF style constraints???
   static public boolean createDPLinearOrIntegerConstraint (LogicalORLinearIntegerConstraints c) {
 	  List<Object> orList = new ArrayList<Object>();
-
+	  
 	  for (LinearIntegerConstraint cRef: c.getList()) {
 		  Comparator c_compRef = cRef.getComparator();
 		  IntegerExpression c_leftRef = (IntegerExpression)cRef.getLeft();
@@ -692,7 +688,7 @@ public class PCParser {
 	  if (orList.size() == 0) return true;
 	  Object constraint_array[] = new Object[orList.size()];
 	  orList.toArray(constraint_array);
-
+	  
 	  pb.postLogicalOR(constraint_array);
 
 	  return true;
@@ -993,7 +989,8 @@ getExpression(stoex.value)), newae));
         return true;
     }
 
-public static boolean createRealArrayConstraint(final RealArrayConstraint cRef) {
+
+  public static boolean createRealArrayConstraint(final RealArrayConstraint cRef) {
         final Comparator c_compRef = cRef.getComparator();
 
 
@@ -1070,54 +1067,44 @@ getExpression(stoex.value)), newae));
    * @return the merged ProblemGeneral object; NULL if problem is unsat
    */
   public static ProblemGeneral parse(PathCondition pc, ProblemGeneral pbtosolve) {
-    pb=pbtosolve;
-
-
-    //I can probably get rid of these.
+    pb = pbtosolve;
+    
     symRealVar = new HashMap<SymbolicReal,Object>();
     symIntegerVar = new HashMap<SymbolicInteger,Object>();
-    //result = null;
     tempVars = 0;
-
+    
     Constraint cRef = pc.header;
-
+    
     pgv = new ProblemGeneralVisitor(pb);
-    //Every time we get into this method, we know that we have a constraint at the start, and then we want to run 
-    //This whole entire method is going to run for both the eq. and neq. of a given conditional.
+    
     if(pb instanceof IncrementalSolver) {
       //If we use an incremental solver, then we push the context
-      //*before* adding the constraint header
-    	//Corina: not needed as the push is done in the listener
-      //((IncrementalSolver)pb).push();
+      //*before* adding only the constraint header
 
-      //Note that for an incremental solver
-      //we only add the constraint header
-    	pgv.clearVars();
-    	if(!cRef.accept(pgv)) { //This doesn't work since I can't change method signatures of visitors.
+    	setPGV(cRef);
+    	if(!cRef.accept(pgv)) {
 			return null;
 		}
-    	//Old code below
 //      if(addConstraint(cRef) == false) {
 //        return null;
 //      }
     } else {
-      //For a non-incremental solver,
-      //we submit the *entire* pc to the solver
-    	
-    	
-    	pgv.clearVars();
+        //For a non-incremental solver, we submit the *entire* pc to the solver
+
     	while(cRef != null) {
+    		setPGV(cRef);
+    		System.out.println(cRef.getClass());
     		if(!cRef.accept(pgv)) {
     			return null;
     		}
     		cRef = cRef.and;
     	}
-    	tempVars = pgv.getTempVars();
     	
     	//Old code for reference: (Uncomment this and comment the code above in order 
     	//to get things working with the old functionality.)
 //      while (cRef != null) {
-//    	 
+//    	  System.out.println(cRef.getClass());
+//    	  
 //        if(addConstraint(cRef) == false) {
 //          return null;
 //        }
@@ -1125,6 +1112,34 @@ getExpression(stoex.value)), newae));
 //      }
     }
     return pb;
+  }
+
+  /**
+   * This is a really bad solution to how to get the proper type of solver working with what's being used, and
+   * should be looked at further for improvements later on, but for the time being it does what it needs to do
+   * properly. That is, it sets the pgv object here to the right type of pgv.
+   * @param cRef - the Constraint that needs a Visitor created for it.
+   * @author Carson Smith
+   */
+  private static void setPGV(Constraint cRef) {
+	  
+	  if (cRef instanceof RealConstraint) {
+		  pgv = new RealConstraintVisitor(pb);
+	  } else if (cRef instanceof LinearIntegerConstraint)  {
+		  pgv = new LinearIntegerConstraintVisitor(pb);
+	  } else if (cRef instanceof MixedConstraint) {
+		  pgv = new MixedConstraintVisitor(pb);
+	  } else if (cRef instanceof LogicalORLinearIntegerConstraints) {
+		  pgv = new LogicalORLinearIntegerConstraintVisitor(pb);
+	  } else if (cRef instanceof ArrayConstraint) {
+		  pgv = new ArrayConstraintVisitor(pb);
+	  } else if (cRef instanceof RealArrayConstraint) {
+		  pgv = new RealArrayConstraintVisitor(pb);
+	  } else if (cRef instanceof NonLinearIntegerConstraint) {
+		  pgv = new NonLinearIntegerConstraintVisitor(pb);
+	  } else {
+		  throw new RuntimeException("PCParser - Unknown constraint type. Create a visitor for it.");
+	  }
   }
   
   private static boolean addConstraint(Constraint cRef) {

@@ -20,11 +20,14 @@ package gov.nasa.jpf.symbc.numeric.visitors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.LinearIntegerConstraint;
 import gov.nasa.jpf.symbc.numeric.LogicalORLinearIntegerConstraints;
 import gov.nasa.jpf.symbc.numeric.MinMax;
+import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
 public class LogicalORLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
@@ -38,13 +41,20 @@ public class LogicalORLinearIntegerConstraintVisitor extends ProblemGeneralVisit
 	public boolean visit(LogicalORLinearIntegerConstraints constraint) {
 
 		List<Object> orList = new ArrayList<Object>();
-
+		
 		for (LinearIntegerConstraint cRef: constraint.getList()) {
 			Object cc;
 			Object lRef = cRef.getLeft().accept(this);
 			Object rRef = cRef.getRight().accept(this);
 			if(lRef instanceof Long && rRef instanceof Long) {
-				cc = parseLOLIC_LL((Long)lRef, cRef.getComparator(), (Long)rRef);
+				boolean ccRet = parseLOLIC_LL((Long)lRef, cRef.getComparator(), (Long)rRef);
+				
+				//This is here to mimic the functionality of how booleans are returned in PCParser.
+				if(ccRet) {
+					return ccRet;
+				} else {
+					continue;
+				}
 			} else if(lRef instanceof Long) {
 				cc = parseLOLIC_LO((Long)lRef, cRef.getComparator(), rRef);
 			} else if(rRef instanceof Long) {
@@ -61,14 +71,14 @@ public class LogicalORLinearIntegerConstraintVisitor extends ProblemGeneralVisit
 		}
 		Object constraint_array[] = new Object[orList.size()];
 		orList.toArray(constraint_array);
-
+		
 		pb.postLogicalOR(constraint_array);
 
 		return true;
 	}
 
 	//LogicalORLinearIntegerConstraints Parsing Methods
-	public Object parseLOLIC_LL(Long left, Comparator comp, Long right) {
+	private boolean parseLOLIC_LL(Long left, Comparator comp, Long right) {
 		long left2 = left.longValue();
 		long right2 = right.longValue();
 		switch(comp){
@@ -106,7 +116,7 @@ public class LogicalORLinearIntegerConstraintVisitor extends ProblemGeneralVisit
 		return false;
 	}
 
-	public Object parseLOLIC_LO(Long left, Comparator comp, Object right) {
+	private Object parseLOLIC_LO(Long left, Comparator comp, Object right) {
 
 		long leftConst = left.longValue(); //This could technically be removed right?
 
@@ -132,7 +142,7 @@ public class LogicalORLinearIntegerConstraintVisitor extends ProblemGeneralVisit
 		}
 	}
 
-	public Object parseLOLIC_OL(Object left, Comparator comp, Long right) {
+	private Object parseLOLIC_OL(Object left, Comparator comp, Long right) {
 		long rightConst = right.longValue(); //This could technically be removed right?
 		Object tempVar = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt("")); 
 		tempVars++;
@@ -156,7 +166,7 @@ public class LogicalORLinearIntegerConstraintVisitor extends ProblemGeneralVisit
 		}
 	}
 
-	public Object parseLOLIC_OO(Object left, Comparator comp, Object right) {
+	private Object parseLOLIC_OO(Object left, Comparator comp, Object right) {
 
 		Object tempVar1 = pb.makeIntVar("mytemp" + tempVars, MinMax.getVarMinInt(""), MinMax.getVarMaxInt(""));
 		tempVars++;

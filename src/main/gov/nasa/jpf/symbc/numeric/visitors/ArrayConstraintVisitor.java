@@ -18,6 +18,8 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
+import java.util.Map;
+
 import gov.nasa.jpf.symbc.arrays.ArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
 import gov.nasa.jpf.symbc.arrays.InitExpression;
@@ -25,6 +27,8 @@ import gov.nasa.jpf.symbc.arrays.SelectExpression;
 import gov.nasa.jpf.symbc.arrays.StoreExpression;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
+import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
@@ -68,7 +72,7 @@ public class ArrayConstraintVisitor extends ProblemGeneralVisitor {
 	}
 
 	//ArrayConstraint Parsing Methods
-	public void parseAC_Select(SelectExpression selex, ArrayConstraint ac, IntegerExpression sel_right) {
+	private void parseAC_Select(SelectExpression selex, ArrayConstraint ac, IntegerExpression sel_right) {
 		assert selex != null;
 		assert sel_right != null;
 
@@ -98,7 +102,7 @@ public class ArrayConstraintVisitor extends ProblemGeneralVisitor {
 		}
 	}
 
-	public void parseAC_Store(StoreExpression stoex, ArrayConstraint ac, ArrayExpression sto_right) {
+	private void parseAC_Store(StoreExpression stoex, ArrayConstraint ac, ArrayExpression sto_right) {
 		assert stoex != null;
 		assert sto_right != null;
 
@@ -128,7 +132,7 @@ public class ArrayConstraintVisitor extends ProblemGeneralVisitor {
 		}
 	}
 
-	public void parseAC_Init(InitExpression initex, ArrayConstraint ac) {
+	private void parseAC_Init(InitExpression initex, ArrayConstraint ac) {
 		assert initex != null;
 		switch(ac.getComparator()) {
 		case EQ:

@@ -18,6 +18,8 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
+import java.util.Map;
+
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
@@ -51,13 +53,13 @@ public class MixedConstraintVisitor extends ProblemGeneralVisitor {
 	}
 
 	//MixedConstraint Parsing Methods
-	public boolean parseMC_OO(RealExpression left, MixedConstraint constraint, IntegerExpression right) {
+	private boolean parseMC_OO(RealExpression left, MixedConstraint constraint, IntegerExpression right) {
 		//However, instead of a false assert, it'd probably be better to throw a Runtime Exception of some sort.
 		assert(false); //This should be unreachable according to the code's author.
 		return true;
 	}
 
-	public boolean parseMC_OI(RealExpression left, MixedConstraint constraint, SymbolicInteger right) {
+	private boolean parseMC_OI(RealExpression left, MixedConstraint constraint, SymbolicInteger right) {
 		assert (constraint.getComparator() == Comparator.EQ);
 
 		Object l = left.accept(this);
@@ -73,7 +75,7 @@ public class MixedConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseMC_RO(SymbolicReal left, MixedConstraint constraint, IntegerExpression right) {
+	private boolean parseMC_RO(SymbolicReal left, MixedConstraint constraint, IntegerExpression right) {
 		assert (constraint.getComparator() == Comparator.EQ);
 
 		Object l = left.accept(this);

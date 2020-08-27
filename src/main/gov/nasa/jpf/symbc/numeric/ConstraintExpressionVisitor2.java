@@ -38,70 +38,70 @@ public abstract class ConstraintExpressionVisitor2 extends ConstraintExpressionV
 
 	/*--- CONSTRAINT VISITOR ROUTINES ---*/
 	
-	public boolean visit(Constraint constraint) {
-		return false;
-	}
+//	public boolean visit(Constraint constraint) {
+//		throw new RuntimeException("Method need to be Overloaded.");
+//	}
 	
 	public boolean visit(LinearIntegerConstraint constraint) {
-		return false;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public boolean visit(NonLinearIntegerConstraint constraint) {
-		return false;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public boolean visit(RealConstraint constraint) {
-		return false;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public boolean visit(MixedConstraint constraint) {
-		return false;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public boolean visit(LogicalORLinearIntegerConstraints constraint) {
-		return false;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public boolean visit(ArrayConstraint constraint) {
-		return false;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public boolean visit(RealArrayConstraint constraint) {
-		return false;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	/*--- EXPRESSION VISITOR ROUTINES ---*/
 	
 	public Object visit(SymbolicInteger expr) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public Double visit(RealConstant expr) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public Object visit(SymbolicReal expr) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public Object visit(MathRealExpression expr) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 	
 	public Object visit(BinaryLinearIntegerExpression expression) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 
 	public Object visit(BinaryNonLinearIntegerExpression expression) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 
 	public Object visit(BinaryRealExpression expression) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 
 	public Long visit(IntegerConstant integerConstant) {
-		return null;
+		throw new RuntimeException("Method need to be Overloaded.");
 	}
 
 }

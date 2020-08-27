@@ -18,7 +18,11 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
+import java.util.Map;
+
 import gov.nasa.jpf.symbc.numeric.NonLinearIntegerConstraint;
+import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemCoral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
@@ -59,7 +63,7 @@ public class NonLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 	}
 
 	//NonLinearIntegerConstraint Parsing Methods
-	public boolean parseNLIC_LL(Long left, NonLinearIntegerConstraint constraint, Long right) {
+	private boolean parseNLIC_LL(Long left, NonLinearIntegerConstraint constraint, Long right) {
 		long r2 = right.longValue();
 		long l2 = left.longValue();
 		switch (constraint.getComparator()) {
@@ -97,7 +101,7 @@ public class NonLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseNLIC_LO(Long left, NonLinearIntegerConstraint constraint, Object right) {
+	private boolean parseNLIC_LO(Long left, NonLinearIntegerConstraint constraint, Object right) {
 		long left2 = left.longValue();
 		switch (constraint.getComparator()) {
 		case EQ:
@@ -122,7 +126,7 @@ public class NonLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseNLIC_OL(Object left, NonLinearIntegerConstraint constraint, Long right) {
+	private boolean parseNLIC_OL(Object left, NonLinearIntegerConstraint constraint, Long right) {
 		long right2 = right.longValue();
 		switch (constraint.getComparator()) {
 		case EQ:
@@ -147,7 +151,7 @@ public class NonLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 		return true;
 	}
 
-	public boolean parseNLIC_OO(Object left, NonLinearIntegerConstraint constraint, Object right) {
+	private boolean parseNLIC_OO(Object left, NonLinearIntegerConstraint constraint, Object right) {
 		switch (constraint.getComparator()) {
 		case EQ:
 			pb.post(pb.eq(left, right));

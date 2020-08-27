@@ -18,12 +18,15 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
+import java.util.Map;
+
 import gov.nasa.jpf.symbc.numeric.LinearIntegerConstraint;
+import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
 /**
  * This class represents a visitor for LinearIntegerConstraints. The expected functionality is that
- * FINISH THIS
  * 
  * @author Carson Smith
  */
