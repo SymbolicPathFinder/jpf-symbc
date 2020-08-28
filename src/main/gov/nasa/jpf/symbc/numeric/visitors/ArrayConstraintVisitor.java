@@ -18,8 +18,6 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
-import java.util.Map;
-
 import gov.nasa.jpf.symbc.arrays.ArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
 import gov.nasa.jpf.symbc.arrays.InitExpression;
@@ -28,8 +26,6 @@ import gov.nasa.jpf.symbc.arrays.StoreExpression;
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
-import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
@@ -40,9 +36,17 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
 /**
  * Used for parsing out ArrayConstraints to a solver.
  * 
- * The logic used here is the same as the logic used from PCParser. I was going to break apart the logic so
- * it's easier to understand, but there was a bug with it for the time being that I'll get around to fixing
- * later on.
+ * The logic used here is the same as the logic used from PCParser.
+ * There is a large amount of commented code here that I was going to use to
+ * break up the logical process of how ArrayConstraints are processed, but 
+ * there was a bug that showed it's face relatively late into the process,
+ * prompting me to take a quick shortcut by just having it run the code used
+ * in PCParser and adapting a few of the getExpression() methods to mesh properly
+ * with the rest of PCParser.
+ * 
+ * In the near future, I'll get around to refactoring this method to follow the
+ * visitor system more closely, probably with unique ways of parsing the types of
+ * ArrayExpressions.
  * 
  * @author Carson Smith 
  */
@@ -55,7 +59,7 @@ public class ArrayConstraintVisitor extends ProblemGeneralVisitor {
 	//ArrayConstraint Visitor
 	@Override
 	public boolean visit(ArrayConstraint constraint) {
-		//TODO: Look into getting rid of this instance of for pb types as well.
+		//TODO: Get rid of this instance of statement for pb types that can solve Array-based constraints.
 		if (pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3Incremental || 
 				pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3BitVectorIncremental) {
 			Comparator c_compRef = constraint.getComparator();

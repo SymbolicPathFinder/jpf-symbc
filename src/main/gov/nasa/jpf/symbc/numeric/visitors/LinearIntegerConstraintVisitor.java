@@ -18,20 +18,21 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
-import java.util.Map;
-
 import gov.nasa.jpf.symbc.numeric.LinearIntegerConstraint;
-import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
-import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
 /**
- * This class represents a visitor for LinearIntegerConstraints. The expected functionality is that
+ * A visitor used for parsing LinearIntegerConstraints to an instance of a solver, mimicking
+ * the old functionality of PCParser.
  * 
  * @author Carson Smith
  */
 public class LinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 
+	/**
+	 * CONSTRUCTOR: Creates a LinearIntegerConstraintVisitor object
+	 * @param pb - The ProblemGeneral object you're initializing with.
+	 */
 	public LinearIntegerConstraintVisitor(ProblemGeneral pb) {
 		super(pb);
 	}

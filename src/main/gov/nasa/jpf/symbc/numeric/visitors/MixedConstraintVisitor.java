@@ -18,8 +18,6 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
-import java.util.Map;
-
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
@@ -30,8 +28,18 @@ import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
 import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
+/**
+ * A visitor used for parsing MixedConstraints to an instance of a solver, mimicking
+ * the old functionality of PCParser.
+ * 
+ * @author Carson Smith
+ */
 public class MixedConstraintVisitor extends ProblemGeneralVisitor {
 
+	/**
+	 * CONSTRUCTOR: Creates a MixedConstraintVisitor object
+	 * @param pb - The ProblemGeneral object you're initializing with.
+	 */
 	public MixedConstraintVisitor(ProblemGeneral pb) {
 		super(pb);
 	}

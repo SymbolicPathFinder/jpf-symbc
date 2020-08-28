@@ -84,8 +84,6 @@ public class PCParser {
   //static Boolean result; // tells whether result is satisfiable or not
   static int tempVars = 0; //Used to construct "or" clauses
   
-
-  
   //Converts IntegerExpression's into DP's IntExp's
   static Object getExpression(IntegerExpression eRef) {
     assert eRef != null;

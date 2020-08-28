@@ -297,6 +297,7 @@ public abstract class IntegerExpression extends Expression {
 	}
 
 	public abstract Object accept(ConstraintExpressionVisitor2 visitor);
+	
 	//protected void finalize() throws Throwable {
     //	System.out.println("Finalized LIExp -> " + this);
     //}

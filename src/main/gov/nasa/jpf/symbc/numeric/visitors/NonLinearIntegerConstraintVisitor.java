@@ -18,31 +18,29 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
-import java.util.Map;
-
 import gov.nasa.jpf.symbc.numeric.NonLinearIntegerConstraint;
-import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
-import gov.nasa.jpf.symbc.numeric.SymbolicReal;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemCoral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
 
+/**
+ * A visitor used for parsing NonLinearIntegerConstraints to an instance of a solver, mimicking
+ * the old functionality of PCParser.
+ * 
+ * @author Carson Smith
+ */
 public class NonLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 
+	/**
+	 * CONSTRUCTOR: Creates a NonLinearIntegerConstraintVisitor object
+	 * @param pb - The ProblemGeneral object the visitor is initializing with.
+	 */
 	public NonLinearIntegerConstraintVisitor(ProblemGeneral pb) {
 		super(pb);
 	}
 	
 	@Override
 	public boolean visit(NonLinearIntegerConstraint constraint) {
-		//TODO: Get rid of this terrible instanceof statement for solver types.
-		//Make a true/false for NLIC supported pb's and just check that.
-		if(pb instanceof ProblemCoral || pb instanceof ProblemZ3|| pb instanceof ProblemZ3Optimize || 
-				pb instanceof ProblemZ3BitVector || pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
+
+		if(pb.isNonLinearSolver()) { //Z3, Z3 derivatives, or Coral
 
 			Object lExpr = constraint.getLeft().accept(this);
 			Object rExpr = constraint.getRight().accept(this);
@@ -58,7 +56,7 @@ public class NonLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 			}
 
 		} else {
-			throw new RuntimeException("## Error: Non Linear Integer Constraint not handled " + constraint);
+			throw new RuntimeException("## Error: Non Linear Integer Constraint not handled: " + constraint);
 		}
 	}
 

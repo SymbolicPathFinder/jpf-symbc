@@ -18,16 +18,22 @@
 
 package gov.nasa.jpf.symbc.numeric.visitors;
 
-import java.util.Map;
-
 import gov.nasa.jpf.symbc.numeric.RealConstraint;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
-import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
-import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
+/**
+ * A visitor used for parsing RealConstraints to an instance of a solver, mimicking
+ * the old functionality of PCParser.
+ * 
+ * @author Carson Smith
+ */
 public class RealConstraintVisitor extends ProblemGeneralVisitor {
 
+	/**
+	 * CONSTRUCTOR: Creates a RealConstraintVisitor object
+	 * @param pb - The ProblemGeneral object you're initializing with.
+	 */
 	public RealConstraintVisitor(ProblemGeneral pb) {
 		super(pb);
 	}

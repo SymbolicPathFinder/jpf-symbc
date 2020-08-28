@@ -20,18 +20,32 @@ package gov.nasa.jpf.symbc.numeric.visitors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.LinearIntegerConstraint;
 import gov.nasa.jpf.symbc.numeric.LogicalORLinearIntegerConstraints;
 import gov.nasa.jpf.symbc.numeric.MinMax;
-import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
-import gov.nasa.jpf.symbc.numeric.SymbolicReal;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
+/**
+ * A class used for parsing out a list of LinearIntegerConstraints, meant to be
+ * OR-ed together, primarily for use with Strings or Arrays. This is an adapted
+ * method from how things are used within the old PCParser.
+ * 
+ * @author Carson Smith
+ */
 public class LogicalORLinearIntegerConstraintVisitor extends ProblemGeneralVisitor {
 
+	/**
+	 * Used to construct "OR" clauses
+	 */
+	static int tempVars;
+	
+	/**
+	 * CONSTRUCTOR: Creates a LogicalORLinearIntegerConstraintVisitor object for use with
+	 * LogicalORLinearIntegerConstraints.
+	 * 
+	 * @param pb - The ProblemGeneral object you're initializing with.
+	 */
 	public LogicalORLinearIntegerConstraintVisitor(ProblemGeneral pb) {
 		super(pb);
 	}

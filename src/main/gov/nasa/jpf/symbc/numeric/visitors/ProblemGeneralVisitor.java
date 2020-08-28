@@ -30,13 +30,7 @@ import gov.nasa.jpf.symbc.numeric.RealConstant;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
 import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
 import gov.nasa.jpf.symbc.numeric.SymbolicReal;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemCoral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVectorIncremental;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Incremental;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
 
 /**
  * This class does the general parsing for the various types of expressions parsed within the PCParser class.
@@ -55,10 +49,9 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3Optimize;
  */
 public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
-	//z3 and Linux testing.
-	
-	static int tempVars;
-
+	/**
+	 * The ProblemGeneral object that the visitor system will be posting to and using.
+	 */
 	static ProblemGeneral pb;
 
 	/**
@@ -68,8 +61,6 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	public ProblemGeneralVisitor(ProblemGeneral pb) {
 		ProblemGeneralVisitor.pb = pb;
 	}
-
-	//------------------------------------------------------------------------------------------------------------------------------------------
 
 	//IntegerConstant Method
 	@Override
@@ -81,7 +72,6 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	//SymbolicInt Method
 	@Override
 	public Object visit(SymbolicInteger symbInt) {
-		//assert(symbInt._min >= Integer.MIN_VALUE && symbInt._max <= Integer.MAX_VALUE);
 		Object dp_var = PCParser.symIntegerVar.get(symbInt);
 
 		if (dp_var == null) {
@@ -101,9 +91,6 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	//SymbolicReal Method
 	@Override
 	public Object visit(SymbolicReal symbReal) {
-		//TODO: This assertion statement completely messes with everything for some reason when double max and mins are specified.
-		//I'll have to look into it.
-		//assert(symbReal._min >= Double.MIN_VALUE && symbReal._max <= Double.MAX_VALUE);
 		Object dp_var = PCParser.symRealVar.get(symbReal);
 
 		if (dp_var == null) {
@@ -199,7 +186,7 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 
 	//BinaryRealExpression Parsing Methods
 	private Object parseBRE_DD(Double lExpr, BinaryRealExpression expression, Double rExpr) {
-		throw new RuntimeException("## Error: this is not a symbolic expression");
+		throw new RuntimeException("## Error: This is not a symbolic expression");
 	}
 
 	private Object parseBRE_DO(Double lExpr, BinaryRealExpression expression, Object rExpr) {
@@ -379,11 +366,7 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 	@Override
 	public Object visit(BinaryNonLinearIntegerExpression expression) {
 
-		//TODO: Get rid of this terrible instanceof statement for solver types.
-		//Make a true/false for non-linear supported pb's and just check that.
-		if(pb instanceof ProblemCoral || pb instanceof ProblemZ3 || pb instanceof ProblemZ3Optimize || pb instanceof ProblemZ3BitVector ||
-				pb instanceof ProblemZ3Incremental || pb instanceof ProblemZ3BitVectorIncremental) {
-
+		if(pb.isNonLinearSolver()) { //Z3, Z3 derivatives, or Coral
 			IntegerExpression left = expression.left;
 			IntegerExpression right = expression.right;
 
