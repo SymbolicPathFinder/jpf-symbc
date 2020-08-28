@@ -20,6 +20,7 @@
 package gov.nasa.jpf.symbc.arrays;
 
 import gov.nasa.jpf.symbc.numeric.Constraint;
+import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor2;
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
 
@@ -51,5 +52,13 @@ public class RealArrayConstraint extends Constraint {
             }
         }
     }
+    
+    //Carson Smith
+    public boolean accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 }
 
