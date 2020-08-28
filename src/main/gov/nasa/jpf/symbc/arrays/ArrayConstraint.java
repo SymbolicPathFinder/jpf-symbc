@@ -21,6 +21,7 @@
 package gov.nasa.jpf.symbc.arrays;
 
 import gov.nasa.jpf.symbc.numeric.Constraint;
+import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor2;
 import gov.nasa.jpf.symbc.numeric.Comparator;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 
@@ -58,5 +59,12 @@ public class ArrayConstraint extends Constraint {
             }
         }
     }
+
+	public boolean accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 }
 

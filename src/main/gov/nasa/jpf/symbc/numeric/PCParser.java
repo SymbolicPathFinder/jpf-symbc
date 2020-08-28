@@ -915,7 +915,7 @@ public class PCParser {
   public static boolean createArrayConstraint(ArrayConstraint cRef) {
     Comparator c_compRef = cRef.getComparator();
 
-    SelectExpression selex = null;
+        SelectExpression selex = null;
         StoreExpression stoex = null;
         IntegerExpression sel_right = null;
         ArrayExpression sto_right = null;
@@ -1085,6 +1085,7 @@ getExpression(stoex.value)), newae));
     	if(!cRef.accept(pgv)) {
 			return null;
 		}
+    	//Old Code Below:
 //      if(addConstraint(cRef) == false) {
 //        return null;
 //      }
@@ -1093,7 +1094,6 @@ getExpression(stoex.value)), newae));
 
     	while(cRef != null) {
     		setPGV(cRef);
-    		System.out.println(cRef.getClass());
     		if(!cRef.accept(pgv)) {
     			return null;
     		}
@@ -1103,7 +1103,6 @@ getExpression(stoex.value)), newae));
     	//Old code for reference: (Uncomment this and comment the code above in order 
     	//to get things working with the old functionality.)
 //      while (cRef != null) {
-//    	  System.out.println(cRef.getClass());
 //    	  
 //        if(addConstraint(cRef) == false) {
 //          return null;
@@ -1118,7 +1117,7 @@ getExpression(stoex.value)), newae));
    * This is a really bad solution to how to get the proper type of solver working with what's being used, and
    * should be looked at further for improvements later on, but for the time being it does what it needs to do
    * properly. That is, it sets the pgv object here to the right type of pgv.
-   * @param cRef - the Constraint that needs a Visitor created for it.
+   * @param cRef - the Constraint to create a visitor for.
    * @author Carson Smith
    */
   private static void setPGV(Constraint cRef) {
@@ -1142,6 +1141,12 @@ getExpression(stoex.value)), newae));
 	  }
   }
   
+  /**
+   * This is the old method for how constraints are parsed. It splits up the functionality into the various other
+   * methods in PCParser that have had their functionality adapted for the Visitor system.
+   * @param cRef
+   * @return constraintResult - boolean value that represents the sat or unsat of a constraint.
+   */
   private static boolean addConstraint(Constraint cRef) {
     boolean constraintResult = true;
 

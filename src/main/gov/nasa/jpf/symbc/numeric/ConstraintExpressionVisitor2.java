@@ -38,9 +38,9 @@ public abstract class ConstraintExpressionVisitor2 extends ConstraintExpressionV
 
 	/*--- CONSTRAINT VISITOR ROUTINES ---*/
 	
-//	public boolean visit(Constraint constraint) {
-//		throw new RuntimeException("Method need to be Overloaded.");
-//	}
+	public boolean visit(Constraint constraint) {
+		throw new RuntimeException("Method need to be Overloaded.");
+	}
 	
 	public boolean visit(LinearIntegerConstraint constraint) {
 		throw new RuntimeException("Method need to be Overloaded.");
