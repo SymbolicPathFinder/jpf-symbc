@@ -39,11 +39,12 @@ import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
  * itself extends from ConstraintExpressionVisitor, where preVisit() and postVisit() methods were created for 
  * each of the different classes.
  * 
- * In order to handle new types of constraints, create a new visitor file for the constraint and extend from
+ * In order to handle new types of constraints, create a new visitor class for the constraint and extend from
  * this class. Have a visit() method overridden inside your new class for the constraint, and handle the parsing
  * of the constraint within the visitor. You'll also probably have to create an accept() method within the 
  * relevant constraint method, but that shouldn't be hard either. If you should need to change the functionality
- * of how any Expressions are parsed, just override the methods below within your newly created visitor.
+ * of how any Expressions are parsed, just override the methods below within your newly created visitor and handle
+ * the expression parsing there.
  * 
  * @author Carson Smith
  */
@@ -75,8 +76,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		Object dp_var = PCParser.symIntegerVar.get(symbInt);
 
 		if (dp_var == null) {
-			dp_var = pb.makeIntVar(((SymbolicInteger)symbInt).getName(),((SymbolicInteger)symbInt)._min, ((SymbolicInteger)symbInt)._max);
-			PCParser.symIntegerVar.put((SymbolicInteger)symbInt, dp_var);
+			dp_var = pb.makeIntVar(symbInt.getName(),symbInt._min, symbInt._max);
+			PCParser.symIntegerVar.put(symbInt, dp_var);
 		}
 		return dp_var;
 	}
@@ -94,8 +95,8 @@ public class ProblemGeneralVisitor extends ConstraintExpressionVisitor2 {
 		Object dp_var = PCParser.symRealVar.get(symbReal);
 
 		if (dp_var == null) {
-			dp_var = pb.makeRealVar(((SymbolicReal)symbReal).getName(), ((SymbolicReal)symbReal)._min, ((SymbolicReal)symbReal)._max);
-			PCParser.symRealVar.put((SymbolicReal)symbReal, dp_var);
+			dp_var = pb.makeRealVar(symbReal.getName(), symbReal._min, symbReal._max);
+			PCParser.symRealVar.put(symbReal, dp_var);
 		}
 		return dp_var;
 	}

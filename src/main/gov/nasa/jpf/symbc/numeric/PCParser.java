@@ -37,7 +37,6 @@
 
 package gov.nasa.jpf.symbc.numeric;
 
-import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.arrays.ArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.ArrayExpression;
 import gov.nasa.jpf.symbc.arrays.InitExpression;
@@ -45,9 +44,7 @@ import gov.nasa.jpf.symbc.arrays.RealArrayConstraint;
 import gov.nasa.jpf.symbc.arrays.RealStoreExpression;
 import gov.nasa.jpf.symbc.arrays.SelectExpression;
 import gov.nasa.jpf.symbc.arrays.StoreExpression;
-import gov.nasa.jpf.symbc.numeric.solvers.IncrementalListener;
 import gov.nasa.jpf.symbc.numeric.solvers.IncrementalSolver;
-import gov.nasa.jpf.symbc.numeric.solvers.ProblemChoco;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemCoral;
 import gov.nasa.jpf.symbc.numeric.solvers.ProblemGeneral;
 
@@ -67,15 +64,12 @@ import gov.nasa.jpf.symbc.numeric.visitors.RealConstraintVisitor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 
 // parses PCs
-
+// The general functionality of this class will eventually get replaced with ProblemGeneralVisitor.
 public class PCParser {
   static ProblemGeneral pb;
   static ProblemGeneralVisitor pgv;
@@ -1135,7 +1129,7 @@ getExpression(stoex.value)), newae));
 	  } else if (cRef instanceof NonLinearIntegerConstraint) {
 		  pgv = new NonLinearIntegerConstraintVisitor(pb);
 	  } else {
-		  throw new RuntimeException("PCParser - Unknown constraint type. Create a visitor for it.");
+		  throw new RuntimeException("PCParser - Unknown constraint type. Create a visitor for it.\n" + cRef.getClass());
 	  }
   }
   
