@@ -3,7 +3,7 @@ classpath=${jpf-symbc}/build/examples
 sourcepath=${jpf-symbc}/src/examples
 symbolic.method = ExampleDReal.test(sym#sym)
 
-symbolic.dp=dreal
+symbolic.dp=choco
 
 dreal.mode = strictified 
 #or relaxed
