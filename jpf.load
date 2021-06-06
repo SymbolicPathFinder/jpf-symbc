@@ -1,3 +1,0 @@
-export JPF=/home/miroslav/Research/jpf/jpf-core/
-export PATH=${JPF}/bin:$PATH
-
