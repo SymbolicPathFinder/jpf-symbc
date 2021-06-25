@@ -53,8 +53,9 @@ public class Z3String3Processor implements Processable {
 		solver1.setParameters(params);	
 		
 		String query = currentQuery.toString();
+		System.out.println("current query... " + query);
 		
-		BoolExpr assertions = context1.parseSMTLIB2String(query,null, null, null, null);
+		BoolExpr[] assertions = context1.parseSMTLIB2String(query,null, null, null, null);
 			
 		solver1.add(assertions);
 		
