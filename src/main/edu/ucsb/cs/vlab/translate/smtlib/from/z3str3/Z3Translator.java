@@ -66,20 +66,20 @@ class Manager extends TranslationManager {
 
 			map(SymbolicLastIndexOfCharInteger.class, "LastIndexof $getSource ?getExpression");
 			map(SymbolicLastIndexOfChar2Integer.class,
-					"LastIndexof ( Substring $getSource %getMinDist ( - (Length $getSource ) %getMinDist )) ?getExpression");
+					"LastIndexof ( str.substr $getSource %getMinDist ( - (str.len $getSource ) %getMinDist )) ?getExpression");
 
 			map(BinaryLinearIntegerExpression.class, "_getOp %getLeft %getRight");
-			map(SymbolicCharAtInteger.class, "CharAt $getExpression %getIndex");
-			map(SymbolicIndexOf2Integer.class, "Indexof $getSource $getExpression %getMinIndex");
-			map(SymbolicIndexOfInteger.class, "Indexof $getSource $getExpression");
+			map(SymbolicCharAtInteger.class, "str.at $getExpression %getIndex");
+			map(SymbolicIndexOf2Integer.class, "str.indexof $getSource $getExpression %getMinIndex");
+			map(SymbolicIndexOfInteger.class, "str.indexof $getSource $getExpression");
 
 			map(SymbolicLastIndexOf2Integer.class,
-					"LastIndexof ( Substring $getSource %getMinIndex ( - (Length $getSource ) %getMinIndex )) $getExpression");
+					"LastIndexof ( str.substr $getSource %getMinIndex ( - (str.len $getSource ) %getMinIndex )) $getExpression");
 			map(SymbolicLastIndexOfInteger.class, "LastIndexof $getSource $getExpression");
 
-			map(SymbolicLengthInteger.class, "Length $getExpression");
-			map(SymbolicIndexOfCharInteger.class, "Indexof $getSource ?getExpression");
-			map(SymbolicIndexOfChar2Integer.class, "Indexof $getSource ?getExpression %getMinDist");
+			map(SymbolicLengthInteger.class, "str.len $getExpression");
+			map(SymbolicIndexOfCharInteger.class, "str.indexof $getSource ?getExpression");
+			map(SymbolicIndexOfChar2Integer.class, "str.indexof $getSource ?getExpression %getMinDist");
 
 			rules.put(IntegerConstant.class, (x) -> {
 				final int v = (int) ((IntegerConstant) x).value;
@@ -106,12 +106,12 @@ class Manager extends TranslationManager {
 		}
 
 		public void init() {
-			map(StringComparator.CONTAINS, "(Contains");
-			map(StringComparator.NOTCONTAINS, "(not (Contains");
-			map(StringComparator.STARTSWITH, "(StartsWith");
-			map(StringComparator.NOTSTARTSWITH, "(not (StartsWith");
-			map(StringComparator.ENDSWITH, "(EndsWith");
-			map(StringComparator.NOTENDSWITH, "(not (EndsWith");
+			map(StringComparator.CONTAINS, "(str.contains");
+			map(StringComparator.NOTCONTAINS, "(not (str.contains");
+			map(StringComparator.STARTSWITH, "(str.prefixof");
+			map(StringComparator.NOTSTARTSWITH, "(not (str.prefixof");
+			map(StringComparator.ENDSWITH, "(str.suffixof");
+			map(StringComparator.NOTENDSWITH, "(not (str.suffixof");
 			map(StringComparator.EQUALS, "(=");
 			map(StringComparator.NOTEQUALS, "(not (=");
 			map(StringComparator.EQUALSIGNORECASE, "(equalsIgnoreCase");
@@ -176,7 +176,7 @@ class Manager extends TranslationManager {
 				final DerivedStringExpression dse = (DerivedStringExpression) expr;
 				final String leftArg = manager.strExpr.collect(dse.left);
 				final String rightArg = manager.strExpr.collect(dse.right);
-				return "(Concat " + leftArg + " " + rightArg + ")";
+				return "(str.++ " + leftArg + " " + rightArg + ")";
 			});
 
 			map(StringOrOperation.SUBSTRING, (expr) -> {
@@ -185,10 +185,10 @@ class Manager extends TranslationManager {
 				final String arg2 = manager.numExpr.collect((IntegerExpression) dse.oprlist[1]);
 
 				if (dse.oprlist.length == 2)
-					return "(Substring " + arg1 + " " + arg2 + "(- (Length " + arg1 + ") " + arg2 + "))";
+					return "(str.substr " + arg1 + " " + arg2 + "(- (str.len " + arg1 + ") " + arg2 + "))";
 				else {
 					final String arg3 = manager.numExpr.collect((IntegerExpression) dse.oprlist[2]);
-					return "(Substring " + arg1 + " " + arg3 + " (- " + arg2 + " " + arg3 + "))";
+					return "(str.substr " + arg1 + " " + arg3 + " (- " + arg2 + " " + arg3 + "))";
 				}
 			});
 

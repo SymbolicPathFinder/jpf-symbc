@@ -71,6 +71,7 @@ import gov.nasa.jpf.symbc.string.translate.TranslateToSAT;
 import gov.nasa.jpf.symbc.string.translate.TranslateToZ3;
 import gov.nasa.jpf.symbc.string.translate.TranslateToZ3Inc;
 import gov.nasa.jpf.symbc.string.translate.TranslateToZ3str2;
+import gov.nasa.jpf.symbc.string.translate.TranslateToZ3str3;
 import gov.nasa.jpf.util.LogManager;
 
 /**
@@ -115,6 +116,7 @@ public class SymbolicStringConstraintsGeneral {
 	/*Possible sovlers for now */
 	public static final String ABC = "ABC";
 	public static final String Z3STR2 = "Z3str2";
+	public static final String Z3STR3 = "Z3str3";
 	public static final String AUTOMATA = "Automata";
 	public static final String SAT = "Sat";
 	public static final String CVC = "CVC";
@@ -393,6 +395,9 @@ public class SymbolicStringConstraintsGeneral {
 		else if (string_dp[0].equals("z3str2")) {
 			solver = Z3STR2;
 		}
+		else if (string_dp[0].equals("z3str3")) {
+			solver = Z3STR3;
+		}
 		else if (string_dp[0].equals("ABC")) {
 			solver = ABC;
 		}
@@ -430,6 +435,14 @@ public class SymbolicStringConstraintsGeneral {
 			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 			System.out.println("Calling Z3str2\n");
 			final Output dpresult = TranslateToZ3str2.solve(pc);
+			constraintCount = constraintCount + 1;
+			return dpresult.isSAT();
+		}
+		
+		else if(solver.equals(Z3STR3)){
+			System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+			System.out.println("Calling Z3str3\n");
+			final Output dpresult = TranslateToZ3str3.solve(pc);
 			constraintCount = constraintCount + 1;
 			return dpresult.isSAT();
 		}
