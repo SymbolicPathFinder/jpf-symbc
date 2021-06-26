@@ -3,6 +3,7 @@ package edu.ucsb.cs.vlab.versions;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class Z3String3Processor implements Processable {
 	public void query(String message, Processor proc) throws IOException {
 		currentQuery.append(message + "\n");
 
-		Files.write(Paths.get(Z3_3.getTempFile()), currentQuery.toString().getBytes());
+		//Files.write(Paths.get(Z3_3.getTempFile()), currentQuery.toString().getBytes());
 	}
 
 	@Override
@@ -60,35 +61,68 @@ public class Z3String3Processor implements Processable {
 		solver1.add(assertions);
 		
 	    if (solver1.check() == Status.SATISFIABLE) {
+	    	sat = true;
 	    	System.out.println(solver1.getModel().toString());
 	    }
 		
-		
-		
-		
-		
-//			List<String> solutions = new ArrayList<>();
-//			if (sat) {
-//				while (!reader.ready()) {}
-//				while (reader.ready()) {
-//					line = reader.readLine();
-//					if (line.contains("define-fun")) {
-//						solutions.add(line + reader.readLine());
-//					}
-//				}
+	    String returned = solver1.getModel().toString();
+	    final BufferedReader reader = new BufferedReader(new StringReader(returned));
+	    
+	    
+	    
+	    
+//		com.microsoft.z3.Model model = solver1.getModel();
+//		
+//		FuncDecl<?>[] decls = model.getDecls();
+//		//FuncDecl<?>[] decls = model.getFuncDecls();
+//		
+//		for (FuncDecl<?> f : decls) {
+//			System.out.println("f: " + f.toString());
+//			System.out.println("s: " + f.getSExpr());
+//			FuncDecl.Parameter[] ps = f.getParameters();
+//			for (FuncDecl.Parameter p : ps) {
+//				System.out.println("p: " + p.toString());
 //			}
+//			Sort[] sorts = f.getDomain();
+//			for (Sort s : sorts) {
+//				System.out.println("sort: " + s.toString());
+//			}
+//			Sort range = f.getRange();
+//			System.out.println("r: " + range.toString());
+//			Symbol sym = f.getName();
+//			System.out.println("n: " + sym.toString());
+//			
+//			
+//		}
+		
+	    	String line; // = reader.readLine();
+//	    	if (line != null) {
+//	    		System.out.println("line not null... " + line);
+//	    	}
+			List<String> solutions = new ArrayList<>();
+			if (sat) {
+				//while (!reader.ready()) {}
+				line = reader.readLine();
+				while (line != null) {
+					
+						if (line.contains("define-fun")) {
+							solutions.add(line + reader.readLine());
+						}
+						line = reader.readLine();
+				}
+			}
 
-//			System.out.println("Returned solutions: ");
-//			for(String s : solutions) {
-//				System.out.println(s.trim());
-//				String value = s.substring(s.indexOf("\""), s.length() -1);
-//				String[] parts = s.split(" ");
-//
-//				String processString = parts[3] + " : " + parts[5] + " -> ";
-//				processString = processString + value;
-//				process(processString);
-//
-//			}
+			System.out.println("Returned solutions: ");
+			for(String s : solutions) {
+				System.out.println(s.trim());
+				String value = s.substring(s.indexOf("\""), s.length() -1);
+				String[] parts = s.split(" ");
+
+				String processString = parts[1] + " : " + parts[3] + " -> ";
+				processString = processString + value;
+				process(processString);
+
+			}
 			
 		//}
 
