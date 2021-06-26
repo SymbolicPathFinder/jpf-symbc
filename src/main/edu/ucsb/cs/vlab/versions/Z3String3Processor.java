@@ -125,7 +125,9 @@ public class Z3String3Processor implements Processable {
 			}
 			
 		//}
-
+			
+		context1.close();	
+			
 		return new Output(sat, assembleModel());
 	}
 
