@@ -130,7 +130,10 @@ public class Translator<Manager extends TranslationManager> {
 	}
 
 	public String getFooter() {
-		return "(check-sat)\n(get-model)\n";
+		
+		// MJR calling get-model on unsat query now causes exception in JNI interface
+		return "";
+		//return "(check-sat)\n(get-model)\n";
 	}
 	
 	public String createSymbolicDeclaration(final Set<String> symbolicVars, String type) {

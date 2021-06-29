@@ -16,6 +16,8 @@ import edu.ucsb.cs.vlab.Z3Interface.Processor;
 import edu.ucsb.cs.vlab.modelling.Output;
 import edu.ucsb.cs.vlab.modelling.Output.Model;
 
+import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
+
 import com.microsoft.z3.*;
 
 public class Z3String3Processor implements Processable {
@@ -44,22 +46,44 @@ public class Z3String3Processor implements Processable {
 //
 //			sat = line.replace(">> ", "").trim().equalsIgnoreCase("SAT");
 
-			
+		//System.out.println("z3str3 ALT: " + SymbolicInstructionFactory.z3str3_aggressive_length_testing);
+		
+
+		
+		
 		Context context1 = new Context();
 		Solver solver1 = context1.mkSolver();
 		Params params = context1.mkParams();
 		params.add("candidate_models", true);
 		params.add("fail_if_inconclusive", false);
 		params.add("smt.string_solver", "z3str3");
+		
+//		if (SymbolicInstructionFactory.z3str3_aggressive_length_testing) {
+//			params.add("str.aggressive_length_testing", true);
+//		}
+		
+		params.add("str.aggressive_length_testing", SymbolicInstructionFactory.z3str3_aggressive_length_testing);
+		params.add("str.aggressive_unroll_testing", SymbolicInstructionFactory.z3str3_aggressive_unroll_testing);
+		params.add("str.aggressive_value_testing", SymbolicInstructionFactory.z3str3_aggressive_value_testing);
+		params.add("str.fast_length_tester_cache", SymbolicInstructionFactory.z3str3_fast_length_tester_cache);
+		params.add("str.fast_value_tester_cache", SymbolicInstructionFactory.z3str3_fast_value_tester_cache);
+		params.add("str.fixed_length_naive_cex", SymbolicInstructionFactory.z3str3_fixed_length_naive_cex);
+		params.add("str.fixed_length_refinement", SymbolicInstructionFactory.z3str3_fixed_length_refinement);
+		params.add("str.string_constant_cache", SymbolicInstructionFactory.z3str3_string_constant_cache);
+		params.add("str.strong_arrangements", SymbolicInstructionFactory.z3str3_strong_arrangements);
+		
 		solver1.setParameters(params);	
 		
 		String query = currentQuery.toString();
 		System.out.println("current query... " + query);
+		// todo strip out check-sat and get-model
 		
 		BoolExpr[] assertions = context1.parseSMTLIB2String(query,null, null, null, null);
 			
 		solver1.add(assertions);
 		
+		// todo prevent get-model call if unsat
+		// todo catch z3 exception for unkown constant (unsupported string function)
 	    if (solver1.check() == Status.SATISFIABLE) {
 	    	sat = true;
 	    	System.out.println(solver1.getModel().toString());

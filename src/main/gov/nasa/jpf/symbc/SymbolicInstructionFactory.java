@@ -601,6 +601,18 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
   static public int maxPcLength;
   static public long maxPcMSec;
   static public long startSystemMillis;
+  
+  	// MJR additional properties for z3str3. 
+  	// The defaults will be set if the property is not present in the jpf file.
+  	static public boolean z3str3_aggressive_length_testing;
+  	static public boolean z3str3_aggressive_unroll_testing;
+  	static public boolean z3str3_aggressive_value_testing;
+  	static public boolean z3str3_fast_length_tester_cache;
+  	static public boolean z3str3_fast_value_tester_cache;
+  	static public boolean z3str3_fixed_length_naive_cex;
+  	static public boolean z3str3_fixed_length_refinement;
+  	static public boolean z3str3_string_constant_cache;
+  	static public boolean z3str3_strong_arrangements;
 
 	ClassInfo ci;
 	ClassInfoFilter filter; // TODO: fix; do we still need this?
@@ -658,6 +670,22 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				string_dp[0] = "none";
 			}
 			if (debugMode) System.out.println("symbolic.string_dp="+string_dp[0]);
+			
+			// MJR Populate z3str3 properties, get each from the jpf file and populate the conf properties.
+			// Choose the default if the property is not present.
+			if (string_dp[0].equals("z3str3")) {
+				
+				z3str3_aggressive_length_testing = conf.getBoolean("symbolic.z3str3_aggressive_length_testing", false);
+				z3str3_aggressive_unroll_testing = conf.getBoolean("symbolic.z3str3_aggressive_unroll_testing", true);
+				z3str3_aggressive_value_testing = conf.getBoolean("symbolic.z3str3_aggressive_value_testing", false);
+				z3str3_fast_length_tester_cache = conf.getBoolean("symbolic.z3str3_fast_length_tester_cache", true);
+				z3str3_fast_value_tester_cache = conf.getBoolean("symbolic.z3str3_fast_value_tester_cache", true);
+				z3str3_fixed_length_naive_cex = conf.getBoolean("symbolic.z3str3_fixed_length_naive_cex", true);
+				z3str3_fixed_length_refinement = conf.getBoolean("symbolic.z3str3_fixed_length_refinement", false);
+				z3str3_string_constant_cache = conf.getBoolean("symbolic.z3str3_string_constant_cache", true);
+				z3str3_strong_arrangements = conf.getBoolean("symbolic.z3str3_strong_arrangements", true);
+				
+			}
 
 			preprocesOnly = conf.getBoolean("symbolic.string_preprocess_only", false);
 			String[] concolic  = conf.getStringArray("symbolic.concolic");
