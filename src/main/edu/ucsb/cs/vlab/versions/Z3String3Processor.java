@@ -20,6 +20,7 @@ import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 
 import com.microsoft.z3.*;
 
+// TODO: This will not need to implement Processable in final version.
 public class Z3String3Processor implements Processable {
 	final Model model = new Model();
 	final StringBuilder currentQuery = new StringBuilder();
@@ -33,6 +34,7 @@ public class Z3String3Processor implements Processable {
 	public void query(String message, Processor proc) throws IOException {
 		currentQuery.append(message + "\n");
 
+		// MJR not doing file IO, using JNI interface
 		//Files.write(Paths.get(Z3_3.getTempFile()), currentQuery.toString().getBytes());
 	}
 
@@ -53,15 +55,14 @@ public class Z3String3Processor implements Processable {
 		
 		Context context1 = new Context();
 		Solver solver1 = context1.mkSolver();
+		
 		Params params = context1.mkParams();
 		params.add("candidate_models", true);
 		params.add("fail_if_inconclusive", false);
 		params.add("smt.string_solver", "z3str3");
 		
-//		if (SymbolicInstructionFactory.z3str3_aggressive_length_testing) {
-//			params.add("str.aggressive_length_testing", true);
-//		}
-		
+		// SymbolicInstructionFactory populated these public vars since z3str3 was specified. 
+		// TODO: add numeric options, these are just the boolean ones.
 		params.add("str.aggressive_length_testing", SymbolicInstructionFactory.z3str3_aggressive_length_testing);
 		params.add("str.aggressive_unroll_testing", SymbolicInstructionFactory.z3str3_aggressive_unroll_testing);
 		params.add("str.aggressive_value_testing", SymbolicInstructionFactory.z3str3_aggressive_value_testing);
@@ -74,16 +75,40 @@ public class Z3String3Processor implements Processable {
 		
 		solver1.setParameters(params);	
 		
-		String query = currentQuery.toString();
-		System.out.println("current query... " + query);
-		// todo strip out check-sat and get-model
 		
-		BoolExpr[] assertions = context1.parseSMTLIB2String(query,null, null, null, null);
+		// TODO: strip out check-sat and get-model, we don't want to take it out of Translator.java
+		// since more than one solver may use Translator.java
+
+		String query = currentQuery.toString();
+		
+		// Translator added (check-sat) and (get-model) to our query. We need to remove them since we will be
+		// performing those functions through our JNI/JAR interface.
+		String queryLine;
+		final BufferedReader queryReader = new BufferedReader(new StringReader(query));
+		StringBuilder finalQuery = new StringBuilder();
+		queryLine = queryReader.readLine();
+		
+		// Strip out (check-sat) and (get-model) from the query. 
+		while (queryLine != null) {
+			if (!queryLine.startsWith("(check-sat)") && !queryLine.startsWith("(get-model)")) {
+				finalQuery.append(queryLine + "\n");
+			}
+			queryLine = queryReader.readLine();
+		}
+		queryReader.close();
+		  
+		
+		System.out.println("current query... " + finalQuery.toString());
+		
+		BoolExpr[] assertions = context1.parseSMTLIB2String(finalQuery.toString(),null, null, null, null);
 			
 		solver1.add(assertions);
 		
-		// todo prevent get-model call if unsat
-		// todo catch z3 exception for unkown constant (unsupported string function)
+		// TODO: prevent get-model call if UNSAT, currently causes exception because a model is only
+		// generated when SAT
+		
+		// TODO: catch z3 exception for unknown constant (unsupported string function)
+		
 	    if (solver1.check() == Status.SATISFIABLE) {
 	    	sat = true;
 	    	System.out.println(solver1.getModel().toString());

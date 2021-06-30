@@ -192,7 +192,7 @@ class Manager extends TranslationManager {
 				}
 			});
 
-			map(StringOrOperation.REPLACE, ReplaceTemplate.apply("(replace"));
+			map(StringOrOperation.REPLACE, ReplaceTemplate.apply("(str.replace"));
 			map(StringOrOperation.REPLACEALL, ReplaceTemplate.apply("(replaceAll"));
 			map(StringOrOperation.REPLACEFIRST, ReplaceTemplate.apply("(replaceFirst"));
 
