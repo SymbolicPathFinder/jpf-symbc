@@ -42,25 +42,25 @@ public class Z3String3Processor implements Processable {
 	public Output getOutput(Processor proc) throws IOException, RuntimeException, NullPointerException {
 		boolean sat = false;
 
-//		final Process process = proc.startProcess();
-//		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-//			String line = reader.readLine();
-//
-//			sat = line.replace(">> ", "").trim().equalsIgnoreCase("SAT");
+		//		final Process process = proc.startProcess();
+		//		try (final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+		//			String line = reader.readLine();
+		//
+		//			sat = line.replace(">> ", "").trim().equalsIgnoreCase("SAT");
 
 		//System.out.println("z3str3 ALT: " + SymbolicInstructionFactory.z3str3_aggressive_length_testing);
-		
 
-		
-		
+
+
+
 		Context context1 = new Context();
 		Solver solver1 = context1.mkSolver();
-		
+
 		Params params = context1.mkParams();
 		params.add("candidate_models", true);
 		params.add("fail_if_inconclusive", false);
 		params.add("smt.string_solver", "z3str3");
-		
+
 		// SymbolicInstructionFactory populated these public vars since z3str3 was specified. 
 		// TODO: add numeric options, these are just the boolean ones.
 		params.add("str.aggressive_length_testing", SymbolicInstructionFactory.z3str3_aggressive_length_testing);
@@ -72,23 +72,25 @@ public class Z3String3Processor implements Processable {
 		params.add("str.fixed_length_refinement", SymbolicInstructionFactory.z3str3_fixed_length_refinement);
 		params.add("str.string_constant_cache", SymbolicInstructionFactory.z3str3_string_constant_cache);
 		params.add("str.strong_arrangements", SymbolicInstructionFactory.z3str3_strong_arrangements);
-		
+
 		solver1.setParameters(params);	
-		
-		
+
+
 		// TODO: strip out check-sat and get-model, we don't want to take it out of Translator.java
 		// since more than one solver may use Translator.java
 
-		String query = currentQuery.toString();
-		
+		//String query = currentQuery.toString();
+
+
 		// Translator added (check-sat) and (get-model) to our query. We need to remove them since we will be
 		// performing those functions through our JNI/JAR interface.
-		String queryLine;
-		final BufferedReader queryReader = new BufferedReader(new StringReader(query));
+		//String queryLine;
+		final BufferedReader queryReader = new BufferedReader(new StringReader(currentQuery.toString()));
 		StringBuilder finalQuery = new StringBuilder();
-		queryLine = queryReader.readLine();
-		
+
 		// Strip out (check-sat) and (get-model) from the query. 
+		String queryLine = queryReader.readLine();
+
 		while (queryLine != null) {
 			if (!queryLine.startsWith("(check-sat)") && !queryLine.startsWith("(get-model)")) {
 				finalQuery.append(queryLine + "\n");
@@ -96,87 +98,105 @@ public class Z3String3Processor implements Processable {
 			queryLine = queryReader.readLine();
 		}
 		queryReader.close();
-		  
-		
-		System.out.println("current query... " + finalQuery.toString());
-		
-		BoolExpr[] assertions = context1.parseSMTLIB2String(finalQuery.toString(),null, null, null, null);
-			
-		solver1.add(assertions);
-		
-		// TODO: prevent get-model call if UNSAT, currently causes exception because a model is only
-		// generated when SAT
-		
-		// TODO: catch z3 exception for unknown constant (unsupported string function)
-		
-	    if (solver1.check() == Status.SATISFIABLE) {
-	    	sat = true;
-	    	System.out.println(solver1.getModel().toString());
-	    }
-		
-	    String returned = solver1.getModel().toString();
-	    final BufferedReader reader = new BufferedReader(new StringReader(returned));
-	    
-	    
-	    
-	    
-//		com.microsoft.z3.Model model = solver1.getModel();
-//		
-//		FuncDecl<?>[] decls = model.getDecls();
-//		//FuncDecl<?>[] decls = model.getFuncDecls();
-//		
-//		for (FuncDecl<?> f : decls) {
-//			System.out.println("f: " + f.toString());
-//			System.out.println("s: " + f.getSExpr());
-//			FuncDecl.Parameter[] ps = f.getParameters();
-//			for (FuncDecl.Parameter p : ps) {
-//				System.out.println("p: " + p.toString());
-//			}
-//			Sort[] sorts = f.getDomain();
-//			for (Sort s : sorts) {
-//				System.out.println("sort: " + s.toString());
-//			}
-//			Sort range = f.getRange();
-//			System.out.println("r: " + range.toString());
-//			Symbol sym = f.getName();
-//			System.out.println("n: " + sym.toString());
-//			
-//			
-//		}
-		
-	    	String line; // = reader.readLine();
-//	    	if (line != null) {
-//	    		System.out.println("line not null... " + line);
-//	    	}
-			List<String> solutions = new ArrayList<>();
-			if (sat) {
-				//while (!reader.ready()) {}
-				line = reader.readLine();
-				while (line != null) {
-					
+
+		if (SymbolicInstructionFactory.debugMode) {
+			System.out.println("current query... " + finalQuery.toString());	
+		}
+
+		try {
+			BoolExpr[] assertions = context1.parseSMTLIB2String(finalQuery.toString(),null, null, null, null);
+
+			solver1.add(assertions);
+
+			// TODO: prevent get-model call if UNSAT, currently causes exception because a model is only
+			// generated when SAT
+
+			// TODO: catch z3 exception for unknown constant (unsupported string function)
+
+			if (solver1.check() == Status.SATISFIABLE) {
+				sat = true;
+
+				if (SymbolicInstructionFactory.debugMode) {
+					System.out.println(solver1.getModel().toString());	
+				}
+
+				//}
+
+				String returned = solver1.getModel().toString();
+				final BufferedReader reader = new BufferedReader(new StringReader(returned));
+
+
+
+
+				//		com.microsoft.z3.Model model = solver1.getModel();
+				//		
+				//		FuncDecl<?>[] decls = model.getDecls();
+				//		//FuncDecl<?>[] decls = model.getFuncDecls();
+				//		
+				//		for (FuncDecl<?> f : decls) {
+				//			System.out.println("f: " + f.toString());
+				//			System.out.println("s: " + f.getSExpr());
+				//			FuncDecl.Parameter[] ps = f.getParameters();
+				//			for (FuncDecl.Parameter p : ps) {
+				//				System.out.println("p: " + p.toString());
+				//			}
+				//			Sort[] sorts = f.getDomain();
+				//			for (Sort s : sorts) {
+				//				System.out.println("sort: " + s.toString());
+				//			}
+				//			Sort range = f.getRange();
+				//			System.out.println("r: " + range.toString());
+				//			Symbol sym = f.getName();
+				//			System.out.println("n: " + sym.toString());
+				//			
+				//			
+				//		}
+
+				//String line; // = reader.readLine();
+				//	    	if (line != null) {
+				//	    		System.out.println("line not null... " + line);
+				//	    	}
+				List<String> solutions = new ArrayList<>();
+				//if (sat) {
+					//while (!reader.ready()) {}
+					String line = reader.readLine();
+					while (line != null) {
+
 						if (line.contains("define-fun")) {
 							solutions.add(line + reader.readLine());
 						}
 						line = reader.readLine();
+					}
+				//}
+
+				// TODO: No need for separate process method. Name and value are available here, 
+				// so just populate the model here. 
+				System.out.println("Returned solutions: ");
+				for(String s : solutions) {
+					System.out.println(s.trim());
+					String value = s.substring(s.indexOf("\""), s.length() -1);
+					String[] parts = s.split(" ");
+
+					//String processString = parts[1] + " : " + parts[3] + " -> ";
+
+					model.put(parts[1], value);
+
+					//processString = processString + value;
+					//process(processString);
+
 				}
-			}
 
-			System.out.println("Returned solutions: ");
-			for(String s : solutions) {
-				System.out.println(s.trim());
-				String value = s.substring(s.indexOf("\""), s.length() -1);
-				String[] parts = s.split(" ");
+				//}
+				reader.close();
+			} // end of sat	
 
-				String processString = parts[1] + " : " + parts[3] + " -> ";
-				processString = processString + value;
-				process(processString);
+			context1.close();	
 
-			}
-			
-		//}
-			
-		context1.close();	
-			
+		}
+		catch (com.microsoft.z3.Z3Exception e) {
+			System.out.println("Z3 exception: " + e.getMessage());
+		}
+
 		return new Output(sat, assembleModel());
 	}
 

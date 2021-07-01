@@ -28,7 +28,7 @@ public class TranslateToZ3str3 {
 			for (String k : o.getModel().keySet()) {
 				System.out.println(k + " => " + o.getModel().get(k));
 			}
-			System.out.println("*************************************");
+			System.out.println("*************************************\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RuntimeException e) {
