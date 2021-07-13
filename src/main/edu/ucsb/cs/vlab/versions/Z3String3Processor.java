@@ -21,25 +21,24 @@ import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import com.microsoft.z3.*;
 
 // TODO: This will not need to implement Processable in final version.
-public class Z3String3Processor implements Processable {
+public class Z3String3Processor {
 	final Model model = new Model();
 	final StringBuilder currentQuery = new StringBuilder();
 
-	@Override
-	public void send(String message, Processor proc) throws IOException {
+	
+	public void send(String message) {
 		currentQuery.append(message + "\n");
 	}
 
-	@Override
-	public void query(String message, Processor proc) throws IOException {
+	
+	public void query(String message) {
 		currentQuery.append(message + "\n");
 
 		// MJR not doing file IO, using JNI interface
 		//Files.write(Paths.get(Z3_3.getTempFile()), currentQuery.toString().getBytes());
 	}
 
-	@Override
-	public Output getOutput(Processor proc) throws IOException, RuntimeException, NullPointerException {
+	public Output getOutput() throws IOException {
 
 		boolean sat = false;
 

@@ -186,7 +186,8 @@ public class Z3Interface {
 	 * @return the processor to use
 	 */
 	public static Z3Interface.Processor create() {
-		return Z3Interface.Processor.Factory.create(Z3String3Processor.class);
+		return null;
+		//return Z3Interface.Processor.Factory.create(Z3String3Processor.class);
 	}
 
 	public static class ExternalToolException extends RuntimeException {
