@@ -544,6 +544,12 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	static public String[] string_dp;
 	static public int stringTimeout;
 	static public boolean preprocesOnly;
+	
+	/* MJR Additional config options for strings */
+	static public int stringLowerBound;
+	static public int stringUpperBound;
+	static public String stringAlphabet;
+	static public int stringAlphabetSize;
 
 	/*
 	 * This is intended to serve as a catchall debug flag.
@@ -663,6 +669,32 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 
 			stringTimeout = conf.getInt("symbolic.string_dp_timeout_ms");
 			if (debugMode) System.out.println("symbolic.string_dp_timeout_ms="+stringTimeout);
+			
+			// MJR additional string parameters from JPF file
+			stringAlphabet = conf.getString("symbolic.string_dp_alpha");
+			if (stringAlphabet == null) {
+				stringAlphabet = "A-Z";
+			} 
+			if (debugMode) System.out.println("symbolic.string_dp_alpha="+stringAlphabet);
+
+			stringAlphabetSize = conf.getInt("symbolic.string_dp_alphaSize", 0);
+			if (stringAlphabetSize == 0) {
+				stringAlphabetSize = 26;
+			}
+			if (debugMode) System.out.println("symbolic.string_dp_alphaSize="+stringAlphabetSize);
+			
+			stringUpperBound = conf.getInt("symbolic.string_dp_upper", 0);
+			if (stringUpperBound == 0) {
+				stringUpperBound = 10;
+			}
+			if (debugMode) System.out.println("symbolic.string_dp_upper="+stringUpperBound);
+			
+			stringLowerBound = conf.getInt("symbolic.string_dp_lower", -1);
+			if (stringLowerBound == -1) {
+				stringLowerBound = 1;
+			}
+			if (debugMode) System.out.println("symbolic.string_dp_lower="+stringLowerBound);
+			// MJR end of additional string parameters
 
 			string_dp = conf.getStringArray("symbolic.string_dp");
 			if (string_dp == null) {

@@ -67,6 +67,7 @@ import gov.nasa.jpf.symbc.string.translate.TranslateToAutomata;
 import gov.nasa.jpf.symbc.string.translate.TranslateToAutomata2;
 import gov.nasa.jpf.symbc.string.translate.TranslateToCVC;
 import gov.nasa.jpf.symbc.string.translate.TranslateToCVCInc;
+import gov.nasa.jpf.symbc.string.translate.TranslateToIGEN;
 import gov.nasa.jpf.symbc.string.translate.TranslateToSAT;
 import gov.nasa.jpf.symbc.string.translate.TranslateToZ3;
 import gov.nasa.jpf.symbc.string.translate.TranslateToZ3Inc;
@@ -124,6 +125,7 @@ public class SymbolicStringConstraintsGeneral {
 	public static final String Z3 = "Z3";
 	public static final String Z3_INC = "Z3_INC";
 	public static final String WRAPPER = "WRAPPER"; //automata+z3
+	public static final String IGEN = "IGEN"; // BSU Input generator
 	
 	/* Default solver */
 	public static String solver = AUTOMATA;
@@ -404,6 +406,9 @@ public class SymbolicStringConstraintsGeneral {
 		else if (string_dp[0].equals("sat")) {
 			solver = SAT;
 		}
+		else if (string_dp[0].equals("igen")) {
+			solver = IGEN;
+		}
 		else if (string_dp[0].equals("cvc")) {
 			solver = CVC;
 		}
@@ -551,7 +556,32 @@ public class SymbolicStringConstraintsGeneral {
 					//println ("[isSatisfiable] Using SAT Solver");
 					decisionProcedure = TranslateToSAT.isSat(global_graph, pc.getNpc());
 				}
-				if (solver.equals(ABC)) {
+				else if (solver.equals(IGEN)) {
+					System.out.println("[SymbolicStringConstraintGeneral] Using Solver IGEN");
+//					System.out.println("global graph start -----------------------------");
+//					System.out.println(global_graph.toDot());
+//					System.out.println("global graph end -----------------------------");
+					
+					
+//					System.out.println("========= npc: " + pc.getNpc().toString());
+//					System.out.println("========= spc: " + pc.stringPC());
+					
+					// pc is a string path condition, containing a numeric pc from the numeric solver.
+					// this inner npc has 
+					decisionProcedure = TranslateToIGEN.isSat(global_graph, pc.getNpc());
+					
+					
+					// **** instead of passing solution in GG, pass it back in pc.solution Map<String,String>
+					// --- no ---- populate setOfSolution with strings from pc.solution.
+					// after setOfSolutions is rebuilt from global_graph, match TranslateToIGEN.solution<String,String>
+					// back to entries in setOfSolutions
+					
+					// report results, return decisionProcedure
+					
+					
+					
+				} 
+				else if (solver.equals(ABC)) {
 					logger.info ("[isSatisfiable] Using ABC Solver");
 					//decisionProcedure = TranslateToSAT.isSat(global_graph, pc.npc);
 					decisionProcedure = false;
@@ -728,6 +758,18 @@ public class SymbolicStringConstraintsGeneral {
 				}
 			}
 			//}
+			
+			// MJR: At this point setOfSolution has been rebuilt from the global graph
+			// in the case of IGEN, the global graph did not have solutions encoded in it
+			// add code here to update the setOfSolutions with the solutions from TranslateToIGEN
+			// hack to update setOfSolution with returned inputs from TranslateToIGEN
+			// should be replaced by placing solutions into global graph?
+			if (solver.equals(IGEN)) {
+				for (StringSymbolic ss : setOfSolution) {
+					ss.solution = TranslateToIGEN.solution.get(ss.getName());
+				}
+			}
+			
 			StringPathCondition.flagSolved = true;
 			//println ("StringPC: " + getSolution());
 			cancelTimer();
