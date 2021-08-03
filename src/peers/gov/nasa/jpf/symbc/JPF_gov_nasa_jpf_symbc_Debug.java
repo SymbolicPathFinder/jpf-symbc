@@ -282,6 +282,13 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
     }
     
     @MJI
+    public static boolean addSymbolicBoolean(MJIEnv env, int objRef, boolean v, int stringRef) {
+        String name = env.getStringObject(stringRef);
+        env.setReturnAttribute(new SymbolicInteger(name, 0, 1));
+        return v;
+    }
+    
+    @MJI
     public static int makeSymbolicInteger(MJIEnv env, int objRef, int stringRef) {
         String name = env.getStringObject(stringRef);
         env.setReturnAttribute(new SymbolicInteger(name, MinMax.getVarMinInt(name), MinMax.getVarMaxInt(name)));
