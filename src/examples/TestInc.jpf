@@ -1,0 +1,15 @@
+target=TestInc
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+#symbolic.method = Assume.test(sym#sym),Assume.test1(sym#sym)
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+symbolic.dp=z3bitvectorinc
+#symbolic.dp=z3bitvector
+symbolic.optimizechoices=false
+#vm.storage.class=nil
+#listener = .symbc.SymbolicListener
+#listener = .listener.ChoiceTracker
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+listener = gov.nasa.jpf.symbc.numeric.solvers.IncrementalListener
+#symbolic.debug=true

@@ -1,0 +1,15 @@
+target = arrays.TestAALOAD
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples 
+
+symbolic.lazy = true
+
+type_classpath = ${jpf-symbc}/build/examples/arrays
+
+symbolic.method = arrays.TestAALOAD.run(sym#sym)
+
+search.multiple_errors=true
+symbolic.dp = z3
+symbolic.arrays=true

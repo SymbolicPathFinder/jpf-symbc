@@ -1,0 +1,15 @@
+target = nested.Test
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples 
+
+symbolic.lazy = true 
+
+type_classpath = ${jpf-symbc}/build/examples/nested
+symbolic.lazy.subtypes = true
+
+#using this instruction factory ensures you use the uberlazy algorithm
+#vm.insn_factory.class=gov.nasa.jpf.symbc.uberlazy.UberLazyInstructionFactory
+
+symbolic.method = nested.Test.foo(sym)

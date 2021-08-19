@@ -1,0 +1,9 @@
+target = uberlazy.TestAliasALOAD
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples 
+
+symbolic.lazy = true
+
+symbolic.method = uberlazy.TestAliasALOAD.run(sym)

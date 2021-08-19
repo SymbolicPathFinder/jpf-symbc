@@ -1,0 +1,9 @@
+target = arrays.Arrays
+
+symbolic.method=arrays.Arrays.create_array(sym)
+symbolic.lazy=on
+classpath=${jpf-symbc}/build/examples
+search.multiple_errors=true
+symbolic.dp=z3bitvector
+#listener=gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+symbolic.arrays=true

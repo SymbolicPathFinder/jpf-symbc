@@ -1,0 +1,21 @@
+target=ImageReading
+
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.min_int=-100
+symbolic.max_int=100
+
+#symbolic.method = Image.foo(sym)
+
+symbolic.collect_constraints=true
+symbolic.db=no_solver
+symbolic.optimizechoices=false
+
+#vm.sysprop.keys=os.name,file.separator,path.separator
+
+#@using = jpf-nhandler
+#native_classpath=${jpf-symbc}/build/examples
+#nhandler.delegateUnhandledNative = true
+#nhandler.spec.delegate = java.awt.image.ColorModel.*,java.awt.image.BufferedImage.*
+# java.awt.EventQueue.*,java.io.RandomAccessFile.*

@@ -1,0 +1,14 @@
+target=compositional.SortedListInt
+
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+
+symbolic.method= Rational.simp(sym)
+
+#symbolic.dp=yices
+
+listener = .symbc.SymbolicListener
+
+vm.storage.class=nil

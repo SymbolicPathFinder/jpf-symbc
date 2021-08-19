@@ -1,0 +1,29 @@
+target=concolic.TestMain
+
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+
+symbolic.method=concolic.TestMain.test_concolic(sym#sym)
+
+symbolic.concolic=true
+
+#symbolic.debug=on
+#symbolic.green=false
+
+#symbolic.heuristicPartition=true
+
+#not used if heuristicPartition is true
+#symbolic.concolic.MAX_TRIES=3
+#symbolic.dp=coral
+
+symbolic.min_int=-100
+symbolic.max_int=100
+
+symbolic.min_double=-100.0
+symbolic.max_double=100.0
+
+listener = .symbc.concolic.ConcreteExecutionListener
+
+vm.storage.class=nil

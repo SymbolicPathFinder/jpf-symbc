@@ -1,0 +1,21 @@
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+target=symbolicheap.NodeBuggy
+
+#symbolic.method = symbolicheap.NodeBuggy.addSimple(sym);
+symbolic.method = symbolicheap.NodeBuggy.addGCIssue();
+#symbolic.method=symbolicheap.NodeBuggy.runTest(con)
+
+#listener = gov.nasa.jpf.listener.ExecTracker
+
+symbolic.green = false
+
+symbolic.lazy = true
+symbolic.lazy.subtypes = true
+vm.storage.class=nil
+
+symbolic.debug=true
+
+#symbolic.dp = cvc3

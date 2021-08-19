@@ -1,0 +1,17 @@
+vm.storage.class=nil
+search.multiple_errors=true
+target=TurnLogic
+symbolic.method=TurnLogic.snippet(sym#sym#sym#sym#sym#sym#sym#sym)
+classpath=${jpf-symbc}/build/examples
+
+#listener = gov.nasa.jpf.continuity.ContinuityListener
+listener=gov.nasa.jpf.symbc.SymbolicListener
+
+#report.console.property_violation=error,trace,snapshot
+#symbolic.debug=true
+
+symbolic.min_double=-100.0
+symbolic.max_double=100.0
+coral.interval_solver=realpaver
+coral.interval_solver.path=/home/mateus/tools/realpaver-0.4/realpaver
+symbolic.dp=coral

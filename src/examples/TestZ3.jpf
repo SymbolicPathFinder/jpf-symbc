@@ -1,0 +1,11 @@
+target=TestZ3
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = TestZ3.test(sym#sym),TestZ3.testSimple(sym#sym),TestZ3.testBitwiseXor(sym#sym),TestZ3.testBitwiseOr(sym#sym),TestZ3.testBitwiseAnd(sym#sym),TestZ3.testShiftLeft(sym#sym),TestZ3.testShiftRight(sym#sym),TestZ3.testLogicalShiftRight(sym#sym)#,TestZ3.testCombination(sym#sym),TestZ3.testBitwiseCombination(sym#sym),TestZ3.testMod(sym#sym)
+symbolic.min_int=-100
+symbolic.max_int=100
+#symbolic.dp=cvc3bitvec
+symbolic.dp=z3bitvector
+#vm.storage.class=nil
+#listener = .symbc.SymbolicListener
+#listener = .listener.ChoiceTracker

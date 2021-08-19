@@ -1,0 +1,15 @@
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+target=FlapController
+
+symbolic.method=FlapController.startThreads(sym#sym#sym)
+#listener = gov.nasa.jpf.symbc.SymbolicListener
+#symbolic.lazy=true
+#vm.storage.class=nil
+symbolic.min_int=-100
+symbolic.max_int=100
+symbolic.undefined=100000
+#symbolic.debug=true
+search.depth_limit=10
+search.multiple_errors=true
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

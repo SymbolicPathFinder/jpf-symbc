@@ -1,0 +1,14 @@
+target=compositional.DART_SMART
+
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+
+symbolic.method= DART_SMART.top(sym)
+
+#symbolic.dp=yices
+
+listener = .symbc.SymbolicListener
+
+vm.storage.class=nil

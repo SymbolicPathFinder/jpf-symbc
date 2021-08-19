@@ -1,0 +1,14 @@
+target=ExampleDReal
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = ExampleDReal.test(sym#sym)
+
+symbolic.dp=dreal
+
+dreal.mode = strictified 
+#or relaxed
+
+dreal.precision=0.001
+#dreal.timeBound=10000   (in milliseconds) 
+
+-Ddreal-bin-path=<path to the bin folder of dReal>

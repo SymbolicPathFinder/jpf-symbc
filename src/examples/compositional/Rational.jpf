@@ -1,0 +1,20 @@
+target=compositional.Rational
+
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+
+#symbolic.method= compositional.Rational.test(sym#sym#sym#sym#sym#sym)
+#symbolic.method= compositional.Rational.abs(sym)
+symbolic.method= compositional.Rational.gcd_composition(sym#sym)
+
+symbolic.dp=coral
+
+#symbolic.debug=on
+
+listener = .symbc.SymbolicListener
+
+vm.storage.class=nil
+search.multiple_errors=true
+#search.depth_limit=10

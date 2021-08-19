@@ -1,0 +1,18 @@
+target = rbt.TreeMap
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples
+
+#symbolic.lazy = true
+
+#symbolic.method = TreeMap.genTreeS4_4(sym#sym#sym#sym), TreeMap.get(sym), getEntry(sym)
+symbolic.method = rbt.TreeMap.genTreeS2_1(sym#sym),rbt.TreeMap.put(sym#con)
+#symbolic.method = TreeMap.genTreeS4_4(sym#sym#sym#sym), TreeMap.remove(sym)
+#symbolic.method = TreeMap.genTreeS4_4(sym#sym#sym#sym)
+#listener = gov.nasa.jpf.symbc.SymbolicListener
+#symbolic.dp=no_solver
+
+#symbolic.debug=true
+search.multiple_errors=true
+search.depth_limit = 50

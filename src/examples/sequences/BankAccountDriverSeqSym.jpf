@@ -1,0 +1,21 @@
+target = sequences.BankAccountDriverSeqSym
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples
+
+symbolic.method = sequences.BankAccount.deposit(sym),sequences.BankAccount.withdraw(sym),sequences.BankAccountDriverSeqSym.flag(sym)
+
+coverage.include=*.BankAccount
+coverage.show_methods=true
+coverage.show_bodies=true
+
+symbolic.minint=-100
+
+symbolic.maxint=100
+symbolic.undefined=-1000
+
+#search.class = .search.heuristic.BFSHeuristic
+
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener,gov.nasa.jpf.listener.CoverageAnalyzer
+coverage.show_methods=true

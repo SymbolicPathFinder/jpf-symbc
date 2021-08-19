@@ -1,0 +1,34 @@
+
+target=gov.nasa.jpf.symbc.FlapController
+classpath=${jpf-symbc}/build/tests
+
+sourcepath=${jpf-symbc}/src/tests
+
+#symbolic.dp=no_solver
+
+symbolic.antonio.settings=/home/anfi/Desktop/profile
+symbolic.antonio.omegaPath=/home/anfi/Desktop/constraintSolvers/omega-project/omega_calc/obj/oc
+symbolic.antonio.lattePath=/home/anfi/Desktop/latte/latte-integrale-1.5.3/dest/bin/count
+symbolic.antonio.tmpDir=/home/anfi/Desktop/tmp/tmp11
+symbolic.antonio.dummyProfile=true
+symbolic.antonio.minInt=0
+symbolic.antonio.maxInt=30
+#symbolic.antonio.problemSettings=/home/anfi/Desktop/upIcse13.txt
+symbolic.antonio.numOfSolvers=1
+symbolic.antonio.keepTempFiles=false
+
+
+#vm.por=false
+
+symbolic.method= gov.nasa.jpf.symbc.FlapController.startThreads(sym#sym#sym)
+listener = gov.nasa.jpf.symbc.AntoniosListener
+#listener = gov.nasa.jpf.symbc.SymbolicListener
+#symbolic.lazy=true
+vm.storage.class=nil
+symbolic.minint=-100
+symbolic.maxint=100
+symbolic.undefined=100000
+#symbolic.debug=true
+search.depth_limit=10
+search.multiple_errors=true
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

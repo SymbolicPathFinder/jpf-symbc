@@ -1,0 +1,44 @@
+{
+  "inputLength" : 10,
+  "alphabet" : {
+    "size" : 26,
+    "declaration" : "A-Z"
+  },
+  "vertices" : [ {
+    "num" : 0,
+    "actualValue" : "Hello,(World!)",
+    "incomingEdges" : [ {
+      "source" : 2,
+      "type" : "t"
+    }, {
+      "source" : 3,
+      "type" : "s1"
+    } ],
+    "sourceConstraints" : [ ],
+    "timeStamp" : 73261830828937,
+    "type" : 0,
+    "id" : 1,
+    "value" : "\"Hello,(World!)\"!:!<init>",
+    "SPFsym" : ""
+  }, {
+    "num" : 0,
+    "actualValue" : "",
+    "incomingEdges" : [ ],
+    "sourceConstraints" : [ ],
+    "timeStamp" : 73261831466238,
+    "type" : 0,
+    "id" : 2,
+    "value" : "var_1_1_SYMSTRING notequals",
+    "SPFsym" : ""
+  }, {
+    "num" : 0,
+    "actualValue" : "",
+    "incomingEdges" : [ ],
+    "sourceConstraints" : [ ],
+    "timeStamp" : 73261831479138,
+    "type" : 0,
+    "id" : 3,
+    "value" : "World!",
+    "SPFsym" : ""
+  } ]
+}

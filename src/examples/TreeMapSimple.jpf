@@ -1,0 +1,11 @@
+target=TreeMapSimple
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method =TreeMapSimple.containsKey(sym),TreeMapSimple.put(sym),TreeMapSimple.remove(sym)
+symbolic.minint=-100
+symbolic.maxint=100
+#cg.randomize_choices=random
+#search.class = .search.heuristic.BFSHeuristic
+#symbolic.dp=no_solver
+vm.storage.class=nil
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

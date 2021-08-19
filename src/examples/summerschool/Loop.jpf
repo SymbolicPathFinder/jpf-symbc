@@ -1,0 +1,13 @@
+target=summerschool.Loop
+
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.method = summerschool.Loop.test(sym)
+
+symbolic.debug=true
+search.depth_limit=10
+listener = gov.nasa.jpf.symbc.SymbolicListener
+
+#symbolic.min_int=-10
+#symbolic.max_int=10

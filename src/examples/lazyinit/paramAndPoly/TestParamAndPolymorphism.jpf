@@ -1,0 +1,14 @@
+target = lazyinit.paramAndPoly.TestParamAndPolymorphism
+
+classpath = ${jpf-symbc}/build/examples
+
+sourcepath = ${jpf-symbc}/src/examples
+
+#type_classpath = ${jpf-symbc}/build/examples/uberlazy
+
+symbolic.lazy = true
+#using this instruction factory ensures you use the uberlazy algorithm
+#vm.insn_factory.class=gov.nasa.jpf.symbc.uberlazy.UberLazyInstructionFactory
+
+symbolic.method = lazyinit.paramAndPoly.TestParamAndPolymorphism.run(sym#sym), lazyinit.paramAndPoly.Node.isNext(sym), lazyinit.paramAndPoly.Node.isNextObject(sym)
+#listener = gov.nasa.jpf.symbc.SymbolicListener

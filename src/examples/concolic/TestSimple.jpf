@@ -1,0 +1,25 @@
+target=concolic.SimpleExample
+
+classpath=${jpf-symbc}/build/examples
+
+sourcepath=${jpf-symbc}/src/examples
+
+# analyze TestPaths.testMe(int x, boolean b) using symbolic values for 'x' and
+# concrete value for 'b'
+symbolic.method=concolic.SimpleExample.test(sym#sym)
+
+symbolic.concolic=true
+
+symbolic.debug=on
+
+#symbolic.minreal=-10.0
+
+#symbolic.maxreal=1000.0
+
+#symbolic.minint=-100
+
+#symbolic.maxint=100
+
+#listener = .symbc.SymbolicListener
+
+vm.storage.class=nil

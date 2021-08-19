@@ -1,0 +1,7 @@
+target = arrays.Arrays
+
+symbolic.method=arrays.Arrays.obj_array(sym#con)
+symbolic.lazy=on
+classpath=${jpf-symbc}/build/examples
+search.multiple_errors=true
+symbolic.dp=z3

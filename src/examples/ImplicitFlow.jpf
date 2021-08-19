@@ -1,0 +1,18 @@
+target=ImplicitFlow
+
+symbolic.method=ImplicitFlow.func(sym)
+
+classpath=${jpf-symbc}/build/examples
+# classpath=/homes/qsp30/workspaceJ/Test/bin
+
+# listener to print information (PCs, test cases) about symbolic run
+	
+listener = gov.nasa.jpf.symbc.SymbolicListener
+
+# The following JPF options are usually used for SPF as well:
+
+# no state matching	
+vm.storage.class=nil
+	
+# instruct jpf not to stop at first error
+search.multiple_errors=true
