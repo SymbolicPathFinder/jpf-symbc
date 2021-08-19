@@ -1,0 +1,33 @@
+target=gov.nasa.jpf.symbc.TreeMap
+
+classpath=${jpf-symbc}/build/tests
+
+sourcepath=${jpf-symbc}/src/tests
+
+symbolic.method = gov.nasa.jpf.symbc.TreeMap.containsKey(sym),gov.nasa.jpf.symbc.TreeMap.put(sym),gov.nasa.jpf.symbc.TreeMap.remove(sym)
+
+symbolic.minint=-100
+
+symbolic.maxint=100
+
+#cg.randomize_choices=random
+
+#search.class = .search.heuristic.BFSHeuristic
+
+#symbolic.dp=coral
+
+#symbolic.dp=choco2
+
+#symbolic.dp=yices
+
+#symbolic.dp=cvc3
+
+#symbolic.dp=no_solver
+
+vm.storage.class=nil
+
+symbolic.debug=true
+
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener,gov.nasa.jpf.listener.CoverageAnalyzer
+
+#listener = gov.nasa.jpf.symbc.SymbolicListener

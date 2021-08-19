@@ -1,0 +1,31 @@
+target=gov.nasa.jpf.symbc.green.MattPaperExample
+
+classpath=${jpf-symbc}/build/tests
+sourcepath=${jpf-symbc}/src/tests
+
+symbolic.method=gov.nasa.jpf.symbc.green.MattPaperExample.m(sym#sym);
+
+symbolic.green=true
+listener = .symbc.GreenListener
+
+symbolic.solver.slicing = true
+symbolic.solver.canonization = true
+symbolic.solver.dp = cvc3
+symbolic.solver.mc = latte
+#symbolic.solver.mc.tool = lib/count.osx
+symbolic.solver.mc.tool = /Users/willem/Documents/latte-integrale-1.5.3/latte-int-1.5/code/latte/count
+symbolic.solver.store = redis
+
+#listener = .symbc.probsym.ProbSymListener
+#listener = .symbc.SymbolicListener
+#symbolic.prob_modelcounter=.symbc.modelcounter.sampler.ConfIntervalSampler,.symbc.modelcounter.latte.LattECounter
+#symbolic.prob_modelcounter=.symbc.modelcounter.latte.LattECounter
+
+symbolic.prob_sample_limit = 10000
+symbolic.prob_confinterval = 0.01
+symbolic.min_int = 0
+symbolic.max_int = 1000
+
+#search.class = gov.nasa.jpf.search.heuristic.BFSHeuristic
+
+#vm.storage.class=nil

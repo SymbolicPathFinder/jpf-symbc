@@ -1,0 +1,18 @@
+
+
+classpath=${jpf-symbc}/build/tests
+
+sourcepath=${jpf-symbc}/src/tests
+
+
+target=gov.nasa.jpf.symbc.LazyExample
+symbolic.lazy = true
+symbolic.lazy.subtypes = true
+symbolic.method = gov.nasa.jpf.symbc.LazyExample.testMethod()
+symbolic.minint=-25
+symbolic.maxint=25
+symbolic.undefined=-100
+listener = gov.nasa.jpf.symbc.heap.HeapSymbolicListener
+#listener = gov.nasa.jpf.symbc.SymbolicListener
+vm.storage.class=nil
+#symbolic.debug=true

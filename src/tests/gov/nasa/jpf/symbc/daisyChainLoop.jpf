@@ -1,0 +1,52 @@
+
+classpath=${jpf-symbc}/build/tests
+
+sourcepath=${jpf-symbc}/src/tests
+
+
+target=gov.nasa.jpf.symbc.daisyChainControllerJustLoop
+
+#symbolic.dp=no_solver
+
+
+
+#symbolic.antonio.problemSettings=/home/cpasarea/workspace/jpf-symbc/src/tests/gov/nasa/jpf/symbc/upDaisyChainStringWind.txt
+symbolic.antonio.problemSettings=/home/cpasarea/workspace/jpf-symbc/src/tests/gov/nasa/jpf/symbc/upDaisyChainWeakWInd.txt
+
+symbolic.antonio.numOfSolvers=1
+symbolic.antonio.cacheFillersPercentage=5
+symbolic.antonio.keepTempFiles=false
+symbolic.antonio.numOfKernels=1
+
+symbolic.antonio.settings=/home/cpasarea/workspace/OAE7.2b/profile
+
+symbolic.antonio.omegaPath=/home/cpasarea/ReliabilityLibs/omega/omega_calc/obj/oc
+symbolic.antonio.lattePath=/home/cpasarea/ReliabilityLibs/latte-integrale-1.5.3/dest/bin/count
+symbolic.antonio.tmpDir=/home/cpasarea/tmp
+symbolic.antonio.dummyProfile=false
+symbolic.antonio.minInt=-1000000000
+symbolic.antonio.maxInt=1000000000
+
+
+#vm.por=false
+
+report.console.property_violation=error
+report.publisher=nil
+
+
+symbolic.method= gov.nasa.jpf.symbc.daisyChainControllerJustLoop.moveFlaps(sym),gov.nasa.jpf.symbc.daisyChainControllerJustLoop.setWindStrength(sym)
+listener = gov.nasa.jpf.symbc.AntoniosListener
+#listener = gov.nasa.jpf.symbc.SymbolicListener
+#symbolic.lazy=true
+vm.storage.class=nil
+#windStrength_1_SYMINT:-15,15;
+#position_2_SYMINT: 0,15;
+symbolic.min_int_windStrength=-15
+symbolic.max_int_windStrength=15
+symbolic.min_int_position=0
+symbolic.min_int_position=15
+symbolic.undefined=100000
+#symbolic.debug=true
+search.depth_limit=300
+search.multiple_errors=true
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
