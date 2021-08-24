@@ -62,7 +62,7 @@ public class Debug {
     native public static byte addSymbolicByte(byte v, String name);
     native public static char addSymbolicChar(char v, String name);
     native public static double addSymbolicDouble(double v, String name);
-    //native public static boolean addSymbolic(boolean v, String name);
+    native public static boolean addSymbolicBoolean(boolean v, String name);
     //native public static String addSymbolic(String v, String name);
     
     native public static boolean isSymbolicInteger(int v);
