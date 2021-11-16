@@ -69,7 +69,7 @@ import gov.nasa.jpf.symbc.string.graph.PreProcessGraph;
 //TODO: Repeat the fix found in _charAt in other constraints
 public abstract class StringExpression extends Expression {
 
-  SymbolicInteger length = null;
+  Map<StringExpression, SymbolicLengthInteger> length = null;
   Map<String, SymbolicCharAtInteger> charAt = null;
   Map<StringExpression, SymbolicIndexOfInteger> indexOf = null;
   Map<StringExpression, SymbolicLastIndexOfInteger> lastIndexOf = null;
@@ -104,13 +104,15 @@ public abstract class StringExpression extends Expression {
 	  //PathCondition.flagSolved = quickSwitch;
 	  return result;
   }
-  
+
   public IntegerExpression _length() {
-    if (length == null) {
-      length = new SymbolicLengthInteger("Length_" + lengthcount + "_", 0, PreProcessGraph.MAXIMUM_LENGTH, this);
+	  SymbolicLengthInteger result = new SymbolicLengthInteger("Length_" + lengthcount + "_", 0, PreProcessGraph.MAXIMUM_LENGTH, this);
       lengthcount++;
-    }
-    return length;
+	  if (length == null) {
+		  length = new HashMap<StringExpression, SymbolicLengthInteger>();
+	  }
+      length.put(this, result);
+    return result;
   }
 
 /* indexOf */
