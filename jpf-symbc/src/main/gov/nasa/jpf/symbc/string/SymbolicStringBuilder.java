@@ -48,6 +48,7 @@ TERMINATION OF THIS AGREEMENT. */
 
 package gov.nasa.jpf.symbc.string;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
@@ -55,6 +56,7 @@ import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.Expression;
+import gov.nasa.jpf.symbc.string.graph.PreProcessGraph;
 
 
 public class SymbolicStringBuilder extends Expression {
@@ -145,6 +147,11 @@ public class SymbolicStringBuilder extends Expression {
 
   public void getVarsVals(Map<String, Object> varsVals) {
   }
+
+  public IntegerExpression _length() {
+     return str._length();
+  }
+
 
   public StringExpression getstr(){
 	return str;
