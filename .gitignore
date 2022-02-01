@@ -1,13 +1,5 @@
-.hg
-.hgignore
-local.properties
-.version
-nbproject/private/*
-build/*
-dist/*
-tmp/*
-trace
-*.class
-*.orig
-*~
-*.DS_Store
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
