@@ -24,6 +24,8 @@ dependencies {
     
 }
 
+apply from: "gradle/source-sets.gradle"
+
 task compile{
     group "Build tasks"
     description "compile all SPF core sources"
