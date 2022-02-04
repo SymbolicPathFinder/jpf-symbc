@@ -26,6 +26,8 @@ First of all please use Java 8 (I am afraid our tools do not work with newer ver
 
 Then please download jpf-core from here:
 https://github.com/yannicnoller/jpf-core/tree/0f2f2901cd0ae9833145c38fee57be03da90a64f
+or here
+https://github.com/corinus/jpf-core
 
 And jpf-symbc from here:
 https://github.com/SymbolicPathFinder/jpf-symbc
