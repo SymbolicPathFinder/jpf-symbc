@@ -6,7 +6,7 @@ sourceSets {
     main {
         java.srcDirs = ["src/main"]
         java.outputDir = file("${buildDir}/main")l
-        //compileClasspath += sourceSets.annotations.output
+        compileClasspath += sourceSets.annotations.output
     }
     examples {
         java.srcDirs = ["src/examples"]
