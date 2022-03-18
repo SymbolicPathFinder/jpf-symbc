@@ -1,3 +1,4 @@
+import java.nio.charset.StandardCharsets;
 
 public class E5 {
 
@@ -5,6 +6,7 @@ public class E5 {
 		String r1 = "A";
 		String r2 = "BA";
 		String r5 = "aa";
+		String r = "abc";
 		strEx(r1,r2);
 		strEx1(r1,r2);
 		strEx2(r5);
@@ -13,6 +15,25 @@ public class E5 {
 		strEx6(r5);
 		strEx7(r5);
 		strEx8(r5);
+		testStarsEndsWith(r2);
+		testIndexOf(r5);
+		testLength(r5);
+		testReplace(r5);
+		testCharAt(r5);
+		testCompareTo(r5);
+		//testJoin(r1,r2);
+		testIsEmpty(r5);
+		testStringBuilder(r);
+		testSplit("aa bb");
+		testEqualsIgnoreCase("AA");
+		testToLowerCase("AA");
+		testFormat("114514");
+		testGetBytes("abc");
+		testGetChars("abc");
+		testLastIndexOf("ccba");
+		testIntern(r);
+		testValueOf(114514);
+		testToCharArray("abc");
 	}
 	
 	public static void strEx (String r1, String r2) {
@@ -46,12 +67,6 @@ public class E5 {
 			System.out.println("r3 does not contain BAA");
 		}
 	}
-	
-	
-	
-	
-	
-	
 	
 	public static void strEx2 (String r5) {
 		if (r5.toUpperCase().concat(r5).contains("AAaa")) {
@@ -107,6 +122,170 @@ public class E5 {
 			// false branch
 		}
 	}
-	
-	
+
+	public static void testStarsEndsWith (String r5) {
+		r5.startsWith("a");
+		r5.endsWith("A");
+	}
+
+	public static void testIndexOf (String r5) {
+		//r5.indexOf("A",1);
+		if(r5.indexOf("a") > 1){
+			//
+		}else{
+			//
+		}
+	}
+
+	public static void testLength (String r5) {
+		if(r5.length()>20){
+			//
+		} else {
+			//
+		}
+	}
+
+	public static void testReplace (String r5) {
+		String r6 = r5.replace('a', 'c');
+		//String r6 = r5.replaceAll("a", "c");
+		if(r6.equals("cc")){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testCharAt (String r5) {
+		char ch = r5.charAt(1);
+		if(ch == 'a'){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testCompareTo (String r5){
+		if(r5.compareTo("aa")==0){
+			// true branch
+		}else{
+			//false branch
+		}
+	}
+
+	public static void testJoin (String r1, String r2) {
+		String r3 = String.join("", r1, r2);
+		if (r3.equals("ABA")) {
+			// true branch
+		} else {
+			// false branch
+		}
+	}
+
+	public static void testIsEmpty (String r5) {
+		if (r5.isEmpty()) {
+			// true branch
+		} else {
+			// false branch
+		}
+	}
+
+	public static void testStringBuilder (String r) {
+		StringBuilder str = new StringBuilder(r);
+		String res = str.replace(0,2,"ba").toString();
+		if (res.equals("bac")) {
+			// true branch
+		} else {
+			// false branch
+		}
+	}
+
+	public static void testSplit (String r){
+		String[] arr = r.split("\\s", 0);
+		if(arr[0].equals("aa")){
+			// true branch
+		}else{
+			//false
+		}
+	}
+
+	public static void testEqualsIgnoreCase (String r){
+		if(r.equalsIgnoreCase("AA")){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testToLowerCase (String r) {
+		if (r.toLowerCase().concat(r).contains("aaAA")) {
+			// true branch
+		} else {
+			// false branch
+		}
+	}
+
+	public static void testFormat (String n) {
+		String r2 = String.format("Senpai said: %s", n);
+		if(r2.equals("Senpai said: 114514")){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testGetBytes (String r) {
+		byte[] barr = r.getBytes();
+		if(barr[0] == 0x61){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testGetChars (String r) {
+		char[] arr = new char[3];
+		r.getChars(0, 3, arr, 0);
+		if(arr[0] == 0x61){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testLastIndexOf (String r) {
+		if(r.lastIndexOf('a') > 2){
+			// true branch
+		}else{
+			//false branch
+		}
+	}
+
+	public static void testIntern (String r) {
+		String r2 = r.intern();
+		if(r == r2){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testValueOf (int n) {
+		String r = String.valueOf(n);
+		if (r.equals("114514")){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testToCharArray (String r) {
+		char[] ch = r.toCharArray();
+		if(ch[0] == 0x61){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+
 }
