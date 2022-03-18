@@ -1,13 +1,16 @@
 .hg
 .hgignore
+.idea
 local.properties
 .version
 nbproject/private/*
 build/*
 dist/*
 tmp/*
+classes/*
 trace
 *.class
 *.orig
 *~
 *.DS_Store
+*.log
