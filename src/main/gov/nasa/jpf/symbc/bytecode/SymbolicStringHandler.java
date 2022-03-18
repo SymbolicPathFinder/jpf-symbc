@@ -52,6 +52,7 @@ package gov.nasa.jpf.symbc.bytecode;
 
 
 
+import gov.nasa.jpf.symbc.numeric.*;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.ClassLoaderInfo;
@@ -66,12 +67,6 @@ import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.symbc.numeric.Expression;
-import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.RealExpression;
-import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
 
@@ -121,7 +116,7 @@ public class SymbolicStringHandler {
 						//to revise
 						return true;
 					} else {
-						return true; 
+						return true;
 					}
 					
 				}
@@ -306,7 +301,17 @@ public class SymbolicStringHandler {
 				handledoubleValue(invInst, th);
 			} else if (shortName.equals("booleanValue")) {
 				handlefloatValue(invInst, th);
-			} else {
+			} else if (shortName.equals("isEmpty")) {
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()){
+					cg = new PCChoiceGenerator(2);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleIsEmpty(invInst, th);
+					return invInst.getNext(th);
+				}
+			}else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
 			}
@@ -1293,6 +1298,55 @@ public class SymbolicStringHandler {
 			}
 		}
 		return null;
+	}
+	public void handleIsEmpty(JVMInvokeInstruction invInst,  ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
+		if (sym_v1 == null) {
+			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleIsEmpty");
+		} else {
+			IntegerExpression sym_v2 = sym_v1._length();
+			ChoiceGenerator<?> cg;
+			boolean conditionValue;
+			cg = th.getVM().getChoiceGenerator();
+
+			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+
+			sf.pop();
+			PathCondition pc;
+
+			ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+			while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+				prev_cg = prev_cg.getPreviousChoiceGenerator();
+			}
+
+			if (prev_cg == null) {
+				pc = new PathCondition();
+			} else {
+				pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+			}
+
+			assert pc != null;
+
+			if(conditionValue){
+				pc._addDet(Comparator.EQ, sym_v2, (IntegerExpression)(new IntegerConstant(0)));
+				if(!pc.simplify()) {
+					th.getVM().getSystemState().setIgnored(true);
+				} else {
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+				}
+			}else{
+				pc._addDet(Comparator.NE, sym_v2, (IntegerExpression)(new IntegerConstant(0)));
+				if(!pc.simplify()) {
+					th.getVM().getSystemState().setIgnored(true);
+				} else {
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+				}
+			}
+
+			sf.push(conditionValue ? 1 : 0, true);
+		}
 	}
 
 	public void handleParseLongValueOf(JVMInvokeInstruction invInst,  ThreadInfo th) {
