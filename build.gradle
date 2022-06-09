@@ -1,0 +1,37 @@
+apply plugin: "java"
+apply plugin: "maven-publish"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.com.palantir.gradle.gitversion:gradle-git-version:0.11.0"
+    }
+}
+
+dependencies {
+    testImplementation "junit:junit:4.12"
+    
+}
+
+apply from: "gradle/source-sets.gradle"
+
+task compile{
+    group "Build tasks"
+    description "compile all SPF core sources"
+
+    // These are automatic generated tasks from the Java Gradle Plugin.
+    // Gradle is able to infer the order of the source sets
+    // due to the compileClasspath attribute
+    dependsOn compileTestJava
+}
