@@ -2,8 +2,8 @@ sourceSets {
     annotations {
         java.srcDirs = ["src/annotations"]
         java.outputDir = file("${buildDir}/annotations")
-    }
-   /* main {
+    }/*
+    main {
         java.srcDirs = ["src/main"]
         java.outputDir = file("${buildDir}/main")
 
