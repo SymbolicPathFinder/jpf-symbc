@@ -1,0 +1,31 @@
+sourceSets {
+    annotations {
+        java.srcDirs = ["src/annotations"]
+        java.outputDir = file("${buildDir}/annotations")
+    }
+   /* main {
+        java.srcDirs = ["src/main"]
+        java.outputDir = file("${buildDir}/main")
+
+    }
+    examples {
+        java.srcDirs = ["src/examples"]
+        java.outputDir = file("${buildDir}/examples")
+
+    }
+    classes {
+        java.srcDirs = ["src/classes"]
+        java.outputDir = file("${buildDir}/classes")
+
+    }
+    peers{
+        java.srcDirs = ["src/peers"]
+        java.outputDir = file("${buildDir}/peers")
+
+    }
+    tests {
+        java.srcDirs = ["src/tests"]
+        java.outputDir = file("${buildDir}/tests")
+        
+    } */
+}
