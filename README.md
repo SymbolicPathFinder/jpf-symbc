@@ -23,6 +23,7 @@ Getting Started
 ----------------
 
 First of all please use Java 8 (I am afraid our tools do not work with newer versions of Java).
+Also please use eclipse (highly recommended).
 
 Then please download jpf-core from here:
 https://github.com/yannicnoller/jpf-core/tree/0f2f2901cd0ae9833145c38fee57be03da90a64f
@@ -43,6 +44,6 @@ extensions=${jpf-core},${jpf-symbc}
 
 
 You can then try to run some examples by selecting a .jpf file from the "examples" directory and then selecting a run configuration from the "Run" menu in Eclipse. 
-In particular you should select: "run-JPF-symbc" to run Symbolic PathFinder on your example (configuration "run-JPF-symbc-mac" is tailored for Mac).
+In particular you should select: "run-JPF-symbc" to run Symbolic PathFinder on your example; configuration "run-JPF-symbc-mac" is tailored for Mac; for Windows please change the environment variable in the run configuration to PATH; it should point to the lib directory in your jpf-symbc project.
 
 Good luck!
