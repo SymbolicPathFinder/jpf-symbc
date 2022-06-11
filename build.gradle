@@ -1,29 +1,168 @@
+plugins {
+    id 'java'
+}
 
-apply plugin: "java"
-apply plugin: "application"
+def getCurrentVersion() {
+    "DEVELOPMENT-SNAPSHOT"
+}
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+version = currentVersion
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
     mavenCentral()
-    jcenter()
 }
 
-dependencies {
-    // This dependency is found on compile classpath of this component and consumers.
-    implementation 'com.google.guava:guava:27.0.1-jre'
-
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
-    compile project(":jpf-core")
+ext.manifestCommonAttrbutes = manifest {
+    attributes(
+            "Built-By": System.getProperty("user.name"),
+            "Implementation-Vendor": "NASA Ames Research Center",
+            "Implementation-Version": version
+    )
 }
-
-// Define the main class for the application
-mainClassName = 'jpf.symbc.App'
 
 apply from: "gradle/ide-support.gradle"
+apply from: "gradle/distribution.gradle"
 apply from: "gradle/source-sets.gradle"
+apply from: "gradle/build-resources.gradle"
+
+dependencies {
+   // ant.importBuild 'build-properties.xml'
+
+   /* def jpfLibs = file("C:/Users/gaura/projects/jpf-core")
+    def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
+    def libs = extLibs + jpfLibs
+
+    implementation libs
+    classesImplementation libs
+    peersImplementation libs
+    examplesImplementation libs
+    testImplementation libs
+    */
+
+    //implementation 'com.github.souzen:light-jpf-maven-plugin:0.0.6'
+    //implementation "net.sf.jpf:jpf:1.5"
+    testImplementation "junit:junit:4.12"
+    //compile project(":jpf-core")
+}
+
+compileJava {
+    dependsOn(':jpf-core:buildJars')
+}
+
+task compile {
+    group = "SPF Build"
+    description = "Compiles all JPF symbc sources."
+
+    // These are automatic generated tasks from the Java Gradle Plugin.
+    // Gradle is able to infer the order of the source sets
+    // due to the compileClasspath attribute
+    dependsOn compileExamplesJava
+    dependsOn compileTestJava
+}
+
+task createJpfClassesJar(type: Jar) {
+    archiveName = "jpf-symbc-classes.jar"
+    destinationDir = file("${buildDir}")
+
+    group = "SPF Jars"
+    description = "Creates the ${archiveName} file."
+
+    dependsOn compile
+    dependsOn copyResources
+
+    from sourceSets.main.java.outputDir
+    from sourceSets.annotations.java.outputDir
+    from sourceSets.classes.java.outputDir
+}
+
+task createJpfJar(type: Jar) {
+    archiveName = "jpf-symbc.jar"
+    destinationDir = file("${buildDir}")
+
+    group = "SPF Jars"
+    description = "Creates the ${archiveName} file."
+
+    dependsOn compile
+    dependsOn copyResources
+
+    from sourceSets.main.java.outputDir
+    from sourceSets.peers.java.outputDir
+    from sourceSets.annotations.java.outputDir
+    from sourceSets.classes.java.outputDir
+
+    manifest {
+        attributes "Implementation-Title": "Symbolic Pathfinder system"
+        from manifestCommonAttrbutes
+    }
+}
+
+task createAnnotationsJar(type: Jar) {
+    archiveName = "jpf-symbc-annotations.jar"
+    destinationDir = file("${buildDir}")
+
+    group = "SPF Jars"
+    description = "Creates the ${archiveName} file."
+
+    dependsOn compile
+    dependsOn copyResources
+
+    from sourceSets.annotations.java.outputDir
+}
+
+task buildJars {
+    group = "SPF Build"
+    description = "Generates all JPF symbc jar files."
+
+    dependsOn createAnnotationsJar
+    dependsOn createJpfClassesJar
+    dependsOn createJpfJar
+}
+
+test {
+    description = "Runs core regression tests."
+
+    dependsOn buildJars
+
+    forkEvery = 1
+    enableAssertions = true
+    maxHeapSize = "1024m"
+
+    exclude "**/JPF_*.class"
+    include "**/Test*.class"
+    exclude "**/TestBitwise*.class"
+    exclude "**/TestCoverage.class"
+    exclude "**/TestDIV.class"
+    exclude "**/TestExJPF.class"
+    exclude "**/TestLazy*.class"
+    exclude "**/TestLazy*.class"
+    exclude "**/TestPathCondition.class"
+    exclude "**/TestStringBuilder.class"
+    exclude "**/strings/*.class"
+    exclude "/gov/nasa/jpf/symbc/strings/*.class"
+    exclude "**/Test*\$*.class"
+    exclude "**/TestSymbolicListener.class"
+    exclude "**/TestSymbolicOutput.class"
+    exclude "**/TestSymbolicJPF.class"
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+
+    afterSuite { testDescriptor, result ->
+        if (!testDescriptor.parent) {
+            println "Test Execution: ${result.resultType}"
+
+            def summaryFields = ["${result.testCount} tests",
+                                 "${result.successfulTestCount} passed",
+                                 "${result.failedTestCount} failed",
+                                 "${result.skippedTestCount} skipped"]
+
+            println "Summary: " + summaryFields.join(", ")
+        }
+    }
+}
+
+defaultTasks "buildJars"

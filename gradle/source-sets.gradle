@@ -2,30 +2,31 @@ sourceSets {
     annotations {
         java.srcDirs = ["src/annotations"]
         java.outputDir = file("${buildDir}/annotations")
-    }/*
+    }
     main {
         java.srcDirs = ["src/main"]
         java.outputDir = file("${buildDir}/main")
-
-    }
-    examples {
-        java.srcDirs = ["src/examples"]
-        java.outputDir = file("${buildDir}/examples")
-
+        compileClasspath += sourceSets.annotations.output// + libs
     }
     classes {
         java.srcDirs = ["src/classes"]
         java.outputDir = file("${buildDir}/classes")
-
+        compileClasspath += sourceSets.main.output + sourceSets.annotations.output// + libs
     }
-    peers{
+    peers {
         java.srcDirs = ["src/peers"]
         java.outputDir = file("${buildDir}/peers")
-
+        compileClasspath += sourceSets.main.output + sourceSets.annotations.output// + libs
     }
-    tests {
+    examples {
+        java.srcDirs = ["src/examples"]
+        java.outputDir = file("${buildDir}/examples")
+        compileClasspath += sourceSets.main.output + sourceSets.annotations.output + sourceSets.classes.output// + libs
+    }
+    test {
         java.srcDirs = ["src/tests"]
         java.outputDir = file("${buildDir}/tests")
-        
-    } */
+        compileClasspath += sourceSets.annotations.output + sourceSets.classes.output + sourceSets.peers.output// + libs
+        runtimeClasspath += compileClasspath
+    }
 }

@@ -1,4 +1,5 @@
 rootProject.name = 'jpf-symbc'
 
+// Added jpf-core as subproject
 include ":jpf-core"
 project(":jpf-core").projectDir = file("C:/Users/gaura/projects/jpf-core")
