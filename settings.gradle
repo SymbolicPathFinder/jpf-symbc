@@ -1,4 +1,4 @@
-rootProject.name = 'jpf-symbc'
+rootProject.name = "jpf-symbc"
 
 // Added jpf-core as subproject
 include ":jpf-core"

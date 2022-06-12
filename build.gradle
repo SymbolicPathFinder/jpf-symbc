@@ -1,5 +1,10 @@
 plugins {
+    id 'com.gradle.build-scan' version '2.3'
     id 'java'
+}
+buildScan {
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
 }
 
 def getCurrentVersion() {
@@ -13,6 +18,7 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 ext.manifestCommonAttrbutes = manifest {
@@ -30,10 +36,11 @@ apply from: "gradle/build-resources.gradle"
 
 dependencies {
    // ant.importBuild 'build-properties.xml'
-
-   /* def jpfLibs = file("C:/Users/gaura/projects/jpf-core")
+    /*
+    def jpfLibs = files("C:/Users/gaura/projects/jpf-core/${buildDir}/")
     def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
     def libs = extLibs + jpfLibs
+    
 
     implementation libs
     classesImplementation libs
