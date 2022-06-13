@@ -36,30 +36,13 @@ apply from: "gradle/source-sets.gradle"
 apply from: "gradle/build-resources.gradle"
 
 dependencies {
-   // ant.importBuild 'build-properties.xml'
-    /*
-    def jpfLibs = files("C:/Users/gaura/projects/jpf-core/${buildDir}/")
-    def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
-    def libs = extLibs + jpfLibs
-    
-
-    implementation libs
-    classesImplementation libs
-    peersImplementation libs
-    examplesImplementation libs
-    testImplementation libs
-    */
-
-    //implementation 'com.github.souzen:light-jpf-maven-plugin:0.0.6'
-    //implementation "net.sf.jpf:jpf:1.5"
+   
     testImplementation "junit:junit:4.12"
-    //classpath 'gov.nasa:jpf-core:1.0.0'
-    //compile project(":jpf-core")
+    
 }
 
-compileJava {
-    //dependsOn gradle.includeBuild("jpf-core").task(":buildJars")      
-    // dependsOn(':jpf-core:buildJars')
+compileJava {     
+    
 }
 
 task compile {
