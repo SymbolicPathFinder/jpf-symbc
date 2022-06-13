@@ -1,6 +1,7 @@
 plugins {
     id 'com.gradle.build-scan' version '2.3'
     id 'java'
+    //id 'gov.nasa.jpf-core' version '1.0.0'
 }
 buildScan {
     termsOfServiceUrl = 'https://gradle.com/terms-of-service'
@@ -52,11 +53,13 @@ dependencies {
     //implementation 'com.github.souzen:light-jpf-maven-plugin:0.0.6'
     //implementation "net.sf.jpf:jpf:1.5"
     testImplementation "junit:junit:4.12"
+    //classpath 'gov.nasa:jpf-core:1.0.0'
     //compile project(":jpf-core")
 }
 
 compileJava {
-    dependsOn(':jpf-core:buildJars')
+    //dependsOn gradle.includeBuild("jpf-core").task(":buildJars")      
+    // dependsOn(':jpf-core:buildJars')
 }
 
 task compile {
