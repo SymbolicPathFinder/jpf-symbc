@@ -47,8 +47,6 @@ dependencies {
     testImplementation libs
 
     testImplementation "junit:junit:4.12"
-   // implementation files('C:/Users/gaura/jpf/jpf-core/build/libs/jpf-core-JPF-8.0-60-g2f8f3c4.jar')
-   // compile project(":jpf-core")
     
 }
 
