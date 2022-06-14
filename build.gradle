@@ -34,6 +34,17 @@ apply from: "gradle/source-sets.gradle"
 apply from: "gradle/build-resources.gradle"
 
 dependencies {
+    ant.importBuild 'build-properties.xml'
+
+    def jpfLibs = files(ant.properties['jpf-core.native_classpath'].split(';'))
+    def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
+    def libs = extLibs + jpfLibs
+
+    implementation libs
+    classesImplementation libs
+    peersImplementation libs
+    examplesImplementation libs
+    testImplementation libs
 
     testImplementation "junit:junit:4.12"
    // implementation files('C:/Users/gaura/jpf/jpf-core/build/libs/jpf-core-JPF-8.0-60-g2f8f3c4.jar')
