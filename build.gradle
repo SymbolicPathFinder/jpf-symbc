@@ -1,7 +1,6 @@
 plugins {
     id 'com.gradle.build-scan' version '2.3'
     id 'java'
-    //id 'gov.nasa.jpf-core' version '1.0.0'
 }
 buildScan {
     termsOfServiceUrl = 'https://gradle.com/terms-of-service'
@@ -36,12 +35,10 @@ apply from: "gradle/source-sets.gradle"
 apply from: "gradle/build-resources.gradle"
 
 dependencies {
-   
-    testImplementation "junit:junit:4.12"
-    
-}
 
-compileJava {     
+    testImplementation "junit:junit:4.12"
+   // implementation files('C:/Users/gaura/jpf/jpf-core/build/libs/jpf-core-JPF-8.0-60-g2f8f3c4.jar')
+   // compile project(":jpf-core")
     
 }
 
