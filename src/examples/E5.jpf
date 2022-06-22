@@ -17,7 +17,7 @@ sourcepath=${jpf-symbc}/src/examples
 #symbolic.method = E5.testCharAt(sym)
 #symbolic.method = E5.testCompareTo(sym)
 #symbolic.method = E5.testJoin(sym#sym)
-symbolic.method = E5.testIsEmpty(sym)
+#symbolic.method = E5.testIsEmpty(sym)
 #symbolic.method = E5.testStringBuilder(sym)
 #symbolic.method = E5.testSplit(sym)
 #symbolic.method = E5.testEqualsIgnoreCase(sym)
@@ -27,15 +27,16 @@ symbolic.method = E5.testIsEmpty(sym)
 #symbolic.method = E5.testGetChars(sym)
 #symbolic.method = E5.testLastIndexOf(sym)
 #symbolic.method = E5.testIntern(sym)
-#symbolic.method = E5.testValueOf(sym)
+#symbolic.method = E5.testValueOfInt(sym)
+symbolic.method = E5.testValueOfChar(sym)
 #symbolic.method = E5.testToCharArray(sym)
 
 symbolic.min_int=-100
 symbolic.max_int=100
 
 
-#symbolic.dp=z3
-symbolic.dp=choco
+symbolic.dp=z3
+#symbolic.dp=choco
 
 symbolic.strings=true
 

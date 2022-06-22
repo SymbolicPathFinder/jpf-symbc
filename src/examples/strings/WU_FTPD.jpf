@@ -25,7 +25,7 @@ symbolic.strings=true
 #symbolic.string_dp=z3_inc
 symbolic.strings = true
 symbolic.string_dp_timeout_ms=3000
-symbolic.string_dp=z3str2
+symbolic.string_dp=z3str3
 #symbolic.string_dp=ABC
 symbolic.debug=true
 # As a side note for eclipse users, to run cvc3
@@ -34,7 +34,7 @@ symbolic.debug=true
 # "Verify..." does not work. In order to run cvc3
 # you need to go through "Run Configuration"
 
-symbolic.method= strings.WU_FTPD.site_exec(sym)
+symbolic.method= strings.WU_FTPD.site_execLL(sym)
 search.depth_limit = 10
 search.multiple_errors=true
 #listener = gov.nasa.jpf.symbc.SymbolicListenerClean

@@ -21,7 +21,7 @@ package strings;
 //This example featured in the paper: "Modeling Imperative String Operations with Transducers"
 public class WU_FTPD {
 	public static void main (String [] args) {
-		site_exec("!!!!!!!!!!!!!!!!!!!!!!!!!!!!%n");
+		site_execLL("!!!!!!!!!!!!!!!!!!!!!!!!!!!!%n");
 	}
 
 	//Some precission and speedup is still needed here

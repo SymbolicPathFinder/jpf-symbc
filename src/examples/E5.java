@@ -32,7 +32,8 @@ public class E5 {
 		testGetChars("abc");
 		testLastIndexOf("ccba");
 		testIntern(r);
-		testValueOf(114514);
+		testValueOfInt(114514);
+		testValueOfChar('a');
 		testToCharArray("abc");
 	}
 	
@@ -117,7 +118,7 @@ public class E5 {
 	
 	public static void strEx8 (String r5) {
 		if (r5.trim().concat(r5).toUpperCase().contains("AA")) {
-			// true branch 
+			// true branch
 		} else {
 			// false branch
 		}
@@ -173,6 +174,9 @@ public class E5 {
 	}
 
 	public static void testJoin (String r1, String r2) {
+		if(r1 == null || r2 == null){
+			return;
+		}
 		String r3 = String.join("", r1, r2);
 		if (r3.equals("ABA")) {
 			// true branch
@@ -269,7 +273,16 @@ public class E5 {
 		}
 	}
 
-	public static void testValueOf (int n) {
+	public static void testValueOfChar (char c) {
+		String r = String.valueOf(c);
+		if (r.equals("a")){
+			// true branch
+		}else{
+			// false branch
+		}
+	}
+
+	public static void testValueOfInt (int n) {
 		String r = String.valueOf(n);
 		if (r.equals("114514")){
 			// true branch

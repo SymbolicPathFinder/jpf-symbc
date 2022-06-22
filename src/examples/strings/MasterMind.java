@@ -7,9 +7,6 @@ import java.io.File;
 
 public class MasterMind {
 	public static void main(String[] args){
-
-
-
 		Random gen= new Random();
 		int target= 0;
 		// while(hasDupes(target= (gen.nextInt(9000) + 1000)));
