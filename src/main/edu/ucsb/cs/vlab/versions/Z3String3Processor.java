@@ -49,7 +49,7 @@ public class Z3String3Processor {
 		Params params = context1.mkParams();
 		//params.add("candidate_models", true);
 		//params.add("fail_if_inconclusive", false);
-		params.add("smt.string_solver", "z3str3");
+		//params.add("smt.string_solver", "z3str3");
 
 		// SymbolicInstructionFactory populated these public vars since z3str3 was specified. 
 		params.add("str.aggressive_length_testing", SymbolicInstructionFactory.z3str3_aggressive_length_testing);
@@ -121,9 +121,7 @@ public class Z3String3Processor {
 					System.out.println(s.trim());
 					String value = s.substring(s.indexOf("\""), s.length() -1);
 					String[] parts = s.split(" ");
-
 					model.put(parts[1], value);
-
 				}
 
 				reader.close();
@@ -135,6 +133,7 @@ public class Z3String3Processor {
 		}
 		catch (com.microsoft.z3.Z3Exception e) {
 			System.out.println("Z3 exception: " + e.getMessage());
+			throw new RuntimeException("ERROR: unsupported string operation");
 		}
 
 		return new Output(sat, assembleModel());
