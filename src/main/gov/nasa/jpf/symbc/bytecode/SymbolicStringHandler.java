@@ -2071,7 +2071,21 @@ public class SymbolicStringHandler {
 	}
 
 	public Instruction handleCharValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
-		throw new RuntimeException("ERROR: symbolic string method not Implemented - CharValueOf");
+		//throw new RuntimeException("ERROR: symbolic string method not Implemented - CharValueOf");
+		StackFrame sf = th.getModifiableTopFrame();
+		IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
+
+		if (sym_v1 == null) {
+			throw new RuntimeException("ERROR: symbolic string method must have symbolic operand: handleIntValueOf");
+		} else {
+			sf.pop();
+			StringExpression sym_v2 = StringExpression._valueOf(sym_v1);
+			int objRef = th.getHeap().newString("", th).getObjectRef();
+			sf.push(objRef, true);
+			sf.setOperandAttr(sym_v2);
+		}
+
+		return null;
 	}
 
 	public Instruction handleCharArrayValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {

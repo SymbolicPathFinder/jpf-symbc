@@ -206,7 +206,10 @@ class Manager extends TranslationManager {
 				if (dse.oprlist[0] instanceof StringExpression) {
 					arg = manager.strExpr.collect((StringExpression) dse.oprlist[0]);
 				} else if (dse.oprlist[0] instanceof IntegerExpression) {
-					arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
+					if (dse.oprlist[0] instanceof SymbolicCharAtInteger) {
+						arg = "(str.from_code " + manager.numExpr.collect((IntegerExpression) dse.oprlist[0]) + ")";
+					} else
+						arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
 				}
 
 				try {
