@@ -1,11 +1,4 @@
-plugins {
-    id 'com.gradle.build-scan' version '2.3'
-    id 'java'
-}
-buildScan {
-    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-    termsOfServiceAgree = 'yes'
-}
+apply plugin: "java"
 
 def getCurrentVersion() {
     "DEVELOPMENT-SNAPSHOT"
