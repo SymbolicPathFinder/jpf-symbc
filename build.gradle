@@ -38,8 +38,8 @@ dependencies {
     classesImplementation libs
     peersImplementation libs
     examplesImplementation libs
-    testImplementation libs*/
-    //compile project(:"jpf-core")
+    testImplementation libs
+    compile project(:"jpf-core")*/
     testImplementation "junit:junit:4.12"
     
 }
