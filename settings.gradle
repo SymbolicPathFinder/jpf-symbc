@@ -1,1 +1,4 @@
 rootProject.name = "jpf-symbc"
+/*
+include ':jpf-core'
+project(":jpf-core").projectDir = file("C:/Users/gaura/jpf/jpf-symbc/jpf-core")*/
