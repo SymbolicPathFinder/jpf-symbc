@@ -1,0 +1,3 @@
+[submodule "jpf-core"]
+	path = jpf-core
+	url = https://github.com/javapathfinder/jpf-core
