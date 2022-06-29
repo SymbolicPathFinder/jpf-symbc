@@ -36,12 +36,11 @@ https://github.com/SymbolicPathFinder/jpf-symbc
 Import them in Eclipse as 2 Java projects.
 Also create a .jpf dir in your home directory and create in it a file  called "site.properties" with the following content:
 
+```
 jpf-core = ${user.home}/.../path-to-jpf-core-folder/jpf-core
-
 jpf-symbc = ${user.home}/.../path-to-jpf-core-folder/jpf-symbc
-
 extensions=${jpf-core},${jpf-symbc}
-
+```
 
 You can then try to run some examples by selecting a .jpf file from the "examples" directory and then selecting a run configuration from the "Run" menu in Eclipse. 
 In particular you should select: "run-JPF-symbc" to run Symbolic PathFinder on your example; configuration "run-JPF-symbc-mac" is tailored for Mac; for Windows please change the environment variable in the run configuration to PATH; it should point to the lib directory in your jpf-symbc project.
