@@ -27,7 +27,7 @@ apply from: "gradle/source-sets.gradle"
 apply from: "gradle/build-resources.gradle"
 
 dependencies {
-    /*
+    
     ant.importBuild 'build-properties.xml'
 
     def jpfLibs = files(ant.properties['jpf-core.native_classpath'].split(';'))
@@ -39,7 +39,7 @@ dependencies {
     peersImplementation libs
     examplesImplementation libs
     testImplementation libs
-    compile project(:"jpf-core")*/
+    /*compile project(:"jpf-core")*/
     testImplementation "junit:junit:4.12"
     
 }
