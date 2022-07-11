@@ -119,9 +119,12 @@ public class Z3String3Processor {
 				System.out.println("Returned solutions: ");
 				for(String s : solutions) {
 					System.out.println(s.trim());
-					String value = s.substring(s.indexOf("\""), s.length() -1);
-					String[] parts = s.split(" ");
-					model.put(parts[1], value);
+					int begin = s.indexOf("\"");
+					if(begin >= 0){
+						String value = s.substring(begin, s.length() -1);
+						String[] parts = s.split(" ");
+						model.put(parts[1], value);
+					}
 				}
 
 				reader.close();
