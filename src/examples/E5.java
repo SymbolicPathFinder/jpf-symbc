@@ -35,6 +35,7 @@ public class E5 {
 		testValueOfInt(114514);
 		testValueOfChar('a');
 		testToCharArray("abc");
+		//testEmptyCharAt(0);
 	}
 	
 	public static void strEx (String r1, String r2) {
@@ -162,6 +163,20 @@ public class E5 {
 			// true branch
 		}else{
 			// false branch
+		}
+	}
+
+	public static void testEmptyCharAt (int idx) {
+		try{
+			char ch = "".charAt(idx);
+			if(ch == 'a'){
+				// true branch
+			}else{
+				// false branch
+			}
+		}
+		catch (StringIndexOutOfBoundsException i){
+			// Exception branch
 		}
 	}
 

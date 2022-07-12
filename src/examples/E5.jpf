@@ -14,6 +14,7 @@ sourcepath=${jpf-symbc}/src/examples
 #symbolic.method = E5.testIndexOf(sym)
 #symbolic.method = E5.testLength(sym)
 #symbolic.method = E5.testReplace(sym)
+#symbolic.method = E5.testEmptyCharAt(sym)
 #symbolic.method = E5.testCharAt(sym)
 #symbolic.method = E5.testCompareTo(sym)
 #symbolic.method = E5.testJoin(sym#sym)
