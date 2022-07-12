@@ -69,7 +69,7 @@ class Manager extends TranslationManager {
 					"LastIndexof ( str.substr $getSource %getMinDist ( - (str.len $getSource ) %getMinDist )) ?getExpression");
 
 			map(BinaryLinearIntegerExpression.class, "_getOp %getLeft %getRight");
-			map(SymbolicCharAtInteger.class, "str.to_code ( str.at $getExpression %getIndex )");
+			map(SymbolicCharAtInteger.class, "str.at $getExpression %getIndex");
 			map(SymbolicIndexOf2Integer.class, "str.indexof $getSource $getExpression %getMinIndex");
 			map(SymbolicIndexOfInteger.class, "str.indexof $getSource $getExpression");
 
