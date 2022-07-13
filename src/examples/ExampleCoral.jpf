@@ -2,10 +2,10 @@
 target = Example
 
 # path to the bytecode of the target (and classes used by the target)
-classpath = .
+classpath = ${jpf-symbc}/build/examples
 
 # path to the Java code of the target (and classes used by the target)
-sourcepath = .
+sourcepath = ${jpf-symbc}/src/examples
 
 # method and its parameters
 symbolic.method = Example.min(sym#sym)
