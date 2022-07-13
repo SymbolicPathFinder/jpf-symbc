@@ -1,0 +1,17 @@
+# fully qualified name of the Java app
+target = Example
+
+# path to the bytecode of the target (and classes used by the target)
+classpath = .
+
+# path to the Java code of the target (and classes used by the target)
+sourcepath = .
+
+# method and its parameters
+symbolic.method = Example.min(sym#sym)
+
+# solver used
+symbolic.dp = coral
+
+# listener that generates JUnit test cases
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

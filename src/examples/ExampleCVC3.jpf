@@ -1,0 +1,55 @@
+# Before running this example, link dynamic/shared library files for CVC3
+#
+# Windows (64-bit)
+# The dynamic library files for CVC3 for Windows 64-bit machines are not readily available.  
+# As a result, this example cannot be run on Windows 64-bit machines.
+#
+# Linux (64-bit)
+# To link the 64-bit shared library files, add the path /path/to/lib/64bit/subdirectory/of/jpf-symbc/
+# to the LD_LIBRARY_PATH environment variable.  For example, in a Linux sh issue the following command.
+#   export LD_LIBRARY_PATH=/path/to/lib/64bit/subdirectory/of/jpf-symbc/
+# In a Linux csh issue the following command.
+#   setenv LD_LIBRARY_PATH /path/to/lib/64bit/subdirectory/of/jpf-symbc/
+#
+# macOS (64-bit)
+# To link the 64-bit shared library files, add the path /path/to/lib/64bit/subdirectory/of/jpf-symbc/
+# to the DYLD_LIBRARY_PATH environment variable.  For example, in a Linux sh issue the following command.
+#   export DYLD_LIBRARY_PATH=/path/to/lib/64bit/subdirectory/of/jpf-symbc/
+# In a Linux csh issue the following command.
+#   setenv DYLD_LIBRARY_PATH /path/to/lib/64bit/subdirectory/of/jpf-symbc/
+#
+# Windows (32-bit)
+# To link the 32-bit dynamic library files, add the path /path/to/lib/subdirectory/of/jpf-symbc/
+# to the PATH environment variable.
+#
+# Linux (32-bit)
+# To link the 32-bit shared library files, add the path /path/to/lib/subdirectory/of/jpf-symbc/
+# to the LD_LIBRARY_PATH environment variable.  For example, in a Linux sh issue the following command.
+#   export LD_LIBRARY_PATH=/path/to/lib/subdirectory/of/jpf-symbc/
+# In a Linux csh issue the following command.
+#   setenv LD_LIBRARY_PATH /path/to/lib/subdirectory/of/jpf-symbc/
+#
+# macOS (32-bit)
+# To link the 32-bit shared library files, add the path /path/to/lib/subdirectory/of/jpf-symbc/
+# to the DYLD_LIBRARY_PATH environment variable.  For example, in a Linux sh issue the following command.
+#   export DYLD_LIBRARY_PATH=/path/to/lib/subdirectory/of/jpf-symbc/
+# In a Linux csh issue the following command.
+#   setenv DYLD_LIBRARY_PATH /path/to/lib/subdirectory/of/jpf-symbc/
+
+# fully qualified name of the Java app
+target = Example
+
+# path to the bytecode of the target (and classes used by the target)
+classpath = .
+
+# path to the Java code of the target (and classes used by the target)
+sourcepath = .
+
+# method and its parameters
+symbolic.method = Example.min(sym#sym)
+
+# solver used
+symbolic.dp = cvc3
+
+# listener that generates JUnit test cases
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

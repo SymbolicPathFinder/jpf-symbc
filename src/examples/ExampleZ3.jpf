@@ -1,0 +1,38 @@
+# Before running this example, link dynamic/shared library files for Z3
+#
+# Windows (64-bit)
+# To link the dynamic library files, add the path /path/to/lib/subdirectory/of/jpf-symbc/
+# to the PATH environment variable.  For example, in a Windows 10 PowerShell issue following command.
+#   $Env:PATH = "/path/to/lib/subdirectory/of/jpf-symbc/;" + $Env:PATH
+#
+# Linux (64-bit)
+# To link the shared library files, add the path /path/to/lib/subdirectory/of/jpf-symbc/
+# to the LD_LIBRARY_PATH environment variable.  For example, in a Linux sh issue the following command.
+#   export LD_LIBRARY_PATH=/path/to/lib/subdirectory/of/jpf-symbc/
+# In a Linux csh issue the following command.
+#   setenv LD_LIBRARY_PATH /path/to/lib/subdirectory/of/jpf-symbc/
+#
+# macOS (64-bit)
+# To link the shared library files, add the path /path/to/lib/subdirectory/of/jpf-symbc/
+# to the DYLD_LIBRARY_PATH environment variable.  For example, in a Linux sh issue the following command.
+#   export DYLD_LIBRARY_PATH=/path/to/lib/subdirectory/of/jpf-symbc/
+# In a Linux csh issue the following command.
+#   setenv DYLD_LIBRARY_PATH /path/to/lib/subdirectory/of/jpf-symbc/
+
+# fully qualified name of the Java app
+target = Example
+
+# path to the bytecode of the target (and classes used by the target)
+classpath = .
+
+# path to the Java code of the target (and classes used by the target)
+sourcepath = .
+
+# method and its parameters
+symbolic.method = Example.min(sym#sym)
+
+# solver used
+symbolic.dp = z3
+
+# listener that generates JUnit test cases
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
