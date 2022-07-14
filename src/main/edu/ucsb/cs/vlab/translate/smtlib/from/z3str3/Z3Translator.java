@@ -13,6 +13,7 @@ import edu.ucsb.cs.vlab.translate.smtlib.generic.StringConstraintTranslator;
 import edu.ucsb.cs.vlab.translate.smtlib.generic.StringExpressionTranslator;
 import gov.nasa.jpf.symbc.numeric.BinaryLinearIntegerExpression;
 import gov.nasa.jpf.symbc.numeric.Comparator;
+import gov.nasa.jpf.symbc.numeric.Operator;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
@@ -63,12 +64,12 @@ class Manager extends TranslationManager {
 		public void init() {
 			replacements = new HashMap<>();
 			replacements.put("/", "div");
+			replacements.put("&", "bvand");
 
 			map(SymbolicLastIndexOfCharInteger.class, "LastIndexof $getSource ?getExpression");
 			map(SymbolicLastIndexOfChar2Integer.class,
 					"LastIndexof ( str.substr $getSource %getMinDist ( - (str.len $getSource ) %getMinDist )) ?getExpression");
 
-			map(BinaryLinearIntegerExpression.class, "_getOp %getLeft %getRight");
 			map(SymbolicCharAtInteger.class, "str.at $getExpression %getIndex");
 			map(SymbolicIndexOf2Integer.class, "str.indexof $getSource $getExpression %getMinIndex");
 			map(SymbolicIndexOfInteger.class, "str.indexof $getSource $getExpression");
@@ -93,6 +94,27 @@ class Manager extends TranslationManager {
 				final SymbolicInteger si = (SymbolicInteger) x;
 				Results.numericVariables.add(si.getName());
 				return si.getName();
+			});
+
+			rules.put(BinaryLinearIntegerExpression.class, (x) -> {
+				Operator op = ((BinaryLinearIntegerExpression) x).getOp();
+				IntegerExpression left = ((BinaryLinearIntegerExpression) x).getLeft();
+				IntegerExpression right = ((BinaryLinearIntegerExpression) x).getRight();
+				if(op.name().equals("AND")){
+					if(left instanceof SymbolicCharAtInteger
+							&& right instanceof IntegerConstant
+							&& ((IntegerConstant)right).value() == 65535){
+						return evaluateExpression(SymbolicCharAtInteger.class, left, "str.at $getExpression %getIndex");
+					}
+					else if(right instanceof SymbolicCharAtInteger
+							&& left instanceof IntegerConstant
+							&& ((IntegerConstant)left).value() == 65535){
+						return evaluateExpression(SymbolicCharAtInteger.class, right, "str.at $getExpression %getIndex");
+					}
+					else
+						return evaluateExpression(BinaryLinearIntegerExpression.class, x, "str.from_code ( bv2int ( _getOp (( _ int2bv 32) ( str.to_code %getLeft )) (( _ int2bv 32 ) %getRight )))");
+				}else
+					return evaluateExpression(BinaryLinearIntegerExpression.class, x, "_getOp %getLeft %getRight");
 			});
 		}
 	}

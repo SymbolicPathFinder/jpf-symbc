@@ -52,7 +52,7 @@ public abstract class NumericExpressionTranslator
 					return manager.numExpr.collect((IntegerExpression) klass.getMethod(rest).invoke(klass.cast(expr)));
 				} else if (part.startsWith("$")) {
 					return manager.strExpr.collect((StringExpression) klass.getMethod(rest).invoke(klass.cast(expr)));
-				} else if (part.startsWith("_")) {
+				} else if (part.startsWith("_") && part.length() > 1) {
 					String lit = String.valueOf(klass.getMethod(rest).invoke(klass.cast(expr)).toString());
 					if (replacements.containsKey(lit.trim()))
 						lit = replacements.get(lit.trim());
