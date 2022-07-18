@@ -41,6 +41,11 @@ public class Tricky {
 
 	public static void test (int n) {
 		String s = foo (n);
+		if(s.length() > 100) {
+			// long branch
+		}else{
+			// short branch
+		}
 		System.out.println(s);
 	}
 
