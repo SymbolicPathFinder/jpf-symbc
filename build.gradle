@@ -27,8 +27,8 @@ apply from: "gradle/source-sets.gradle"
 apply from: "gradle/build-resources.gradle"
 
 dependencies {
-    /*
-    ant.importBuild 'build-properties.xml'
+    
+  /*  ant.importBuild 'build-properties.xml'
 
     def jpfLibs = files(ant.properties['jpf-core.native_classpath'].split(';'))
     def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
@@ -38,8 +38,26 @@ dependencies {
     classesImplementation libs
     peersImplementation libs
     examplesImplementation libs
+    testImplementation libs*/
+
+//   File jpf_core = file("$rootDir/jpf-core/build/")
+//        File file2 = rootProject.file('root-relative/path/to/file2')
+//        println "$file1.absolutePath $file2.absolutePath"
+
+    //Jars(project(path: ":jpf-core", configuration: 'Jars'))
+   // compile project(path: 'jpf-core', configuration: 'Jars')
+   implementation project(':jpf-core')
+    def jpfLibs = fileTree("${project(':jpf-core').buildDir}") { include '*.jar' }
+    //files(project(':jpf-core').buildDir)
+    def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
+    def libs = extLibs + jpfLibs
+
+    implementation libs
+    classesImplementation libs
+    peersImplementation libs
+    examplesImplementation libs
     testImplementation libs
-    compile project(:"jpf-core")*/
+    
     testImplementation "junit:junit:4.12"
     
 }
