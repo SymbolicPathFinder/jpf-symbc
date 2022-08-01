@@ -1,170 +1,35 @@
+apply plugin: "java-library"
 apply plugin: "java"
 
-def getCurrentVersion() {
-    "DEVELOPMENT-SNAPSHOT"
+allprojects{
+
 }
 
-version = currentVersion
+project(':jpf-core'){
+    task copyJpfCoreJars(type: Copy) {
+        group = "Copy Jars"
+        description = "Copies the jpf-core jars to jpf-symbc/lib."
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-    jcenter()
-}
-
-ext.manifestCommonAttrbutes = manifest {
-    attributes(
-            "Built-By": System.getProperty("user.name"),
-            "Implementation-Vendor": "NASA Ames Research Center",
-            "Implementation-Version": version
-    )
-}
-
-apply from: "gradle/ide-support.gradle"
-apply from: "gradle/distribution.gradle"
-apply from: "gradle/source-sets.gradle"
-apply from: "gradle/build-resources.gradle"
-
-dependencies {
-
-    implementation project(':jpf-core')
-    def jpfLibs = fileTree("${project(':jpf-core').buildDir}") { include '*.jar' }
-    def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
-    def libs = extLibs + jpfLibs
-
-    //implementation 'org.opt4j:opt4j-core:3.1.4' //Tests are falling after implimetation
-    implementation 'org.sat4j:org.sat4j.core:2.3.1'
-    implementation 'jaxen:jaxen:1.1'
-    implementation 'redis.clients:jedis:2.0.0'
-    implementation 'com.github.green-solver:green:0.2.0'
-    implementation 'commons-math:commons-math:1.2'
-    implementation 'commons-lang:commons-lang:2.4'
-    implementation 'org.choco-solver:choco-solver:4.10.4'
-    implementation 'bcel:bcel:5.1'
-    implementation 'com.googlecode.aima-java:aima-core:0.10.5'
-    implementation 'com.martiansoftware:jsap:2.1'
-    
-    implementation libs
-    classesImplementation libs
-    peersImplementation libs
-    examplesImplementation libs
-    testImplementation libs
-
-    testImplementation "junit:junit:4.12"
-    
-}
-
-task compile {
-    group = "SPF Build"
-    description = "Compiles all JPF symbc sources."
-
-    // These are automatic generated tasks from the Java Gradle Plugin.
-    // Gradle is able to infer the order of the source sets
-    // due to the compileClasspath attribute
-    dependsOn compileExamplesJava
-    dependsOn compileTestJava
-}
-
-task createJpfClassesJar(type: Jar) {
-    archiveName = "jpf-symbc-classes.jar"
-    destinationDir = file("${buildDir}")
-
-    group = "SPF Jars"
-    description = "Creates the ${archiveName} file."
-
-    dependsOn compile
-    dependsOn copyResources
-
-    from sourceSets.main.java.outputDir
-    from sourceSets.annotations.java.outputDir
-    from sourceSets.classes.java.outputDir
-}
-
-task createJpfJar(type: Jar) {
-    archiveName = "jpf-symbc.jar"
-    destinationDir = file("${buildDir}")
-
-    group = "SPF Jars"
-    description = "Creates the ${archiveName} file."
-
-    dependsOn compile
-    dependsOn copyResources
-
-    from sourceSets.main.java.outputDir
-    from sourceSets.peers.java.outputDir
-    from sourceSets.annotations.java.outputDir
-    from sourceSets.classes.java.outputDir
-
-    manifest {
-        attributes "Implementation-Title": "Symbolic Pathfinder system"
-        from manifestCommonAttrbutes
+        from project(':jpf-core').buildDir
+        into project(':jpf-symbc').file('lib')
+        exclude ("jpf-classes.jar","asm-7.1.jar","classloader_specific_tests.jar","RunJPF.jar","RunTest.jar")
+        exclude ("annotations","classes","examples","generated","main","peers","tests","tmp","libs","reports","test-results")
     }
+    defaultTasks "copyJpfCoreJars"
 }
 
-task createAnnotationsJar(type: Jar) {
-    archiveName = "jpf-symbc-annotations.jar"
-    destinationDir = file("${buildDir}")
-
-    group = "SPF Jars"
-    description = "Creates the ${archiveName} file."
-
-    dependsOn compile
-    dependsOn copyResources
-
-    from sourceSets.annotations.java.outputDir
+project(':jpf-symbc'){
+   
 }
 
-task buildJars {
-    group = "SPF Build"
-    description = "Generates all JPF symbc jar files."
+task copyAllJars(type: Copy) {
 
-    dependsOn createAnnotationsJar
-    dependsOn createJpfClassesJar
-    dependsOn createJpfJar
+    group = "Copy Jars"
+    description = "Copies the jpf-core and jpf-symbc JARS to SPF/build/allJars."
+
+    from subprojects.collect { it.tasks.withType(Jar) }
+    into "$buildDir/allJars"
+
 }
 
-test {
-    description = "Runs core regression tests."
-
-    dependsOn buildJars
-
-    forkEvery = 1
-    enableAssertions = true
-    maxHeapSize = "1024m"
-
-    exclude "**/JPF_*.class"
-    include "**/Test*.class"
-    exclude "**/TestBitwise*.class"
-    exclude "**/TestCoverage.class"
-    exclude "**/TestDIV.class"
-    exclude "**/TestExJPF.class"
-    exclude "**/TestLazy*.class"    
-    exclude "**/TestPathCondition.class"
-    exclude "**/strings/*.class"
-    exclude "/gov/nasa/jpf/symbc/strings/*.class"
-    //include "**/Test*\$*.class"
-    //include "**/TestSymbolicListener.class"
-    //include "**/TestSymbolicOutput.class"
-    include "**/TestSymbolicJPF.class"
-
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-
-    afterSuite { testDescriptor, result ->
-        if (!testDescriptor.parent) {
-            println "Test Execution: ${result.resultType}"
-
-            def summaryFields = ["${result.testCount} tests",
-                                 "${result.successfulTestCount} passed",
-                                 "${result.failedTestCount} failed",
-                                 "${result.skippedTestCount} skipped"]
-
-            println "Summary: " + summaryFields.join(", ")
-        }
-    }
-}
-
-defaultTasks "buildJars"
+defaultTasks "copyAllJars"
