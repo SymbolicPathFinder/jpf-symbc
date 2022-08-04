@@ -6,16 +6,7 @@ allprojects{
 }
 
 project(':jpf-core'){
-    // task copyJpfCoreJars(type: Copy) {
-    //     group = "Copy Jars"
-    //     description = "Copies the jpf-core jars to jpf-symbc/lib."
-
-    //     from project(':jpf-core').buildDir
-    //     into project(':jpf-symbc').file('lib')
-    //     exclude ("jpf-classes.jar","asm-7.1.jar","classloader_specific_tests.jar","RunJPF.jar","RunTest.jar")
-    //     exclude ("annotations","classes","examples","generated","main","peers","tests","tmp","libs","reports","test-results")
-    // }
-    //defaultTasks "copyJpfCoreJars"
+   
 }
 
 project(':jpf-symbc'){
