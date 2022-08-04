@@ -31,8 +31,10 @@ apply from: "gradle/build-resources.gradle"
 
 dependencies {
 
+    implementation project(':jpf-core')
+    def jpfLibs = fileTree("${project(':jpf-core').buildDir}") { include '*.jar' }
     def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
-    def libs = extLibs
+    def libs = extLibs + jpfLibs
 
     //implementation 'org.opt4j:opt4j-core:3.1.4' //Tests are falling after implimetation
     implementation 'org.sat4j:org.sat4j.core:2.3.1'
