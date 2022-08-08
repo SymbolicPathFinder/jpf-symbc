@@ -24,5 +24,5 @@ jobs:
       with:
         java-version: 8
         distribution: 'adopt'
-    - name: Build jpf-symbc with Gradle
-      run: ./gradlew :jpf-symbc:build --dry-run
+    - name: Build jpf-core and jpf-symbc with Gradle
+      run: ./gradlew build
