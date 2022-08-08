@@ -2,7 +2,6 @@ apply plugin: "java-library"
 apply plugin: "java"
 
 
-
 task copyAllJars(type: Copy) {
 
     group = "Copy Jars"

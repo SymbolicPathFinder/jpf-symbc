@@ -31,7 +31,7 @@ apply from: "gradle/build-resources.gradle"
 
 dependencies {
 
-    implementation project(':jpf-core')
+    //implementation project(':jpf-core')
     def jpfLibs = fileTree("${project(':jpf-core').buildDir}") { include '*.jar' }
     def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
     def libs = extLibs + jpfLibs
