@@ -1,17 +1,7 @@
 apply plugin: "java-library"
 apply plugin: "java"
 
-allprojects{
 
-}
-
-project(':jpf-core'){
-   
-}
-
-project(':jpf-symbc'){
-   
-}
 
 task copyAllJars(type: Copy) {
 
