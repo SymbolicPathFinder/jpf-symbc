@@ -16,15 +16,16 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - name: Set up JDK 1.8
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: 8
         distribution: 'adopt'
     - name: Build jpf-core jars with Gradle
+      uses: actions/checkout@v3
       run: ./gradlew :jpf-core:build
     - name: Build jpf-symbc with Gradle
       run: ./gradlew :jpf-symbc:check
