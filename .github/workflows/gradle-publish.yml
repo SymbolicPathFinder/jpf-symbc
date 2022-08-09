@@ -29,7 +29,7 @@ jobs:
         
         
     - name: Build jpf-core and jpf-symbc with Gradle
-      run: |
+    - run: |
         echo what is in this directory?
         ls -a
         echo Is java installed?
