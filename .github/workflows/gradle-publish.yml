@@ -26,4 +26,9 @@ jobs:
         distribution: 'adopt'
       
     - name: Build jpf-symbc with Gradle
-      run: ./gradlew :jpf-symbc:build --dry-run
+      run: |
+        echo what is in this directory?
+        ls -a
+        echo Is java installed?
+        java -version
+        
