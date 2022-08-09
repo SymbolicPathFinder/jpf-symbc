@@ -28,9 +28,13 @@ jobs:
       
     - name: Build jpf-symbc with Gradle
       run: |
+        echo Current working directory is as follow
+        pwd
         echo what is in this directory?
-        cd /home/runner/work/SPF/SPF/jpf-core
+        ls -a
+        cd jpf-core
         ls
+        
         echo Is java installed?
         java -version
         
