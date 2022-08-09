@@ -29,6 +29,8 @@ jobs:
       run: |
         echo what is in this directory?
         ls -a
+        cd jpf-core
+        ls
         echo Is java installed?
         java -version
         
