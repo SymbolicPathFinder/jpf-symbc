@@ -26,7 +26,7 @@ jobs:
         java-version: 8
         distribution: 'adopt'
       
-    - name: Build jpf-symbc with Gradle
+    - name: Testing
       run: |
         echo Current working directory is as follow
         pwd
@@ -40,4 +40,8 @@ jobs:
 
         echo Is Git installed?
         git --version
-        
+
+    - name: Build jpf-symbc with Gradle
+      run: |
+        ./gradlew :jpf-core:buildJars
+        ./gradlew :jpf-symbc:build
