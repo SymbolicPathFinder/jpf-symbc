@@ -24,5 +24,14 @@ jobs:
       with:
         java-version: 8
         distribution: 'adopt'
+      
+    - name: Run multi-line Script
+      run: |
+        echo what is in this directory?
+        ls -a
+        echo Is java installed?
+        java -version
+        
+        
     - name: Build jpf-core and jpf-symbc with Gradle
-      run: ./gradlew build
+      #run: ./gradlew build
