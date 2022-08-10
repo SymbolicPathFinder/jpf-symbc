@@ -20,26 +20,12 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 0
+        
     - name: Set up JDK 1.8
       uses: actions/setup-java@v3
       with:
         java-version: 8
         distribution: 'adopt'
-      
-    - name: Testing
-      run: |
-        echo Current working directory is as follow
-        pwd
-        echo what is in this directory?
-        ls -a
-        cd jpf-core
-        ls
-        
-        echo Is java installed?
-        java -version
-
-        echo Is Git installed?
-        git --version
 
     - name: Build jpf-symbc with Gradle
       run: |
