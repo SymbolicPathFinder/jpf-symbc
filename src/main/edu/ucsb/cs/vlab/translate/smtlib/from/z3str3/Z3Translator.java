@@ -184,6 +184,12 @@ class Manager extends TranslationManager {
 				};
 			};
 
+			final Function<StringExpression, String> ValueOfInt = (expr) -> {
+					final DerivedStringExpression dse = (DerivedStringExpression) expr;
+					final String arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
+					return "(ite ( < " + arg + " 0) (str.++ \"-\" (str.from_int (- " + arg + "))) (str.from_int " +  arg + "))";
+				};
+
 			map(StringOrOperation.NONSYM, (expr) -> {
 				return "\"" + ((StringConstant) expr).value + "\"";
 			});
@@ -233,9 +239,9 @@ class Manager extends TranslationManager {
 						if(op._min == 0 && op._max == 65535)
 							arg = "(str.from_code " + manager.numExpr.collect((IntegerExpression) dse.oprlist[0]) + ")";
 						else
-							arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
+							arg = ValueOfInt.apply(expr);
 					} else
-						arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
+						arg = ValueOfInt.apply(expr);
 				}
 
 				try {
