@@ -1,15 +1,3 @@
 apply plugin: "java-library"
 apply plugin: "java"
 
-
-task copyAllJars(type: Copy) {
-
-    group = "Copy Jars"
-    description = "Copies the jpf-core and jpf-symbc JARS to SPF/build/allJars."
-
-    from subprojects.collect { it.tasks.withType(Jar) }
-    into "$buildDir/allJars"
-
-}
-
-defaultTasks "copyAllJars"

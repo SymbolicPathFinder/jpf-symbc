@@ -3,31 +3,44 @@ name: Gradle Package
 on:
   push:
     branches: [ main-gk ]
+
   pull_request:
     branches: [ main-gk ]
   workflow_dispatch:
 
+
 jobs:
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
 
+
     steps:
+
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
         submodules: recursive
         fetch-depth: 0
         
+
     - name: Set up JDK 1.8
       uses: actions/setup-java@v3
       with:
         java-version: 8
         distribution: 'adopt'
+        cache: gradle
+
 
     - name: Build jpf-symbc with Gradle
       run: |
         ./gradlew :jpf-core:buildJars
-        ./gradlew :jpf-symbc:build
+        ./gradlew :jpf-symbc:buildJar
+      
+
+    - name: Test jpf-symbc with Junit version 4.2
+      run: |
+        ./gradlew :jpf-symbc:test

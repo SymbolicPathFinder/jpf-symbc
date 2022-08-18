@@ -36,6 +36,8 @@ dependencies {
     def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
     def libs = extLibs + jpfLibs
 
+    //Following dependencies are pulled from mavenCentral() repositories
+    
     //implementation 'org.opt4j:opt4j-core:3.1.4' //Tests are falling after implimetation
     implementation 'org.sat4j:org.sat4j.core:2.3.1'
     implementation 'jaxen:jaxen:1.1'
@@ -120,13 +122,15 @@ task createAnnotationsJar(type: Jar) {
 
 task buildJars {
     group = "SPF Build"
-    description = "Generates all JPF symbc jar files."
+    description = "Generates all jpf-symbc jar files."
 
     dependsOn createAnnotationsJar
     dependsOn createJpfClassesJar
     dependsOn createJpfJar
 }
 
+
+//test Task runs a collection of test cases using any supported test library i.e. Junit
 test {
     description = "Runs core regression tests."
 
@@ -136,6 +140,8 @@ test {
     enableAssertions = true
     maxHeapSize = "1024m"
 
+//exclude tag ---> gradle will not run the tests present under exclude tag
+//include tag ---> gradle will run the tests present under include tag
     exclude "**/JPF_*.class"
     include "**/Test*.class"
     exclude "**/TestBitwise*.class"
@@ -169,6 +175,10 @@ test {
     }
 }
 
+/* This task is provided by the "maven-publish" plugin and it will publish 
+   the Jars for local repository --> 'Users/.m2/gov/nasa'
+    */
+
 publishing {
     publications {
         jpfSymbc(MavenPublication) {
@@ -189,4 +199,5 @@ publishing {
     }
 }
 
+// By default this task will get execute by gradle
 defaultTasks "buildJars"
