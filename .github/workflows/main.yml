@@ -35,12 +35,12 @@ jobs:
         cache: gradle
 
 
-    - name: Build jpf-symbc with Gradle
+    - name: Building jpf-symbc with Gradle
       run: |
         ./gradlew :jpf-core:buildJars
         ./gradlew :jpf-symbc:buildJar
       
 
-    - name: Test jpf-symbc with Junit version 4.2
+    - name: Testing jpf-symbc with Junit version 4.2
       run: |
         ./gradlew :jpf-symbc:test
