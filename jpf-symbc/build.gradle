@@ -176,7 +176,7 @@ test {
 }
 
 /* This task is provided by the "maven-publish" plugin and it will publish 
-   the Jars for local repository --> 'Users/.m2/gov/nasa'
+   the Jars for local repository --> 'Users/.m2/gov/nasa' 
     */
 
 publishing {
