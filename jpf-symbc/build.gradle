@@ -183,16 +183,19 @@ publishing {
     publications {
         jpfSymbc(MavenPublication) {
             groupId = 'gov.nasa'
+            version = '1.0.0'
             artifactId = 'jpf-symbc'
             artifact createJpfJar
         }
         jpfAnnotation(MavenPublication) {
             groupId = 'gov.nasa'
+            version = '1.0.0'
             artifactId = 'jpf-annotations'
             artifact createAnnotationsJar
         }
         jpfClasses(MavenPublication) {
             groupId = 'gov.nasa'
+            version = '1.0.0'
             artifactId = 'jpf-classes'
             artifact createJpfClassesJar
         }
