@@ -1,6 +1,7 @@
 package gov.nasa.jpf.symbc.string.translate;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import edu.ucsb.cs.vlab.Z3_3;
@@ -29,12 +30,15 @@ public class TranslateToZ3str3 {
 			final Output out = stringProcessor.getOutput();
 
 			o = new Output(out.isSAT(), out.getModel());
+			HashMap<String, String> solution = new HashMap<String, String>();
 
 			System.out.println("*************************************");
 			System.out.println("Satisfiable: " + o.isSAT());
 			for (String k : o.getModel().keySet()) {
 				System.out.println(k + " => " + o.getModel().get(k));
+				solution.put(k, o.getModel().get(k).replaceAll("^\"|\"$", ""));
 			}
+			pc.solution = new HashMap<String, String>(solution);
 			System.out.println("*************************************\n");
 			
 				} catch (IOException e) {
