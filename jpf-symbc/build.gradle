@@ -42,7 +42,6 @@ dependencies {
     implementation 'org.sat4j:org.sat4j.core:2.3.1'
     implementation 'jaxen:jaxen:1.1'
     implementation 'redis.clients:jedis:2.0.0'
-    implementation 'com.github.green-solver:green:0.2.0'
     implementation 'commons-math:commons-math:1.2'
     implementation 'commons-lang:commons-lang:2.4'
     implementation 'org.choco-solver:choco-solver:4.10.4'
