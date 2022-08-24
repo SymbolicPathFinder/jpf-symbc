@@ -146,7 +146,7 @@ Then, use the git command `clone` to check out your forked repository in your lo
 
 
 ~~~~~~~~ {.bash}
-> cd ~/projects
+> cd ~/SPF
 
 > git clone --recurse-submodules https://github.com/gaurangkudale/SPF.git -b main-gk
 Cloning into 'SPF'...
