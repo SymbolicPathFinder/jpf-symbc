@@ -134,6 +134,14 @@ class Manager extends TranslationManager {
 				return "(or (not (= (str.to_int " + in_str + ") -1)) (and (= (str.at "+ in_str +" 0) \"-\") (not (= (str.to_int (str.substr " + in_str + " 1 (str.len " + in_str + "))) -1))))";
 			};
 
+			final Function<String, Function<StringConstraint, String>> RightLeftTemplate = (prefix) -> {
+				return (expr) -> {
+					final String right = manager.strExpr.collect((StringExpression) expr.getRight());
+					final String left = manager.strExpr.collect((StringExpression) expr.getLeft());
+					return prefix + " " + right + " " + left + ")";
+				};
+			};
+
 			map(StringComparator.CONTAINS, "(str.contains");
 			map(StringComparator.NOTCONTAINS, "(not (str.contains");
 			map(StringComparator.STARTSWITH, "(str.prefixof");
@@ -167,6 +175,22 @@ class Manager extends TranslationManager {
 
 			rules.put(StringComparator.NOTINTEGER, (x) -> {
 				return "(not " + IsInteger.apply(x) + ")";
+			});
+
+			rules.put(StringComparator.STARTSWITH, (x) -> {
+				return RightLeftTemplate.apply("(str.prefixof").apply(x);
+			});
+
+			rules.put(StringComparator.NOTSTARTSWITH, (x) -> {
+				return "(not " + RightLeftTemplate.apply("(str.prefixof").apply(x) + ")";
+			});
+
+			rules.put(StringComparator.ENDSWITH, (x) -> {
+				return RightLeftTemplate.apply("(str.suffixof").apply(x);
+			});
+
+			rules.put(StringComparator.NOTENDSWITH, (x) -> {
+				return "(not " + RightLeftTemplate.apply("(str.suffixof").apply(x) + ")";
 			});
 		}
 	}
