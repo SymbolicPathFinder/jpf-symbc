@@ -31,6 +31,7 @@ sourcepath=${jpf-symbc}/src/examples
 #symbolic.method = E5.testValueOfInt(sym)
 #symbolic.method = E5.testValueOfChar(sym)
 #symbolic.method = E5.testToCharArray(sym)
+#symbolic.method = E5.testTrim(sym)
 
 symbolic.min_int=-100
 symbolic.max_int=100

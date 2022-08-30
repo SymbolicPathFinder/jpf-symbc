@@ -7,6 +7,7 @@ public class E5 {
 		String r2 = "BA";
 		String r5 = "aa";
 		String r = "abc";
+		testTrim(" 123abc ");
 		strEx(r1,r2);
 		strEx1(r1,r2);
 		strEx2(r5);
@@ -315,5 +316,12 @@ public class E5 {
 		}
 	}
 
+	public static void testTrim(String str){
+		if(str.startsWith(" ") && str.trim().equals("123abc")){
+			// true branch
+		}else{
+			// false (error) branch
+		}
+	}
 
 }
