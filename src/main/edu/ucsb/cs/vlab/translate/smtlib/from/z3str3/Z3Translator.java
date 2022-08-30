@@ -32,6 +32,7 @@ import gov.nasa.jpf.symbc.string.SymbolicLastIndexOfChar2Integer;
 import gov.nasa.jpf.symbc.string.SymbolicLastIndexOfCharInteger;
 import gov.nasa.jpf.symbc.string.SymbolicLastIndexOfInteger;
 import gov.nasa.jpf.symbc.string.SymbolicLengthInteger;
+import gov.nasa.jpf.symbc.string.StringConstraint;
 
 class Manager extends TranslationManager {
 
@@ -128,6 +129,11 @@ class Manager extends TranslationManager {
 		}
 
 		public void init() {
+			final Function<StringConstraint, String> IsInteger = (x) -> {
+				final String in_str = manager.strExpr.collect((StringExpression) x.getRight());
+				return "(or (not (= (str.to_int " + in_str + ") -1)) (and (= (str.at "+ in_str +" 0) \"-\") (not (= (str.to_int (str.substr " + in_str + " 1 (str.len " + in_str + "))) -1))))";
+			};
+
 			map(StringComparator.CONTAINS, "(str.contains");
 			map(StringComparator.NOTCONTAINS, "(not (str.contains");
 			map(StringComparator.STARTSWITH, "(str.prefixof");
@@ -154,6 +160,14 @@ class Manager extends TranslationManager {
 			map(StringComparator.NOTLONG, "(not (isLong");
 			map(StringComparator.NOTDOUBLE, "(not (isDouble");
 			map(StringComparator.NOTBOOLEAN, "(not (isBoolean");
+
+			rules.put(StringComparator.ISINTEGER, (x) -> {
+				return IsInteger.apply(x);
+			});
+
+			rules.put(StringComparator.NOTINTEGER, (x) -> {
+				return "(not " + IsInteger.apply(x) + ")";
+			});
 		}
 	}
 
