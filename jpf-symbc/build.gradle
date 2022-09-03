@@ -31,7 +31,7 @@ apply from: "gradle/build-resources.gradle"
 
 dependencies {
 
-    //implementation project(':jpf-core')
+    // Path of jpf-core build directory is declared as a dependencies for jpf-symbc (Line 35-37)
     def jpfLibs = fileTree("${project(':jpf-core').buildDir}") { include '*.jar' }
     def extLibs = fileTree(dir: 'lib', include: ['*.jar'])
     def libs = extLibs + jpfLibs
