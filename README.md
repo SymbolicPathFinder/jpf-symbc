@@ -1,15 +1,14 @@
-# Symbolic PathFinder SPF
+# Symbolic PathFinder (SPF)
 ![build main-gk](https://github.com/gaurangkudale/SPF/actions/workflows/main.yml/badge.svg)
 
 This JPF extension provides symbolic execution for Java bytecode. It performs a non-standard interpretation of byte-codes. It allows symbolic execution on methods with arguments of basic types (int, long, double, boolean, etc.). It also supports symbolic strings, arrays, and user-defined data structures.
-***
 
-* ## General Information about SPF
+## General Information about SPF
 All the latest developments, changes, documentation can be found on our
 [wiki](https://github.com/SymbolicPathFinder/jpf-symbc/wiki) page.
 
 
-* ## Directory Structure of SPF
+## Directory Structure of SPF
 **The current directory structure is as follow.**
 
 ```{bash}
@@ -18,27 +17,22 @@ All the latest developments, changes, documentation can be found on our
         ---| jpf-symbc (Gradle Sub-Project)
 ```
 
-As of Augest 2022, we are migrating our build workflow to `Gradle`, While migrating the SPF to `Gradle` we have introduced `Gradle Multi-Project build` and `GitHub Submodule` to the SPF.
+As of Augest 2022, we are migrating our build workflow to `Gradle`. While migrating the SPF to `Gradle` we have introduced `Gradle Multi-Project build` and `GitHub Submodule` to SPF.
 
-* `Gradle Multi-Project Build :-` A multi-project build in Gradle consists of one root project, and one or more subprojects. In our case `jpf-core` and `jpf-symbc` are two subprojects.
- The more information about gradle multi-project build can be found at official documentation of 
- [Gradle Multi-Project Build](https://docs.gradle.org/current/userguide/multi_project_builds.html) page.
+* **Gradle Multi-Project Build:** A multi-project build in Gradle consists of one root project, and one or more subprojects. In our case, `jpf-core` and `jpf-symbc` are two subprojects. More information can be found at the official documentation of [Gradle Multi-Project Build](https://docs.gradle.org/current/userguide/multi_project_builds.html).
  
- * `Git-Submodule :-` Git submodules allow you to keep a git repository as a subdirectory of another git repository. Git submodules are simply a reference to another repository at a particular snapshot in time. Git submodules enable a Git repository  to incorporate and track version history of external code. Git submodules are a powerful way to leverage git as an external dependency management tool.
- The more information about Git-Submodule can be found at official documentation of
- [Git-Submodule](https://git-scm.com/docs/git-submodule) page.
- ***
+* **Git-Submodule:** Git submodules allow you to keep a Git repository as a subdirectory of another Git repository. Git submodules are simply a reference to another repository at a particular snapshot in time. Git submodules enable a Git repository  to incorporate and track version history of external code. Git submodules are a powerful way to leverage Git as an external dependency management tool. More information can be found in its official documentation of [Git-Submodule](https://git-scm.com/docs/git-submodule).
  
  
- * ## Building and Installing
+# Building and Installing
  
- Instructions for installing and running SPF, please look at the following guide.
+Please find below detailed instructions for installing and running SPF.
  
- <details close>
- <summary> <b> Step : 1 Click Here for System Requirments </b></summary>
- SPF is a pure Java Application, The minimal version is Java SE 8. We generally advise using the latest stable Java version 8 that is available for your platform.
+<details close>
+<summary><h2>Step 1: System Requirments</h2></summary>
+SPF is a pure Java Application, The minimal version is Java SE 8. We generally advise using the latest stable Java version 8 that is available for your platform.
  
- You can find out about your java by running the following statement from the command line.
+You can determine your Java version by executing the following statement in the command line.
 
 ~~~~~~~~ {.bash}
 > java -version
@@ -48,27 +42,26 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.341-b10, mixed mode)
 ...
 ~~~~~~~~
 
-* ### Java specifics for Windows ###
+### Java specifics for Windows
 Make sure you have the JDK installed, otherwise there is no javac compiler available.
 
 In order to build JPF from a Windows Command Prompt, you have to set the `JAVA_HOME` environment variable. 
 
-* ### Java specifics for OS X ###
-On Mac OS X 10.10, Java 1.7 is default, but `/Applications/Utilities/Java Preferences.app` can change the setting. In some cases, it may be necessary to manually change the symlink that determines which version is default:
+### Java specifics for OS X
+On Mac OS X 10.10, Java 1.7 is the default, but `/Applications/Utilities/Java Preferences.app` can change the setting. In some cases, it may be necessary to manually change the symlink that determines which version is default:
 
 ~~~~~~~~ {.bash}
 sudo rm /System/Library/Frameworks/JavaVM.framework/Versions/Current
 sudo ln -s 1.8 /System/Library/Frameworks/JavaVM.framework/Versions/Current
 ~~~~~~~~
 
-* ## Gradle (Build Automation Tool) ##
+### Gradle (Build Automation Tool)
 
-* To download the Gradle version 6.9 from [ClickHere](https://gradle.org/next-steps/?version=6.9&format=bin)
+Make sure that you use [Gradle version 6.9](https://gradle.org/next-steps/?version=6.9&format=bin)!
 
-If you want to build the SPF source repositories, you need to install the Gradle,
-[click Here for Step by step installation guide for Gradle](https://docs.gradle.org/6.9/userguide/installation.html) 
+If you want to build the SPF source repositories, you need to install the Gradle. Please follow the [step by step installation guide for Gradle](https://docs.gradle.org/6.9/userguide/installation.html).
 
-You can check if you have Gradle version 6.9 on your machine with the following command:
+You can check your Gradle version by executing the following command in the command line:
 
 ```{bash}
 > gradle -version
@@ -86,36 +79,17 @@ JVM:          1.8.0_341 (Oracle Corporation 25.341-b10)
 OS:           Windows 11 10.0 amd64
 ```
 
-**Note : Please use Gradle version 6.9 which is supported for SPF**
-
 If you are new to Gradle, check the [official website](https://docs.gradle.org/6.9/userguide/userguide.html) to learn the basics.
-Note that all major IDEs (e.g., Netbeans, Eclipse, IntelliJ) comes with Gradle support by default.
-
-
-
-* ## Git (Version Control System) ##
-
-If you want to download the JPF source repositories, you need to install the [Git](https://git-scm.com/downloads) distributed version control system on your machine. Most Unix platforms come with Git installed. You can check if you have Git on your machine with the following command:
-
-```{bash}
-> git --version
-```
-
-If you are new to Git, check the [official website](https://git-scm.com/) to learn the basics. You can also find some GUI Clients for different platforms.
-Note that all major IDEs (e.g., Netbeans, Eclipse, IntelliJ) comes with Git support by default.
-
-For more information about Git and how to use it to clone the repository, refer to the [Downloading Sources](https://github.com/javapathfinder/jpf-core/wiki/Downloading-sources) page.
-***
-
-
+Note that all major IDEs (e.g., Netbeans, Eclipse, IntelliJ) come with Gradle support by default.
 </details>
+
 <details close>
-<summary> <b> Step 2 : Downloading sources from the GitHub repositories </b> </summary>
-SPF sources are kept as https://github.com/SymbolicPathFinder repositories on GitHub within the [Symbolic PathFinder](https://github.com/SymbolicPathFinder). You need to clone the repository (e.g. https://github.com/gaurangkudale/SPF/tree/main-gk) that you are interested in.
+<summary><h2>Step 2: Downloading sources from the GitHub repository</h2></summary>
+SPF sources are kept as https://github.com/SymbolicPathFinder repositories on GitHub within the [Symbolic PathFinder](https://github.com/SymbolicPathFinder) organization. You need to clone the repository (e.g. https://github.com/gaurangkudale/SPF/tree/main-gk) that you are interested in.
 
 There are two stable branches in our repository:
 1. `java-8-ant`: It provides Java 8 support using the Ant Build system.
-2. `master`: Contains the latest stable version of our repository. In this version of SPF, We have introduced jpf-core as a git-submodule
+2. `master`: Contains the latest stable version of our repository. In this version of SPF, we have introduced jpf-core as a git-submodule.
 
 If you want to keep using Ant, consider using the `java-8-ant` branch. The branch `master` will drop Ant support to switch to Gradle.
 
@@ -126,8 +100,7 @@ We also encourage you to check the following GitHub guides to familiarize yourse
 1. [Fork a Repo](https://help.github.com/articles/fork-a-repo/)
 2. [About Pull Requests](https://help.github.com/articles/about-pull-requests/)
 
-* ## Command Line Access ##
-
+### Command Line Access
 
 #### Getting the source files
 
@@ -167,7 +140,7 @@ Receiving objects: 100% (3873/3873), 2.26 MiB | 1002.00 KiB/s, done.
 Resolving deltas: 100% (1868/1868), done.
 ~~~~~~~~
 
-* #### Synchronizing your forked repository with our main repository
+### Synchronizing your forked repository with our main repository
 
 When you have a forked repository, it will not update git-submodule automatically when the original repository updates.
 To keep your forked repository synchronized, proceed with the following steps:
@@ -195,7 +168,7 @@ Now, your local repostory is synchronized, but you need to update your remote (f
 > git push origin master
 ~~~~~~~~
 
-4. To update git sub-module use following command:
+4. To update git sub-module use the following command:
 
 ~~~~~~~~ {.bash}
 >  git submodule update --init --recursive
@@ -209,11 +182,11 @@ If you want to contribute to the project, you must make changes in your local re
 
 </details>
 <details close>
-<summary> <b> Step 3 : Building, Testing, Runing </b> </summary>
+<summary><h2>Step 3: Building, Testing, Running</h2></summary>
 
-## Building SPF
+### Building SPF
 
-### Using the command line
+#### Using the command line
 
 The SPF repository includes a Gradle wrapper that requires nothing except Java to execute. It ensures that all JPF developers and environments use the same builder to avoid any kind of configuration issue.
 Note that we assume that `./gradle` is used below, which installs a local copy of version 6.9. If you use your own version of Gradle, make sure it is version 6.9 or below.
@@ -274,9 +247,9 @@ Verification tasks
 > gradle :jpf-symbc:test - Runs core regression tests.
 ```
 
-## Running SPF ##
+### Running SPF
 
-### Using the command line ###
+#### Using the command line
 
 ~~~~~~~~ {.bash}
 > cd SPF
