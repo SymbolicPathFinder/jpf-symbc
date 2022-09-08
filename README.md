@@ -249,17 +249,68 @@ Verification tasks
 
 ### Running SPF
 
-#### Using the command line
+#### Run Simple Example from the command line
+Inside the jpf-symbc folder, run the following command:
+
 
 ~~~~~~~~ {.bash}
 > cd SPF
-> 
-** NOTE : ADD EXAMPLE **
+> cd jpf-symbc
+> java -Xmx1024m -ea -jar ../jpf-core/build/RunJPF.jar src/examples/demo/StringExample.jpf
+symbolic.min_int=-2147483648
+symbolic.min_long=-9223372036854775808
+symbolic.min_short=-32768
+symbolic.min_byte=-128
+symbolic.min_char=0
+symbolic.max_int=2147483647
+symbolic.max_long=9223372036854775807
+symbolic.max_short=32767
+symbolic.max_byte=127
+symbolic.max_char=65535
+symbolic.min_double=4.9E-324
+symbolic.max_double=1.7976931348623157E308
+JavaPathfinder core system v8.0 (rev 643cf6064f1906cde3e1b5f92d83f3695332f4f8) - (C) 2005-2014 United States Government. All rights reserved.
+
+
+====================================================== system under test
+demo.StringExample.main()
+
+====================================================== search started: 8/9/22 1:02 PM
+start
+end
+
+====================================================== Method Sequences
+
+====================================================== JUnit 4.0 test class
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
+public class demo_StringExampleTest {
+
+        private demo.StringExample demo_stringexample;
+
+        @Before
+        public void setUp() throws Exception {
+                demo_stringexample = new demo.StringExample();
+        }
+}
+
+====================================================== results
+no errors detected
+
+====================================================== statistics
+elapsed time:       00:00:00
+states:             new=2,visited=0,backtracked=2,end=1
+search:             maxDepth=2,constraints=0
+choice generators:  thread=1 (signal=0,lock=1,sharedRef=0,threadApi=0,reschedule=0), data=1
+heap:               new=456,released=13,maxLive=450,gcCycles=2
+instructions:       6403
+max memory:         236MB
+loaded code:        classes=81,methods=1619
+
+====================================================== search finished: 8/9/22 1:02 PM
 ~~~~~~~~
-
-
-
-
 
 
 
