@@ -43,7 +43,8 @@ public class Translator<Manager extends TranslationManager> {
 		final String assertions = Arrays.asList(
 			additional_assertions.stream().collect(Collectors.joining("\n")),
 		        manager.strCons.collect(strc),
-		        manager.numCons.collect(npc)
+		        manager.numCons.collect(npc),
+				Results.constraints.stream().collect(Collectors.joining("\n"))
 		).stream().collect(Collectors.joining("\n"));
 
 		// pull out the declarations

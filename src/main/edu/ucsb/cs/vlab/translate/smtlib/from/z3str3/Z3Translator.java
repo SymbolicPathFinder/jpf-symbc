@@ -262,7 +262,18 @@ class Manager extends TranslationManager {
 			map(StringOrOperation.REPLACEALL, ReplaceTemplate.apply("(replaceAll"));
 			map(StringOrOperation.REPLACEFIRST, ReplaceTemplate.apply("(replaceFirst"));
 
-			map(StringOrOperation.TRIM, RightTemplate.apply("(trim"));
+			map(StringOrOperation.TRIM, (expr) -> {
+				final DerivedStringExpression dse = (DerivedStringExpression) expr;
+				final String in_str = manager.strExpr.collect(dse.right);
+				String arg = "out_str";
+				Results.stringVariables.add("out_str");
+				Results.constraints.add("(declare-const ws RegLan)");
+				Results.constraints.add("(declare-const nwc RegLan)");
+				Results.constraints.add("(assert (= ws (re.union (re.+ (re.range (str.from_code 0) (str.from_code 32))) (str.to_re \"\"))))");
+				Results.constraints.add("(assert (= nwc (re.diff re.allchar (re.range (str.from_code 0) (str.from_code 32)))))");
+				Results.constraints.add("(assert (and (str.in_re " + in_str + " (re.++ ws (str.to_re out_str) ws)) (or (= out_str \"\")(and (str.in_re out_str (re.++ nwc re.all)) (str.in_re out_str (re.++ re.all nwc))))))");
+				return arg;
+			});
 			map(StringOrOperation.TOLOWERCASE, RightTemplate.apply("(toLowerCase"));
 			map(StringOrOperation.TOUPPERCASE, RightTemplate.apply("(toUpperCase"));
 
