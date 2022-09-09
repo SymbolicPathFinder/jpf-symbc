@@ -1584,9 +1584,11 @@ public class SymbolicStringHandler {
 				if (!pc.simplify()) {// not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
-					throw new RuntimeException("ERROR: Integer Format Type Exception");
-					//th.getVM().getSystemState().setIgnored(true);TODO: needs revision
-					//sf.push(0, true);
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+					th.createAndThrowException("java.lang.NumberFormatException");
+//					throw new RuntimeException("ERROR: Integer Format Type Exception");
+//					//th.getVM().getSystemState().setIgnored(true);TODO: needs revision
+//					//sf.push(0, true);
 				}
 			}
 		}
