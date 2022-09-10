@@ -289,7 +289,19 @@ class Manager extends TranslationManager {
 							arg = "(str.from_code " + manager.numExpr.collect((IntegerExpression) dse.oprlist[0]) + ")";
 						else
 							arg = ValueOfInt.apply(expr);
-					} else
+					}
+					else if(dse.oprlist[0] instanceof SymbolicCharAtInteger){
+						arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
+					}
+					else if (dse.oprlist[0] instanceof BinaryLinearIntegerExpression){
+						BinaryLinearIntegerExpression op = (BinaryLinearIntegerExpression)dse.oprlist[0];
+						if(op.getOp().name().equals("AND") && (op.getLeft() instanceof SymbolicCharAtInteger || op.getRight() instanceof SymbolicCharAtInteger)){
+							arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
+						}
+						else
+							arg = ValueOfInt.apply(expr);
+					}
+					else
 						arg = ValueOfInt.apply(expr);
 				}
 

@@ -30,6 +30,9 @@ Based on the result running examples in [src/examples/strings](../src/examples/s
 `valueOf(char)` is modeled by `str.from_code`.
 To model `valueOf(int)`, the input integer is converted to its absolute value, and then converted to string by str.from_int.  
 
+Note: SPF sometimes cannot tell whether the `valueOf()` function should be modeled as `valueOf(char)` or `valueOf(Int)`.
+Add more pattern checking on demand.
+
 Integer `AND`, `ParseInt()` and `trim()` are partially supported due to limited time.
 We discuss what already works and what left unfinished.
 
