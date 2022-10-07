@@ -5,7 +5,7 @@ import gov.nasa.jpf.symbc.Debug;
 public class IndexOfTest {
 
 	public static void main(String [] args){
-//		test("");
+		//test("");
 		test2("");
 	}
 	

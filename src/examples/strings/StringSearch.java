@@ -2,8 +2,13 @@ package strings;
 
 public class StringSearch {
 	public static void main (String [] args) {
-		String haystack = "test: This is a tttest haystack string for testing.";	
+		String haystack = "test: This is a tttest haystack string for testing.";
+		String str = "114514";
 		System.out.println(search_1("<script", haystack));
+		System.out.println(search_2("ab", haystack));
+		System.out.println(search_3(58, haystack));
+		System.out.println(search_4("t", haystack));
+		System.out.println(search_5("a", str));
 	}
 	
 	public static int search_1(String needle, String haystack) {

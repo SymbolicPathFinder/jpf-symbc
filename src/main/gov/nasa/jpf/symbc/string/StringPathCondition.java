@@ -150,6 +150,10 @@ public class StringPathCondition {
 	    return "SPC # = " + count + ((header == null) ? "" : "\n" + header.stringPC()) +"\n"
 	    		+ "NPC "+npc.stringPC();
 	  }
+	  
+	  public String stringSPC() {
+		    return header.stringPC();
+		  }
 
 	  public String toString() {
 	    return "SPC # = " + count + ((header == null) ? "" : "\n" + header.toString()) +"\n"

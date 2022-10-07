@@ -1,0 +1,15 @@
+target=strings.MasterMind
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.strings = true
+symbolic.dp=z3
+symbolic.string_dp=z3str3
+symbolic.string_dp_timeout_ms=3000
+symbolic.debug=true
+
+symbolic.method= strings.MasterMind.guessCode(sym#conc)
+search.depth_limit = 20
+search.multiple_errors=true
+listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+vm.storage.class=nil

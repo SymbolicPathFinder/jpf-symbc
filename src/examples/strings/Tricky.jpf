@@ -15,19 +15,25 @@ sourcepath=${jpf-symbc}/src/examples
 
 # in this particular configuration all the input
 # parameters to methods test2 and test are symbolic
-symbolic.dp=coral
+#symbolic.dp=coral
+#symbolic.dp=choco
+symbolic.dp=z3
 
 # settings for the symbolic string support, either
 # "none" (default), "cvc", "automata" (recommended) or
 # "sat". At the moment symbolic.dp must be equal to
 # "choco" for it to work.
-symbolic.string_dp=z3str2
+symbolic.string_dp=z3str3
+symbolic.strings=true
+symbolic.debug=true
+#symbolic.string_dp=ABC
 # As a side note for eclipse users, to run cvc3
 # enabled programs, the eclipse plugin which allows
 # you to right click on a .jpf test file and click
 # "Verify..." does not work. In order to run cvc3
 # you need to go through "Run Configuration"
 
+symbolic.min_int=2
 symbolic.method= strings.Tricky.test(sym)
 
 listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener

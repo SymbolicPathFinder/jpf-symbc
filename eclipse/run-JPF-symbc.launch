@@ -24,5 +24,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gov.nasa.jpf.tool.RunJPF"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="&quot;${resource_loc}&quot;"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jpf-symbc"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024m -ea"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx2048m -ea -Djava.library.path=&quot;/usr/local/lib&quot;"/>
 </launchConfiguration>

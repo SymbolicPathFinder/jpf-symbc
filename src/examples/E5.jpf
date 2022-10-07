@@ -1,0 +1,73 @@
+target=E5
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+#symbolic.method = E5.strEx(sym#sym)
+#symbolic.method = E5.strEx1(sym#sym)
+#symbolic.method = E5.strEx2(sym)
+#symbolic.method = E5.strEx3(sym)
+#symbolic.method = E5.strEx4(sym)
+#symbolic.method = E5.strEx6(sym)
+#symbolic.method = E5.strEx7(sym)
+#symbolic.method = E5.strEx8(sym)
+#symbolic.method = E5.testStarsEndsWith(sym)
+#symbolic.method = E5.testIndexOf(sym)
+#symbolic.method = E5.testLength(sym)
+#symbolic.method = E5.testReplace(sym)
+#symbolic.method = E5.testEmptyCharAt(sym)
+#symbolic.method = E5.testCharAt(sym)
+#symbolic.method = E5.testCompareTo(sym)
+#symbolic.method = E5.testJoin(sym#sym)
+#symbolic.method = E5.testIsEmpty(sym)
+#symbolic.method = E5.testStringBuilder(sym)
+#symbolic.method = E5.testSplit(sym)
+#symbolic.method = E5.testEqualsIgnoreCase(sym)
+#symbolic.method = E5.testToLowerCase(sym)
+#symbolic.method = E5.testFormat(sym)
+#symbolic.method = E5.testGetBytes(sym)
+#symbolic.method = E5.testGetChars(sym)
+#symbolic.method = E5.testLastIndexOf(sym)
+#symbolic.method = E5.testIntern(sym)
+#symbolic.method = E5.testValueOfInt(sym)
+#symbolic.method = E5.testValueOfChar(sym)
+#symbolic.method = E5.testToCharArray(sym)
+#symbolic.method = E5.testTrim(sym)
+
+symbolic.min_int=-100
+symbolic.max_int=100
+
+
+symbolic.dp=z3
+#symbolic.dp=choco
+
+symbolic.strings=true
+
+symbolic.string_dp=z3str3
+#symbolic.string_dp=cvc
+
+#symbolic.string_dp=igen
+symbolic.string_dp_upper=2
+symbolic.string_dp_lower=1
+symbolic.string_dp_alphaSize=6
+symbolic.string_dp_alpha=A,B,C,a,b,c
+
+symbolic.string_dp_timeout_ms=3000
+symbolic.debug=true
+
+
+#vm.storage.class=nil
+
+#listener = .symbc.SymbolicListener
+
+#listener = .listener.ChoiceTracker
+#choice.trace=test.trc
+#choice.class=E5
+
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+
+#listener=gov.nasa.jpf.listener.CoverageAnalyzer
+
+listener = gov.nasa.jpf.symbc.HeuristicListener
+# these two are exclusive of one another.
+#symbolic.heuristicRandom=true
+#symbolic.heuristicPartition=true
