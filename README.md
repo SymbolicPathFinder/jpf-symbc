@@ -4,11 +4,13 @@
 This JPF extension provides symbolic execution for Java bytecode. It performs a non-standard interpretation of byte-codes. It allows symbolic execution on methods with arguments of basic types (int, long, double, boolean, etc.). It also supports symbolic strings, arrays, and user-defined data structures.
 
 <br>
+
 ## General Information about SPF
 All the latest developments, changes, documentation can be found on our
 [wiki](https://github.com/SymbolicPathFinder/jpf-symbc/wiki) page.
 
 <br>
+
 ## Directory Structure of SPF
 **The current directory structure is as follow.**
 
@@ -25,6 +27,7 @@ As of August 2022, we migrated our build workflow to `Gradle`. While migrating t
 * **Git-Submodule:** Git submodules allow you to keep a Git repository as a subdirectory of another Git repository. Git submodules are simply a reference to another repository at a particular snapshot in time. Git submodules enable a Git repository  to incorporate and track version history of external code. Git submodules are a powerful way to leverage Git as an external dependency management tool. More information can be found in its official documentation of [Git-Submodule](https://git-scm.com/docs/git-submodule).
  
 <br>
+
 ## Quick Start Guide
 
 SPF requires: **Java 8** and **Gradle 6.9**.
@@ -292,6 +295,7 @@ loaded code:        classes=85,methods=1648
 TODO -->
 
 <br>
+
 ## Detailed Instructions and Suggestions
  
 Please find below detailed instructions for installing and running SPF.
