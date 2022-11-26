@@ -46,4 +46,5 @@ extensions=${jpf-core},${jpf-symbc}
 You can then try to run some examples by selecting a .jpf file from the "examples" directory and then selecting a run configuration from the "Run" menu in Eclipse. 
 In particular you should select: "run-JPF-symbc" to run Symbolic PathFinder on your example; configuration "run-JPF-symbc-mac" is tailored for Mac; for Windows please change the environment variable in the run configuration to PATH; it should point to the lib directory in your jpf-symbc project.
 
-Good luck!
+
+<b><i>Note that we currently work on changing the build system of SPF to Gradle. In the meantime, check our [blog post](https://yannicnoller.notion.site/Symbolic-PathFinder-Setup-47fe784d81614f98b4525f260618fa35) with some instructions and relevant notes for building with Ant.</i></b>
