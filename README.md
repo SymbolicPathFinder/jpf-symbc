@@ -1,5 +1,5 @@
 # Symbolic PathFinder (SPF)
-![build main-gk](https://github.com/gaurangkudale/SPF/actions/workflows/main.yml/badge.svg)
+![build SPF](https://github.com/gaurangkudale/SPF/actions/workflows/main.yml/badge.svg)
 
 This JPF extension provides symbolic execution for Java bytecode. It performs a non-standard interpretation of byte-codes. It allows symbolic execution on methods with arguments of basic types (int, long, double, boolean, etc.). It also supports symbolic strings, arrays, and user-defined data structures.
 
