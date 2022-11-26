@@ -296,9 +296,8 @@ TODO -->
 Please find below detailed instructions for installing and running SPF.
  
 <details>
-<summary><h2>System Requirments</h2></summary>
+<summary><h2>System Requirements</h2></summary>
 SPF is a pure Java Application and the minimal version is Java SE 8. We generally advise using the latest stable Java version 8 that is available for your platform.
- 
 You can determine your Java version by executing the following statement in the command line.
 
 ~~~~~~~~ {.bash}
@@ -389,7 +388,7 @@ Submodule path 'jpf-core': checked out '45a4450cd0bd1193df5419f7c9d9b89807d00db6
 <details>
 <summary><h2>Building, Testing, Running</h2></summary>
 
-### Building SPF using the command line
+### Building SPF using the Command Line
 
 Requirements: **Java 8** and **Gradle 6.9**.
 
@@ -678,7 +677,7 @@ BUILD SUCCESSFUL in 21s
 ```
 </details>
 
-### Step 4: Run Simple Example from the command line
+### Step 4: Run Simple Example from the Command Line
 *Inside the jpf-symbc folder, run the following command:*
 
 ```{bash}
@@ -778,7 +777,10 @@ Then, the execution of:
 
 `java -Xmx1024m -ea -jar ../jpf-core/build/RunJPF.jar ./src/examples/demo/NumericExample.jpf`
 
-will result in an **error**:
+will result in an **error**: `java.lang.UnsatisfiedLinkError: no libz3java in java.library.path`
+
+<details>
+<summary>Full Error Stack Trace</summary>
 
 ```bash
 java.lang.UnsatisfiedLinkError: no libz3java in java.library.path
@@ -809,6 +811,7 @@ java.lang.UnsatisfiedLinkError: no libz3java in java.library.path
 	at gov.nasa.jpf.tool.Run.call(Run.java:80)
 	at gov.nasa.jpf.tool.RunJPF.main(RunJPF.java:116)
 ```
+</details>
 
 #### → Solution: Set the right java library path to the lib folder where the z3 native libraries are located
 
@@ -831,7 +834,7 @@ DYLD_LIBRARY_PATH=/Users/yannic/repositories/jpf-symbc/lib/ \
 ```
 
 <details>
-<summary>Successfull Console Output</summary>
+<summary>Successful Console Output</summary>
     
 ```{bash}
 yannic@Yannics-MacBook-Pro jpf-symbc % DYLD_LIBRARY_PATH=/Users/yannic/repositories/jpf-symbc/lib/ \
