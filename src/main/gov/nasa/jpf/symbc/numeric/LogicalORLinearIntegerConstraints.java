@@ -91,4 +91,11 @@ public class LogicalORLinearIntegerConstraints extends Constraint{
 		}
 		return true;
 	}
+	
+	public boolean accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 }

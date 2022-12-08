@@ -770,4 +770,9 @@ public class ProblemCoral extends ProblemGeneral {
 		return null;
 	}
 	
+	@Override
+	public boolean isNonLinearSolver() {
+		return true;
+	}
+	
 }

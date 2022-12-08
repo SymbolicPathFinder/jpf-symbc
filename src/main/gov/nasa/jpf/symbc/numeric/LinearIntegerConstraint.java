@@ -61,5 +61,14 @@ public class LinearIntegerConstraint extends Constraint {
     @Override
     public LinearIntegerConstraint not() {
         return new LinearIntegerConstraint(getLeft(), getComparator().not(), getRight());
-    }    
+    }
+
+    //Carson Smith
+    @Override
+    public boolean accept(ConstraintExpressionVisitor2 visitor) {
+    	visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 }

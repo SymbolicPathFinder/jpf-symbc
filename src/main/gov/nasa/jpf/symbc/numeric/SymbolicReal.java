@@ -174,6 +174,14 @@ public class SymbolicReal extends RealExpression {
 		visitor.preVisit(this);
 		visitor.postVisit(this);
 	}
+	
+	@Override
+	public Object accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 
 	@Override
 	public int compareTo(Expression expr) {

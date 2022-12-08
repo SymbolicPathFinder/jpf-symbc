@@ -54,6 +54,7 @@ import java.util.Map;
 
 
 import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
+import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor2;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.Expression;
@@ -114,5 +115,10 @@ public class SpecialRealExpression extends RealExpression {
 			} else {
 				return getClass().getCanonicalName().compareTo(expr.getClass().getCanonicalName());
 			}
+		}
+
+		@Override
+		public Object accept(ConstraintExpressionVisitor2 visitor) {
+			throw new RuntimeException("This isn't a supported expression type for the visitor system.");
 		}
 }

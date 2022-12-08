@@ -1519,4 +1519,9 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
             throw new RuntimeException("## Error Z3 : Exception caught in Z3 JNI: " + e);
         }
     }
+
+    @Override
+	public boolean isNonLinearSolver() {
+		return true; //Returns true as Z3BitVectorIncremental can solve NonLinearIntegerExpressions
+	}
 }

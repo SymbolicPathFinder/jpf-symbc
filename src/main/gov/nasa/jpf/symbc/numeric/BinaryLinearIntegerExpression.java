@@ -59,6 +59,15 @@ public class BinaryLinearIntegerExpression extends LinearIntegerExpression
 		right.accept(visitor);
 		visitor.postVisit(this);
 	}
+	
+	//Carson Smith
+	@Override
+	public Object accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 
 	@Override
 	public int compareTo(Expression expr) {

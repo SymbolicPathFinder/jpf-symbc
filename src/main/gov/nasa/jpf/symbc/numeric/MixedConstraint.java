@@ -61,5 +61,13 @@ public class MixedConstraint extends Constraint {
     @Override
     public MixedConstraint not() {
         return new MixedConstraint(getLeft(), getComparator().not(), getRight());
-    }    
+    }
+
+	@Override
+	public boolean accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 }

@@ -19,6 +19,7 @@
 package gov.nasa.jpf.symbc.arrays;
 
 import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
+import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor2;
 import gov.nasa.jpf.symbc.numeric.Expression;
 import gov.nasa.jpf.symbc.numeric.IntegerConstant;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;

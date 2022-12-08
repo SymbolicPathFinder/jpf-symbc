@@ -39,6 +39,7 @@ package gov.nasa.jpf.symbc.concolic;
 // support for arbitrary external functions
 
 import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
+import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor2;
 import gov.nasa.jpf.symbc.numeric.Expression;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
@@ -203,6 +204,9 @@ public class FunctionExpression extends RealExpression
 		}
 	}
 
-	
+	@Override
+	public Object accept(ConstraintExpressionVisitor2 visitor) {
+		throw new RuntimeException("FunctionExpression - This isn't a supported expression type for the visitor system.");
+	}
 
 }

@@ -237,6 +237,4 @@ public abstract class ConstraintExpressionVisitor {
 	public void postVisit(SymbolicStringBuilder expr) {
 	}
 
-
-
 }

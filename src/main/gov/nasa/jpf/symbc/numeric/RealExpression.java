@@ -106,4 +106,6 @@ public abstract class RealExpression extends Expression {
 		//System.out.println("Expression Solution request Error: " + this);
 		//return -666;
 	}
+
+	public abstract Object accept(ConstraintExpressionVisitor2 visitor);
 }

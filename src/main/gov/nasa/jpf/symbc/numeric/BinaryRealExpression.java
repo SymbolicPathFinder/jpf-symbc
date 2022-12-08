@@ -122,4 +122,12 @@ public class BinaryRealExpression extends RealExpression
 			return getClass().getCanonicalName().compareTo(expr.getClass().getCanonicalName());
 		}
 	}
+
+	@Override
+	public Object accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
 }

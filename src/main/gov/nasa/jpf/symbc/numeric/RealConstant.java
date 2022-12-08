@@ -211,4 +211,12 @@ public class RealConstant extends RealExpression {
 		}
 	}
 
+	@Override
+	public Object accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		Object result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
+
 }

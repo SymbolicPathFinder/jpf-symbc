@@ -1201,4 +1201,9 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
             throw new RuntimeException("## Error Z3 : Exception caught in Z3 JNI: " + e);
         }
     }
+
+    @Override
+	public boolean isNonLinearSolver() {
+		return true; //Returns true as Z3Incremental can solve NonLinearIntegerExpressions
+	}
 }

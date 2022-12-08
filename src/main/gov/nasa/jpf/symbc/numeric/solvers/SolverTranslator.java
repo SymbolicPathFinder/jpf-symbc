@@ -45,7 +45,7 @@ public class SolverTranslator {
 		while (c != null) {
 			Translator translator = new Translator();
 			c.accept(translator);
-
+			
 			Expression tmp = translator.getExpression();
 
 			if (e == null) {

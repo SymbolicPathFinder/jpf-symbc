@@ -922,4 +922,9 @@ public class ProblemZ3Optimize extends ProblemGeneral {
     public void maximize(Object expr) {
         solver.MkMaximize((ArithExpr) expr);
     }
+
+    @Override
+	public boolean isNonLinearSolver() {
+		return true; //Returns true as Z3Optimize can solve NonLinearIntegerExpressions
+	}
 }

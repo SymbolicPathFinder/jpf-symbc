@@ -38,6 +38,7 @@
 package gov.nasa.jpf.symbc.numeric.solvers;
 
 public abstract class ProblemGeneral{
+	
 	public abstract Object makeIntVar(String name, long _min, long _max);
 	public abstract Object makeRealVar(String name, double min, double max);
 
@@ -235,4 +236,16 @@ public abstract class ProblemGeneral{
 	public abstract Object rem(Object exp1, Object exp2) ;
 	public abstract Object rem(long exp1, Object exp2) ;
 	public abstract Object rem(Object exp1, long exp2) ;
+	
+	/**
+	 * Carson Smith - A variable return to see if the solver supports non-linear solving.
+	 * For the sake of avoiding having to implement a method returning false in the vast majority
+	 * of solvers, I didn't make this method abstract. It can be changed to an abstract method later
+	 * if needed.
+	 * 
+	 * @return - boolean based on whether the solver type can solve NonLinearIntegerConstraints
+	 */
+	public boolean isNonLinearSolver() {
+	  return false; //Returns false as a default.
+	}
 }

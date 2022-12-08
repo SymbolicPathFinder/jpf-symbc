@@ -61,5 +61,14 @@ public class RealConstraint extends Constraint {
     @Override
     public RealConstraint not() {
         return new RealConstraint(getLeft(), getComparator().not(), getRight());
-    }    
+    }
+    
+    @Override
+    public boolean accept(ConstraintExpressionVisitor2 visitor) {
+		visitor.preVisit(this);
+		boolean result = visitor.visit(this);
+		visitor.postVisit(this);
+		return result;
+	}
+ 
 }

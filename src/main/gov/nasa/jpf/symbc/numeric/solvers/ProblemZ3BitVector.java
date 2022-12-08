@@ -1545,4 +1545,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         // TODO Auto-generated method stub
         throw new RuntimeException("## Error Z3 \n");
     }
+
+    @Override
+	public boolean isNonLinearSolver() {
+		return true; //Returns true as Z3BitVector can solve NonLinearIntegerExpressions
+	}
 }
