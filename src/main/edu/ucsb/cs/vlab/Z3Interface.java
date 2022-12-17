@@ -24,7 +24,7 @@ import java.nio.file.Paths;
 
 import edu.ucsb.cs.vlab.modelling.Output;
 import edu.ucsb.cs.vlab.modelling.Output.Model;
-import edu.ucsb.cs.vlab.versions.Z3StringProcessor;
+import edu.ucsb.cs.vlab.versions.Z3String3Processor;
 
 public class Z3Interface {
 	/**
@@ -99,7 +99,7 @@ public class Z3Interface {
 			public static <Kind extends Processable> Processor create(Class<Kind> processableClass) {
 				try {
 					final Kind processableInstance = processableClass.newInstance();
-					final ProcessLambda process = () -> Runtime.getRuntime().exec(Z3.getInteractive());
+					final ProcessLambda process = () -> Runtime.getRuntime().exec(Z3_3.getInteractive());
 					return new Processor(processableInstance, process);
 				} catch (InstantiationException | IllegalAccessException e) {
 					e.printStackTrace();
@@ -186,7 +186,8 @@ public class Z3Interface {
 	 * @return the processor to use
 	 */
 	public static Z3Interface.Processor create() {
-		return Z3Interface.Processor.Factory.create(Z3StringProcessor.class);
+		return null;
+		//return Z3Interface.Processor.Factory.create(Z3String3Processor.class);
 	}
 
 	public static class ExternalToolException extends RuntimeException {

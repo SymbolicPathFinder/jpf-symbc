@@ -1,0 +1,51 @@
+target=E5
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.method = E5.strEx(sym#sym)
+#symbolic.method = E5.strEx1(sym#sym)
+#symbolic.method = E5.strEx2(sym)
+#symbolic.method = E5.strEx3(sym)
+#symbolic.method = E5.strEx4(sym)
+#symbolic.method = E5.strEx6(sym)
+#symbolic.method = E5.strEx7(sym)
+#symbolic.method = E5.strEx8(sym)
+
+symbolic.min_int=-100
+symbolic.max_int=100
+
+
+#symbolic.dp=z3
+symbolic.dp=choco
+
+symbolic.strings=true
+
+#symbolic.string_dp=z3str2
+#symbolic.string_dp=cvc
+
+symbolic.string_dp=igen
+symbolic.string_dp_upper=2
+symbolic.string_dp_lower=1
+symbolic.string_dp_alphaSize=6
+symbolic.string_dp_alpha=A,B,C,a,b,c
+
+symbolic.string_dp_timeout_ms=3000
+symbolic.debug=false
+
+
+#vm.storage.class=nil
+
+#listener = .symbc.SymbolicListener
+
+#listener = .listener.ChoiceTracker
+#choice.trace=test.trc
+#choice.class=E5
+
+#listener = gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
+
+#listener=gov.nasa.jpf.listener.CoverageAnalyzer
+
+listener = gov.nasa.jpf.symbc.HeuristicListener
+# these two are exclusive of one another.
+#symbolic.heuristicRandom=true
+#symbolic.heuristicPartition=true

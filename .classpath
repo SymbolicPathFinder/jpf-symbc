@@ -36,5 +36,7 @@
 	<classpathentry kind="lib" path="lib/yicesapijava.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/proteus.jar"/>
+	<classpathentry kind="lib" path="lib/inv-solver.jar"/>
+	<classpathentry kind="lib" path="lib/parser.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

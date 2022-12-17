@@ -1,0 +1,6 @@
+domain{
+ x_1_SYMINT:0,10;
+ };
+ usageProfile{
+  x_1_SYMINT>=0:100/100;
+ };

@@ -130,11 +130,17 @@ public class Translator<Manager extends TranslationManager> {
 	}
 
 	public String getFooter() {
+		
 		return "(check-sat)\n(get-model)\n";
 	}
 	
 	public String createSymbolicDeclaration(final Set<String> symbolicVars, String type) {
-		return symbolicVars.parallelStream().map((var) -> "(declare-variable " + var + " " + type + ")")
+		
+		//return symbolicVars.parallelStream().map((var) -> "(declare-variable " + var + " " + type + ")")
+		//		.collect(Collectors.joining("\n"));
+		
+		// MJR 06/25/21 smt-lib 2.5 uses declare-const for variable declarations
+		return symbolicVars.parallelStream().map((var) -> "(declare-const " + var + " " + type + ")")
 				.collect(Collectors.joining("\n"));
 	}
 

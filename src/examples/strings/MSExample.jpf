@@ -28,7 +28,8 @@ symbolic.dp=choco
 # "sat". At the moment symbolic.dp must be equal to
 # "choco" for it to work.
 symbolic.strings=true
-symbolic.string_dp=z3str2
+symbolic.string_dp=z3str3
+#symbolic.string_dp=ABC
 
 #Set the symbolic string executioner timeout (in ms)
 #zero for no timeout.
