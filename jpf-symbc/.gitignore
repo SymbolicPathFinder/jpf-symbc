@@ -76,3 +76,14 @@ out/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
+
+#Jpf jar files
+jpf.jar
+jpf-annotations.jar
+asm-7.1.jar
+classloader_specific_tests.jar
+jpf-classes.jar
+RunJPF.jar
+RunTest.jar
+jpf-core.jar
+*.h
