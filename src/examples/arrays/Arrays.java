@@ -15,9 +15,13 @@ public class Arrays {
     }
     
     public static int check_length(int i, int[] arr) {
+    	arr[0]=0;
         int j = arr.length;
         int a = arr[1];
         int b = 10/j;
+        if(arr[i]>0){
+        	System.out.println("yy");
+        }
         return b;
     }
 
