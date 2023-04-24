@@ -113,7 +113,7 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
                         arrayRef = frame.peek(2);
                         ElementInfo eiArray = ti.getModifiableElementInfo(arrayRef);
                         eiArray.setReferenceElement(currentChoice, value);
-
+                        ((PCChoiceGenerator) cg).setCurrentPC(pc);
                         frame.pop(3); // We pop the array, the object and the index
                         return getNext(ti);
                       } else {
