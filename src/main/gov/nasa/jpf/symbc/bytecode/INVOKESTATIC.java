@@ -39,7 +39,7 @@ public class INVOKESTATIC extends gov.nasa.jpf.jvm.bytecode.INVOKESTATIC {
 
 	    MethodInfo callee = getInvokedMethod(th);
 	    if (callee == null) {
-	      return th.createAndThrowException("java.lang.NoSuchMethodException!!",
+	      return th.createAndThrowException("java.lang.NoSuchMethodException",
 	                                   cname + '.' + mname);
 	    }
         BytecodeUtils.InstructionOrSuper nextInstr = BytecodeUtils.execute(this, th);
