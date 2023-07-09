@@ -39,7 +39,7 @@ public class INVOKESPECIAL extends gov.nasa.jpf.jvm.bytecode.INVOKESPECIAL {
 		MethodInfo mi = getInvokedMethod(th);
 
 	    if (mi == null){
-	      return th.createAndThrowException("java.lang.NoSuchMethodException!*", "Calling " + cname + '.' + mname);
+	      return th.createAndThrowException("java.lang.NoSuchMethodException", "Calling " + cname + '.' + mname);
 	    }
 	    
 		BytecodeUtils.InstructionOrSuper nextInstr = BytecodeUtils.execute(this, th);
