@@ -1,27 +1,23 @@
-FROM openjdk:8u312-jdk
-
-# Install Git
-RUN apt-get update && apt-get install -y git
-
-# Set the working directory
-WORKDIR /app
-
-# Install Gradle
+# Step 1: Base image with Ubuntu
+FROM ubuntu:latest
+# Step 2: Install OpenJDK 8 and Gradle
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get install -y unzip wget && \
+    apt-get clean
+RUN apt-get update && apt-get install -y dos2unix && apt-get clean
+RUN apt-get install -y git
+# Download and install Gradle
 ENV GRADLE_VERSION 6.9
-ENV GRADLE_HOME /opt/gradle
-ENV PATH $PATH:$GRADLE_HOME/bin
-
-RUN wget -q "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -O /tmp/gradle.zip \
-    && unzip -q /tmp/gradle.zip -d /opt \
-    && mv "/opt/gradle-${GRADLE_VERSION}" "$GRADLE_HOME" \
-    && rm /tmp/gradle.zip
-
-# Clone the Git repository
-RUN git clone --recurse-submodules https://github.com/gaurangkudale/SPF.git -b SPF .
-
-# Add any additional setup or configuration steps here
-
-# Run multiple commands using a shell script
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-CMD ["/app/entrypoint.sh"]
+RUN wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip && \
+    unzip -q gradle-${GRADLE_VERSION}-bin.zip -d /opt && \
+    rm gradle-${GRADLE_VERSION}-bin.zip
+ENV GRADLE_HOME=/opt/gradle-${GRADLE_VERSION}
+ENV PATH=${GRADLE_HOME}/bin:${PATH}
+# Step 3: Set the working directory
+WORKDIR /app
+# Step 4: Copy files from the current directory to the working directory
+COPY . .
+RUN dos2unix /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+# Step 5: Run a Bash script
+CMD ["/bin/bash", "entrypoint.sh"]
