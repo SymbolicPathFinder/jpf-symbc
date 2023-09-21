@@ -924,12 +924,13 @@ loaded code:        classes=85,methods=1648
 ### Step 6: Use SPF inside Eclipse
 TODO
 -->
+</details>
+<details>
 <summary><h2>Building, Testing, Running Using Docker</h2></summary>
 
 
-This Dockerfile sets up an Ubuntu-based Docker image with OpenJDK 8, Gradle, dos2unix, and Git installed. It provides a convenient environment for building and running Java projects using Gradle.
-
-## Usage
+This Dockerfile sets up an Ubuntu-based Docker image with OpenJDK 8, Gradle, dos2unix, and Git installed. It provides a convenient environment for building and running SPF projects using Gradle.
+Here is more information about [docker](https://docs.docker.com/get-started/)
 
 ### Building the Docker Image
 
@@ -942,9 +943,9 @@ This Dockerfile sets up an Ubuntu-based Docker image with OpenJDK 8, Gradle, dos
    ```shell
    docker build -t spf:latest .
    ```
-   <summary>Successful Console Output</summary>
+<details>Successful Console Output
     
-```{bash}
+```shell
 C:\Users\gaura\SPF>docker build -t spf:latest .
 [+] Building 6.8s (13/13) FINISHED
  => [internal] load build definition from Dockerfile                                                                                                   0.0s
@@ -969,21 +970,36 @@ C:\Users\gaura\SPF>docker build -t spf:latest .
 
 Use 'docker scan' to run Snyk tests against images to find vulnerabilities and learn how to fix them
 ```
-5. Run the Docker container using the following command:
+  </details>
+4. Run the Docker container in interactive mode using the following command:
+   
    ```shell
-   docker run spf:latest
+       docker run -it spf:latest /bin/bash
    ```
- <summary>Successful Console Output</summary>
- 
+
+5. Execute the shell script (it contains the necessary commands to build SPF)
+
     ```shell
-   		
+    ./entrypoint.sh
+    ```
+  <details>Successful Console Output
+	  
+ ``` shell
+  
+	root@0a40f0e7f184:/app# ./entrypoint.sh
+	Running ls...
+	Dockerfile  README.md  build.gradle  entrypoint.sh  gradle  gradlew  gradlew.bat  jpf-core  jpf-symbc  settings.gradle
+	Running cd jpf-core...
+	./entrypoint.sh: 8: cd: can't cd to pwd
+	Running the Gradle version cmd...
+	
 	Welcome to Gradle 6.9!
 	
 	Here are the highlights of this release:
-	- This is a small backport release.
-	- Java 16 can be used to compile when used with Java toolchains
-	- Dynamic versions can be used within plugin declarations
-	- Native support for Apple Silicon processors
+	 - This is a small backport release.
+	 - Java 16 can be used to compile when used with Java toolchains
+	 - Dynamic versions can be used within plugin declarations
+	 - Native support for Apple Silicon processors
 	
 	For more details see https://docs.gradle.org/6.9/release-notes.html
 	
@@ -998,8 +1014,8 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	Kotlin:       1.4.20
 	Groovy:       2.5.12
 	Ant:          Apache Ant(TM) version 1.10.9 compiled on September 27 2020
-	JVM:          1.8.0_362 (Private Build 25.362-b09)
-	OS:           Linux 5.15.79.1-microsoft-standard-WSL2 amd64
+	JVM:          1.8.0_312 (Oracle Corporation 25.312-b07)
+	OS:           Linux 5.15.49-linuxkit-pr aarch64
 	
 	Running the current working dir cmd...
 	/app
@@ -1011,16 +1027,16 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	> Task :jpf-core:compileJava
 	/app/jpf-core/src/main/gov/nasa/jpf/vm/HashedAllocationContext.java:21: warning: sun.misc.SharedSecrets is internal proprietary API and may be removed in a future release
 	import sun.misc.SharedSecrets;
-	       ^
+	               ^
 	/app/jpf-core/src/main/gov/nasa/jpf/vm/HashedAllocationContext.java:22: warning: sun.misc.JavaLangAccess is internal proprietary API and may be removed in a future release
 	import sun.misc.JavaLangAccess;
-	       ^
+	               ^
 	/app/jpf-core/src/main/gov/nasa/jpf/vm/HashedAllocationContext.java:85: warning: sun.misc.JavaLangAccess is internal proprietary API and may be removed in a future release
-	static final JavaLangAccess JLA = SharedSecrets.getJavaLangAccess();
-		^
+	   static final JavaLangAccess JLA = SharedSecrets.getJavaLangAccess();
+	                ^
 	/app/jpf-core/src/main/gov/nasa/jpf/vm/HashedAllocationContext.java:85: warning: sun.misc.SharedSecrets is internal proprietary API and may be removed in a future release
-	static final JavaLangAccess JLA = SharedSecrets.getJavaLangAccess();
-				     ^
+	   static final JavaLangAccess JLA = SharedSecrets.getJavaLangAccess();
+	                                     ^
 	Note: /app/jpf-core/src/main/gov/nasa/jpf/vm/choice/PermutationCG.java uses or overrides a deprecated API.
 	Note: Recompile with -Xlint:deprecation for details.
 	Note: Some input files use unchecked or unsafe operations.
@@ -1030,76 +1046,76 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	> Task :jpf-core:compileClassesJava
 	/app/jpf-core/src/classes/java/lang/ClassLoader.java:29: warning: sun.misc.CompoundEnumeration is internal proprietary API and may be removed in a future release
 	import sun.misc.CompoundEnumeration;
-	       ^
+	               ^
 	/app/jpf-core/src/classes/java/lang/ClassLoader.java:114: warning: sun.misc.CompoundEnumeration is internal proprietary API and may be removed in a future release
-	return new CompoundEnumeration<URL>(resEnum);
-	       ^
-	/app/jpf-core/src/classes/java/lang/System.java:64: warning: sun.misc.VM is internal proprietary API and may be removed in a future release
-	sun.misc.VM.saveAndRemoveProperties(properties);
-	    ^
+	    return new CompoundEnumeration<URL>(resEnum);
+	               ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:52: warning: sun.misc.JavaUtilJarAccess is internal proprietary API and may be removed in a future release
-	private static JavaUtilJarAccess javaUtilJarAccess;
-		 ^
+	  private static JavaUtilJarAccess javaUtilJarAccess;
+	                 ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:60: warning: sun.misc.JavaOISAccess is internal proprietary API and may be removed in a future release
-	private static JavaOISAccess javaOISAccess;
-		 ^
+	  private static JavaOISAccess javaOISAccess;
+	                 ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:61: warning: sun.misc.JavaObjectInputStreamAccess is internal proprietary API and may be removed in a future release
-	private static JavaObjectInputStreamAccess javaObjectInputStreamAccess;
-		 ^
+	  private static JavaObjectInputStreamAccess javaObjectInputStreamAccess;
+	                 ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:82: warning: sun.misc.JavaUtilJarAccess is internal proprietary API and may be removed in a future release
-	public static JavaUtilJarAccess javaUtilJarAccess() {
-		^
+	  public static JavaUtilJarAccess javaUtilJarAccess() {
+	                ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:88: warning: sun.misc.JavaUtilJarAccess is internal proprietary API and may be removed in a future release
-	public static void setJavaUtilJarAccess(JavaUtilJarAccess access) {
-					  ^
+	  public static void setJavaUtilJarAccess(JavaUtilJarAccess access) {
+	                                          ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:142: warning: sun.misc.JavaObjectInputStreamAccess is internal proprietary API and may be removed in a future release
-	public static JavaObjectInputStreamAccess getJavaObjectInputStreamAccess() {
-		^
+	  public static JavaObjectInputStreamAccess getJavaObjectInputStreamAccess() {
+	                ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:151: warning: sun.misc.JavaObjectInputStreamAccess is internal proprietary API and may be removed in a future release
-	public static void setJavaObjectInputStreamAccess(JavaObjectInputStreamAccess access) {
-						    ^
+	  public static void setJavaObjectInputStreamAccess(JavaObjectInputStreamAccess access) {
+	                                                    ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:162: warning: sun.misc.JavaOISAccess is internal proprietary API and may be removed in a future release
-	public static void setJavaOISAccess(JavaOISAccess access) {
-				      ^
+	  public static void setJavaOISAccess(JavaOISAccess access) {
+	                                      ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:166: warning: sun.misc.JavaOISAccess is internal proprietary API and may be removed in a future release
-	public static JavaOISAccess getJavaOISAccess() {
-		^
+	  public static JavaOISAccess getJavaOISAccess() {
+	                ^
 	/app/jpf-core/src/classes/sun/misc/SharedSecrets.java:175: warning: sun.misc.JavaObjectInputStreamReadString is internal proprietary API and may be removed in a future release
-	public void setJavaObjectInputStreamReadString(sun.misc.JavaObjectInputStreamReadString ignored) {
-							 ^
+	  public void setJavaObjectInputStreamReadString(sun.misc.JavaObjectInputStreamReadString ignored) {
+	                                                         ^
 	/app/jpf-core/src/classes/sun/misc/JavaNetAccess.java:32: warning: sun.misc.URLClassPath is internal proprietary API and may be removed in a future release
-	URLClassPath getURLClassPath (URLClassLoader ucl);
-	^
+	    URLClassPath getURLClassPath (URLClassLoader ucl);
+	    ^
+	/app/jpf-core/src/classes/java/lang/System.java:64: warning: sun.misc.VM is internal proprietary API and may be removed in a future release
+	    sun.misc.VM.saveAndRemoveProperties(properties);
+	            ^
 	14 warnings
 	
 	> Task :jpf-core:compilePeersJava
 	/app/jpf-core/src/peers/gov/nasa/jpf/vm/JPF_java_util_Random.java:32: warning: sun.misc.Unsafe is internal proprietary API and may be removed in a future release
 	import sun.misc.Unsafe;
-	       ^
+	               ^
 	/app/jpf-core/src/peers/gov/nasa/jpf/vm/JPF_java_util_Random.java:93: warning: sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-	private static Unsafe unsafe;
-		 ^
+	  private static Unsafe unsafe;
+	                 ^
 	/app/jpf-core/src/peers/gov/nasa/jpf/vm/JPF_java_util_Random.java:99: warning: sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-	Field singletonField = Unsafe.class.getDeclaredField("theUnsafe");
-			     ^
+	      Field singletonField = Unsafe.class.getDeclaredField("theUnsafe");
+	                             ^
 	/app/jpf-core/src/peers/gov/nasa/jpf/vm/JPF_java_util_Random.java:101: warning: sun.misc.Unsafe is internal proprietary API and may be removed in a future release
-	unsafe = (Unsafe)singletonField.get(null);
-		^
+	      unsafe = (Unsafe)singletonField.get(null);
+	                ^
 	4 warnings
 	
 	> Task :jpf-core:compileTestJava
 	/app/jpf-core/src/tests/gov/nasa/jpf/test/vm/reflection/ReflectionTest.java:34: warning: sun.reflect.Reflection is internal proprietary API and may be removed in a future release
-	Class<?> callerCls = sun.reflect.Reflection.getCallerClass(0); // that would be getCallerClass()
-				      ^
+	      Class<?> callerCls = sun.reflect.Reflection.getCallerClass(0); // that would be getCallerClass()
+	                                      ^
 	/app/jpf-core/src/tests/gov/nasa/jpf/test/vm/reflection/ReflectionTest.java:38: warning: sun.reflect.Reflection is internal proprietary API and may be removed in a future release
-	callerCls = sun.reflect.Reflection.getCallerClass(1); // foo()
-			     ^
+	      callerCls = sun.reflect.Reflection.getCallerClass(1); // foo()
+	                             ^
 	/app/jpf-core/src/tests/gov/nasa/jpf/test/vm/reflection/ReflectionTest.java:42: warning: sun.reflect.Reflection is internal proprietary API and may be removed in a future release
-	callerCls = sun.reflect.Reflection.getCallerClass(2); // bar()
-			     ^
+	      callerCls = sun.reflect.Reflection.getCallerClass(2); // bar()
+	                             ^
 	/app/jpf-core/src/tests/gov/nasa/jpf/test/vm/reflection/ReflectionTest.java:46: warning: sun.reflect.Reflection is internal proprietary API and may be removed in a future release
-	callerCls = sun.reflect.Reflection.getCallerClass(3); // callIt()
-			     ^
+	      callerCls = sun.reflect.Reflection.getCallerClass(3); // callIt()
+	                             ^
 	Note: /app/jpf-core/src/tests/gov/nasa/jpf/test/vm/reflection/ReflectionTest.java uses or overrides a deprecated API.
 	Note: Recompile with -Xlint:deprecation for details.
 	Note: Some input files use unchecked or unsafe operations.
@@ -1110,7 +1126,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	Use '--warning-mode all' to show the individual deprecation warnings.
 	See https://docs.gradle.org/6.9/userguide/command_line_interface.html#sec:command_line_warnings
 	
-	BUILD SUCCESSFUL in 47s
+	BUILD SUCCESSFUL in 23s
 	15 actionable tasks: 15 executed
 	Running the Gradle build cmd for JPF-SYMBC...
 	jpf-core
@@ -1131,7 +1147,7 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	Use '--warning-mode all' to show the individual deprecation warnings.
 	See https://docs.gradle.org/6.9/userguide/command_line_interface.html#sec:command_line_warnings
 	
-	BUILD SUCCESSFUL in 1m 9s
+	BUILD SUCCESSFUL in 35s
 	12 actionable tasks: 12 executed
 	Run SPF Tests
 	jpf-core
@@ -1139,7 +1155,11 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	
 	> Task :jpf-symbc:test
 	
-	gov.nasa.jpf.symbc.TestMethodInvocation > mainTest PASSED
+	gov.nasa.jpf.symbc.TestDoubleVirtual1 > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestTermination > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestDoubleStatic1 > mainTest PASSED
 	
 	gov.nasa.jpf.symbc.TestSymbolicJPF > testISUB_oneConcrete PASSED
 	
@@ -1149,43 +1169,39 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	
 	gov.nasa.jpf.symbc.TestSymbolicJPF > testIADD_oneConcrete PASSED
 	
-	gov.nasa.jpf.symbc.TestFloatVirtual1 > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestFCMPLConditions > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestBooleanVirtual1 > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestIntStatic1 > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestFloatStatic1 > mainTest PASSED
+	gov.nasa.jpf.symbc.TestFloatSpecial1 > mainTest PASSED
 	
 	gov.nasa.jpf.symbc.TestBooleanStatic1 > mainTest PASSED
 	
-	gov.nasa.jpf.symbc.TestIntSpecial1 > mainTest PASSED
+	gov.nasa.jpf.symbc.TestFloatVirtual1 > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestIntStatic1 > mainTest PASSED
 	
 	gov.nasa.jpf.symbc.TestBooleanSpecial1 > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestDCMPLConditions > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestIntSpecial1 > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestInvokeSTATICandVIRTUAL > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestIntVirtual1 > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestBooleanVirtual1 > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestFloatStatic1 > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestSwitch > mainTest PASSED
 	
 	gov.nasa.jpf.symbc.TestSymbc > testSymbcDriver PASSED
 	
 	gov.nasa.jpf.symbc.TestLCMPConditions > mainTest PASSED
 	
+	gov.nasa.jpf.symbc.TestMethodInvocation > mainTest PASSED
+	
+	gov.nasa.jpf.symbc.TestFCMPLConditions > mainTest PASSED
+	
 	gov.nasa.jpf.symbc.TestDoubleSpecial1 > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestDoubleStatic1 > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestSwitch > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestDCMPLConditions > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestTermination > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestIntVirtual1 > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestInvokeSTATICandVIRTUAL > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestFloatSpecial1 > mainTest PASSED
-	
-	gov.nasa.jpf.symbc.TestDoubleVirtual1 > mainTest PASSED
 	Test Execution: SUCCESS
 	Summary: 24 tests, 24 passed, 0 failed, 0 skipped
 	
@@ -1193,9 +1209,9 @@ Use 'docker scan' to run Snyk tests against images to find vulnerabilities and l
 	Use '--warning-mode all' to show the individual deprecation warnings.
 	See https://docs.gradle.org/6.9/userguide/command_line_interface.html#sec:command_line_warnings
 	
-	BUILD SUCCESSFUL in 23s
+	BUILD SUCCESSFUL in 9s
 	13 actionable tasks: 6 executed, 7 up-to-date
-	Keep container running
-    ```
-   
+
+```
+  </details>
 </details>
