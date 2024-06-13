@@ -425,7 +425,7 @@ public class TranslateToSAT {
 		
 		if (i == null) {
 			//println (v.getName() + " start ...");
-			map.put (v, new Integer(vectorOffset));
+			map.put (v, vectorOffset);
 			//Apply the basic rules to the Vertex
 			int[] clause = new int [SymbolicStringConstraintsGeneral.DIFF_CHAR];
 			

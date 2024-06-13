@@ -2015,7 +2015,7 @@ public class TranslateToAutomata2 {
 		//Setup iteration
 		List<Integer> iteration = new ArrayList<Integer>(base);
 		for (int i = 0; i < base; i++) {
-			iteration.add(new Integer(0));
+			iteration.add(0);
 		}
 		
 		//Run through iterations

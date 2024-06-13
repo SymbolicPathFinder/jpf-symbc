@@ -96,7 +96,7 @@ public class TestMain {
 
 
 		      for (int i=0; i< method_args.length; i++)
-			        method_args[i] = new Double(1.0);
+			        method_args[i] = 1.0;
 
 		      for (int i=0; i< method_args.length; i++)
 			        argTypes[i] = Double.TYPE;

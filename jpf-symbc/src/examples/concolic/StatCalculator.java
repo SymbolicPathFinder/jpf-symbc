@@ -52,26 +52,26 @@ public class StatCalculator implements Serializable
 
     public static void addValue(long newValue)
     {
-        Number val = new Long(newValue);
+        Number val = newValue;
         addValue(val);
     }
 
     public static void addValue(int newValue)
     {
-    	Number val = new Integer(newValue);
+    	Number val = newValue;
         addValue(val);
         
     }
 
     public static void addValue(float newValue)
     {
-        Number val = new Float(newValue);
+        Number val = newValue;
         addValue(val);
     }
 
     public static void addValue(double newValue)
     {
-        Number val = new Double(newValue);
+        Number val = newValue;
         addValue(val);
     }
 

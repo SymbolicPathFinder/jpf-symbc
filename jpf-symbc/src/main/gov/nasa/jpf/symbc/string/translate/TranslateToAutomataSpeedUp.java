@@ -82,7 +82,7 @@ public class TranslateToAutomataSpeedUp {
 			mapAutomaton = new HashMap<Vertex, Automaton>();
 			mapConcat = new HashMap<EdgeConcat, Integer>();
 			for (Vertex v: g.getVertices()) {
-				mapSolved.put(v, new Integer(0));
+				mapSolved.put(v, 0);
 				Automaton length = AutomatonExtra.lengthAutomaton(v.getLength());
 				if (!v.isConstant()) {
 					mapAutomaton.put(v, AutomatonExtra.makeAnyStringFixed().intersection(length));
@@ -98,46 +98,46 @@ public class TranslateToAutomataSpeedUp {
 				if (e instanceof EdgeConcat) {
 					Integer i = mapEdgeCount.get(e.getSources().get(0));
 					if (i == null) {
-						mapEdgeCount.put(e.getSources().get(0), new Integer(1));
+						mapEdgeCount.put(e.getSources().get(0), 1);
 					}
 					else {
-						mapEdgeCount.put(e.getSources().get(0), new Integer(i+1));
+						mapEdgeCount.put(e.getSources().get(0), i + 1);
 					}
 					i = mapEdgeCount.get(e.getSources().get(1));
 					if (i == null) {
-						mapEdgeCount.put(e.getSources().get(1), new Integer(1));
+						mapEdgeCount.put(e.getSources().get(1), 1);
 					}
 					else {
-						mapEdgeCount.put(e.getSources().get(1), new Integer(i+1));
+						mapEdgeCount.put(e.getSources().get(1), i + 1);
 					}
 					i = mapEdgeCount.get(e.getDest());
 					if (i == null) {
-						mapEdgeCount.put(e.getDest(), new Integer(1));
+						mapEdgeCount.put(e.getDest(), 1);
 					}
 					else {
-						mapEdgeCount.put(e.getDest(), new Integer(i+1));
+						mapEdgeCount.put(e.getDest(), i + 1);
 					}
 				}
 				else {
 					Integer i = mapEdgeCount.get(e.getSource());
 					if (i == null) {
-						mapEdgeCount.put(e.getSource(), new Integer(1));
+						mapEdgeCount.put(e.getSource(), 1);
 					}
 					else {
-						mapEdgeCount.put(e.getSource(), new Integer(i+1));
+						mapEdgeCount.put(e.getSource(), i + 1);
 					}
 					i = mapEdgeCount.get(e.getDest());
 					if (i == null) {
-						mapEdgeCount.put(e.getDest(), new Integer(1));
+						mapEdgeCount.put(e.getDest(), 1);
 					}
 					else {
-						mapEdgeCount.put(e.getDest(), new Integer(i+1));
+						mapEdgeCount.put(e.getDest(), i + 1);
 					}
 				}
 			}
 			for (Vertex v: g.getVertices()) {
 				if (mapEdgeCount.get(v) == null) {
-					mapEdgeCount.put(v, new Integer (0));
+					mapEdgeCount.put(v, 0);
 				}
 			}
 			int max = 0;
@@ -151,7 +151,7 @@ public class TranslateToAutomataSpeedUp {
 			boolean result = false;
 			while (!result && g.getEdges().size() > 0) {
 				for (Vertex v: g.getVertices()) {
-					mapSolved.put(v, new Integer(0));
+					mapSolved.put(v, 0);
 					Automaton length = AutomatonExtra.lengthAutomaton(v.getLength());
 					Automaton toput;
 					if (!v.isConstant()) {

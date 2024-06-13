@@ -19,6 +19,7 @@ package edu.ucsb.cs.vlab;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -98,14 +99,18 @@ public class Z3Interface {
 		public static class Factory {
 			public static <Kind extends Processable> Processor create(Class<Kind> processableClass) {
 				try {
-					final Kind processableInstance = processableClass.newInstance();
+					final Kind processableInstance = processableClass.getDeclaredConstructor().newInstance();
 					final ProcessLambda process = () -> Runtime.getRuntime().exec(Z3.getInteractive());
 					return new Processor(processableInstance, process);
 				} catch (InstantiationException | IllegalAccessException e) {
 					e.printStackTrace();
 					return null;
-				}
-			}
+				} catch (InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 		}
 
 		private final Processable processable;

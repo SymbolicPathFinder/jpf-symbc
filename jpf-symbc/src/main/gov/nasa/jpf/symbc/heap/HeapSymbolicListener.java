@@ -172,13 +172,13 @@ public class HeapSymbolicListener extends PropertyListenerAdapter implements Pub
 										ClassInfo ci,  int objNum){
 
 		if ((currentDepth<=refDepth || refDepth == -1) &&
-					!seenSet.contains(new Integer(objNum))){
-			seenSet.add(new Integer(objNum));
+					!seenSet.contains(objNum)){
+			seenSet.add(objNum);
 			currentDepth++;
 			String name = "";
 			FieldInfo[] fields = ci.getDeclaredInstanceFields();
 			ElementInfo ei = ti.getElementInfo(objNum);
-			Integer ref = new Integer(objNum);
+			Integer ref = objNum;
 			if (null != ei && fields.length >0){
 				for (int i = 0; i < fields.length; i++) {
 					if (!fields[i].getName().contains("this")){
@@ -236,7 +236,7 @@ public class HeapSymbolicListener extends PropertyListenerAdapter implements Pub
 										exp = new IntegerConstant(objIndex);
 										pc._addDet(Comparator.EQ, symField, exp);
 									}else{
-										exp = nameMap.get(new Integer(objIndex));
+										exp = nameMap.get(objIndex);
 										if (null == exp)
 											exp = new IntegerConstant(objIndex);
 										pc._addDet(Comparator.EQ, symField, exp);
@@ -311,7 +311,7 @@ public class HeapSymbolicListener extends PropertyListenerAdapter implements Pub
 									exp = new IntegerConstant(objIndex);
 									pc._addDet(Comparator.EQ, symStatic,exp);
 								}else{
-									exp = nameMap.get(new Integer(objIndex));
+									exp = nameMap.get(objIndex);
 									if (null == exp){
 										String nm = ci.getName();
 									    nm = name.substring(name.lastIndexOf('.')+1) + "@" + objNum ;
@@ -354,7 +354,7 @@ public class HeapSymbolicListener extends PropertyListenerAdapter implements Pub
 		seenSet = new HashSet<Integer>();
 		definedFields = new HashSet<String>();
 
-		nameMap.put(new Integer(thisRef), new SymbolicInteger(name)); // why is this necessary
+		nameMap.put(thisRef, new SymbolicInteger(name)); // why is this necessary
 
 		// adds constraints representing this
 
@@ -387,7 +387,7 @@ public class HeapSymbolicListener extends PropertyListenerAdapter implements Pub
 			((HeapChoiceGenerator)heapCG).getCurrentSymInputHeap();
 			HeapNode node = symInputHeap.header;
 			while (null != node){
-				nameMap.put(new Integer(node.getIndex()), node.getSymbolic());
+				nameMap.put(node.getIndex(), node.getSymbolic());
 				node = node.getNext();
 			}
 		}
@@ -557,7 +557,7 @@ public class HeapSymbolicListener extends PropertyListenerAdapter implements Pub
 								HeapNode node = symInputHeap.header;
 								while (null != node){
 									// why is this map necessary?
-									nameMap.put(new Integer(node.getIndex()), node.getSymbolic());
+									nameMap.put(node.getIndex(), node.getSymbolic());
 									node = node.getNext();
 								}
 							}

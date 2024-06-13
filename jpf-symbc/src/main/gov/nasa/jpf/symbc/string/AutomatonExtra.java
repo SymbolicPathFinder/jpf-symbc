@@ -438,7 +438,7 @@ public class AutomatonExtra {
 				
 				if (t.getMax() > 127) {
 					for (int i = 128; i <= t.getMax(); i++) {
-						specialCharsAlreadyInAutomata.add(new Integer(i));
+						specialCharsAlreadyInAutomata.add(i);
 					}
 				}
 			}
@@ -481,8 +481,8 @@ public class AutomatonExtra {
 		for (State s: a.getStates()) {
 			for (Transition t: s.getTransitions()) {
 				for (int i = t.getMin(); i > 127 && i <= t.getMax(); i++) {
-					if (!specialCharsInA.contains(new Integer(i)))
-						specialCharsInA.add (new Integer (i));
+					if (!specialCharsInA.contains(i))
+						specialCharsInA.add (i);
 				}
 			}
 		}
@@ -498,8 +498,8 @@ public class AutomatonExtra {
 		for (State s: b.getStates()) {
 			for (Transition t: s.getTransitions()) {
 				for (int i = t.getMin(); i > 127 && i <= t.getMax(); i++) {
-					if (!specialCharsInB.contains(new Integer(i)))
-						specialCharsInB.add (new Integer (i));
+					if (!specialCharsInB.contains(i))
+						specialCharsInB.add (i);
 				}
 			}
 		}
@@ -615,7 +615,7 @@ public class AutomatonExtra {
 		/*only worry about characters between 32 and 127 (inclusive)*/
 		for (int i = 32; i <= 127; i++) {
 			if (used[i] == false) {
-				result.add (new Character ((char)i));
+				result.add ((char) i);
 			}
 		}
 		return result;

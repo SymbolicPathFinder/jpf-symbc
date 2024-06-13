@@ -48,8 +48,10 @@ TERMINATION OF THIS AGREEMENT. */
 
 package gov.nasa.jpf.symbc.string;
 
+import java.lang.ref.Cleaner;
 import java.util.Map;
 
+import gov.nasa.jpf.State;
 import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
 import gov.nasa.jpf.symbc.numeric.IntegerExpression;
 import gov.nasa.jpf.symbc.numeric.RealExpression;
@@ -58,18 +60,28 @@ import gov.nasa.jpf.symbc.numeric.Expression;
 
 
 public class SymbolicStringBuilder extends Expression {
-
+  private static final Cleaner cleaner = Cleaner.create();
+  private final State state;
+    private static class State implements Runnable {
+        @Override
+        public void run() {
+            // cleanup actions here
+        }
+    }
   protected StringExpression str;
 
   public SymbolicStringBuilder() {
     super();
+    this.state = new State();
+    cleaner.register(this, state);
     str = null;
   }
 
   public SymbolicStringBuilder(StringExpression s) {
     super();
+    this.state = new State();
+    cleaner.register(this, state);
     str = s;
-
   }
 
   public SymbolicStringBuilder clone() {
@@ -83,11 +95,6 @@ public class SymbolicStringBuilder extends Expression {
   public SymbolicStringBuilder _clone()
       throws CloneNotSupportedException {
     return (SymbolicStringBuilder) clone();
-  }
-
-  public void _finalize()
-      throws Throwable {
-    finalize();
   }
 
   public IntegerExpression _hashCode() {

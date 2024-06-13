@@ -22,7 +22,7 @@ public class NumberExample {
 	private int value = 0;
 	
 	public double run(int val) {
-		Number n = new Integer(val);
+		Number n = val;
 		if(n.doubleValue() == 10.0) {
 			System.out.println("foo");
 		} else{

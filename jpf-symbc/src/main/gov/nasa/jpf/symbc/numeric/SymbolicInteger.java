@@ -165,10 +165,6 @@ public class SymbolicInteger extends LinearIntegerExpression
         //return Integer.toHexString(_min ^ _max).hashCode();
     	return unique_id;
     }
-
-    protected void finalize() throws Throwable {
-    	//System.out.println("Finalized " + this);
-    }
     
     @Override
 	public void accept(ConstraintExpressionVisitor visitor) {

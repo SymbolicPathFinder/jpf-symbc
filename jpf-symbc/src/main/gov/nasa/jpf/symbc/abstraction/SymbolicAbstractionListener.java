@@ -679,9 +679,9 @@ public class SymbolicAbstractionListener extends PropertyListenerAdapter{
 			sequence += "}";
 		}
 		else{ // vertex v, is not null
-			if (!discovered.contains(new Integer(n))){ // vertex v just discovered
+			if (!discovered.contains(n)){ // vertex v just discovered
 				// discovery time for v - so put v into the hashset and open paranthesis
-				discovered.add(new Integer(n));
+				discovered.add(n);
 				sequence += "{";
 				sequence += "0";
 
@@ -694,7 +694,7 @@ public class SymbolicAbstractionListener extends PropertyListenerAdapter{
 					//System.out.println("field name " + fname);
 					int temp = env.getReferenceField(n, fname);
 					// null (short-circuited) OR successor yet undiscovered
-					if(temp==-1 || !discovered.contains(new Integer(temp))){
+					if(temp==-1 || !discovered.contains(temp)){
 						traverseRootedHeapAndGetSequence(env, temp);
 					}
 				}

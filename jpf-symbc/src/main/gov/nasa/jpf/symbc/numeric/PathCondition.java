@@ -540,7 +540,7 @@ public class PathCondition implements Comparable<PathCondition> {
     @Override
     public int hashCode() {
         if (hashCode == null) {
-            hashCode = new Integer(0);
+            hashCode = 0;
             Constraint c = header;
             while (c != null) {
                 hashCode = hashCode ^ c.hashCode();

@@ -111,10 +111,10 @@ public class FunctionExpression extends RealExpression
 			  Object[] args = new Object[sym_args.length];
 		      for (int i=0; i<args.length; i++)
 		    	  if (sym_args[i] instanceof IntegerExpression) {
-			        args[i] = new Long(((IntegerExpression)sym_args[i]).solution());
+			        args[i] = ((IntegerExpression) sym_args[i]).solution();
 		    	  }
 			      else {// RealExpression
-			    	args[i] = new Double(((RealExpression)sym_args[i]).solution());
+			    	args[i] = ((RealExpression) sym_args[i]).solution();
 			      }
 		      Method m = cls.getMethod(method_name, argTypes);
 		      int modifiers = m.getModifiers();

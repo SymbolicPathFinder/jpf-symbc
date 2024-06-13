@@ -551,8 +551,8 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
             // ElementInfo ei = DynamicArea.getHeap().get(objvRef);
             ElementInfo ei = VM.getVM().getHeap().get(objvRef);
             sequence += "[" + objvRef + "]";
-            if (!discovered.contains(new Integer(objvRef))) {
-                discovered.add(new Integer(objvRef));
+            if (!discovered.contains(objvRef)) {
+                discovered.add(objvRef);
                 sequence += "{";
 
                 FieldInfo[] fields = ci.getDeclaredInstanceFields();
@@ -657,9 +657,9 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
             sequence += "-1";
             sequence += "}";
         } else { // vertex v, is not null
-            if (!discovered.contains(new Integer(n))) { // vertex v just discovered
+            if (!discovered.contains(n)) { // vertex v just discovered
                 // discovery time for v - so put v into the hashset and open paranthesis
-                discovered.add(new Integer(n));
+                discovered.add(n);
                 sequence += "{";
                 sequence += "0";
 
@@ -672,7 +672,7 @@ public class JPF_gov_nasa_jpf_symbc_Debug extends NativePeer {
                         // System.out.println("field name " + fname);
                         int temp = env.getReferenceField(n, fname);
                         // null (short-circuited) OR successor yet undiscovered
-                        if (temp == MJIEnv.NULL || !discovered.contains(new Integer(temp))) {
+                        if (temp == MJIEnv.NULL || !discovered.contains(temp)) {
                             traverseRootedHeapAndGetSequence(env, temp);
                         }
                     }

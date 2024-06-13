@@ -34,7 +34,7 @@ public class ExDarko {
 	}
 
 	private void boxed(int i, int j) {
-		if (new Integer(i).equals(new Integer(j))) {
+		if (Integer.valueOf(i).equals(j)) {
 			System.out.println("HIT");
 		}
 	}

@@ -112,7 +112,7 @@ public class PCChoiceGenerator extends IntIntervalGenerator {
 	}
 	// sets the PC constraints for the specified choice
 	public void setPC(PathCondition pc, int choice) {
-			PC.put(new Integer(choice),pc);
+			PC.put(choice,pc);
 
 		}
 	
