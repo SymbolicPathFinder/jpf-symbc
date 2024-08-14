@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <key attr.name="originFileName" attr.type="string" for="edge" id="originfile">
+    <default>&lt;command-line&gt;</default>
+  </key>
+  <key attr.name="isViolationNode" attr.type="boolean" for="node" id="violation">
+    <default>false</default>
+  </key>
+  <key attr.name="isEntryNode" attr.type="boolean" for="node" id="entry">
+    <default>false</default>
+  </key>
+  <key attr.name="producer" attr.type="string" for="graph" id="producer"/>
+  <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
+  <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>
+  <key attr.name="assumption.scope" attr.type="string" for="edge" id="assumption.scope"/>
+  <graph edgedefault="directed">
+      <data key="producer">SPF</data>
