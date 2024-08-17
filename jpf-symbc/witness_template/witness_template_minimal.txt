@@ -13,5 +13,7 @@
   <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
   <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>
   <key attr.name="assumption.scope" attr.type="string" for="edge" id="assumption.scope"/>
+  <key attr.name="witness-type" attr.type="string" for="graph" id="witness-type"/>
   <graph edgedefault="directed">
+      <data key="witness-type">violation_witness</data>
       <data key="producer">SPF</data>
