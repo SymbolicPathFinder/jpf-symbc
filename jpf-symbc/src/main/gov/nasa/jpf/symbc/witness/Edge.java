@@ -1,3 +1,15 @@
+/**
+ * Object that represents a single edge of the violation witness
+ * It has two methods, serializeEdge() and serializeAllEdges()
+ * Variable indexOfEdge denotes an index of the node
+ * Variable fileName denotes the value of the key "originfile" in the edge
+ * Variable assumptionScope denotes the value of the key "assumption.scope" in the edge
+ * Variable allowMethodInvocation is a flag that shows whether invocation of method is allowed
+ * to represent the string value of assumption or not
+ * List symbolicVariableInfoList is a list that contains the value of
+ * the key "startline" and "assumption"
+ */
+
 package gov.nasa.jpf.symbc.witness;
 
 import java.util.List;
@@ -20,8 +32,13 @@ public class Edge{
         this.allowMethodInvocation = allowMethodInvocation;
         this.assumptionScope = assumptionScope;
     }
+
+    /**
+     * It serializes a single edge of the violation witness
+     * @return A string that represents single edge
+     */
     private String serializeEdge(){
-        // later, I have to handle the case when length == 0 and string type for assumption
+
         StringBuilder edgeBuilder = new StringBuilder();
         edgeBuilder.append(String.format("       <edge source=\"n%d\" target=\"n%d\">\n", indexOfEdge, indexOfEdge+1));
         //edgeId += System.lineSeparator();
@@ -66,6 +83,11 @@ public class Edge{
         return edgeBuilder.toString();
     }
 
+    /**
+     * It serializes every edge in edgeList
+     * @param edgeList contains all edges of the violation witness
+     * @return A string that represents every edge of the violation witness
+     */
     public static String serializeAllEdges(List<Edge> edgeList){
         StringBuilder allEdgesBuilder = new StringBuilder();
         for(Edge edge : edgeList){
