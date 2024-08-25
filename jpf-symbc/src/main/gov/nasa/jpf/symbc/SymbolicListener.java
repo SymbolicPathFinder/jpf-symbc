@@ -16,6 +16,38 @@
  * limitations under the License.
  */
 
+/**
+ * v.nasa.jpf.symbc.witness package
+ *
+ * Edge edge = new Edge(Node node1, Node node2);
+ *  edges.toString()
+ *  *              node1.toString()
+ *                 node2.toString()
+ *
+ *
+ * class GraphMl
+         * boolean allowMethodAssumptions = false;
+         * graphml.toString()
+         *        template
+         *        edges.print(allowMethodAssumptions)
+         *              node.toString
+         *  graphml.serialize()
+         *          String witnessStr = graphml.toString()
+         *          printToWitnessFile(witnessStr)
+ *
+ * classes
+ *  Node : toString/Serialize method
+ *  Edge
+ *  GraphMl
+ *
+ *
+ *  SymbolicListener
+ *       Edge edge = new Edge(Node node1, Node node2);
+ *       GraphMl graphml = new GraphMl(List <Edge> edges)
+ *       graphml.serialize();
+ *
+ */
+
 package gov.nasa.jpf.symbc;
 
 import gov.nasa.jpf.Config;
@@ -39,11 +71,15 @@ import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.bytecode.BytecodeUtils;
 import gov.nasa.jpf.symbc.bytecode.INVOKESTATIC;
 import gov.nasa.jpf.symbc.concolic.PCAnalyzer;
+import gov.nasa.jpf.symbc.witness.SymbolicVariableInfo;
+import gov.nasa.jpf.symbc.witness.Node;
+import gov.nasa.jpf.symbc.witness.Edge;
+import gov.nasa.jpf.symbc.witness.GraphML;
+import gov.nasa.jpf.symbc.witness.PathConditionParser;
 
 //import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
 
 import gov.nasa.jpf.util.Pair;
-import org.apache.commons.lang.ObjectUtils;
 
 import java.io.*;
 import java.util.*;
@@ -99,137 +135,14 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
     // } catch (Exception e) {
     // }
     // }
-    public static class VerifierInfo{
-        private final int lineNumber;
-        private final String returnType;
 
-        private final String varName;
-
-        private Object varValue = null;
-
-        public VerifierInfo(int lineNumber, String returnType, String varName){
-            this.lineNumber = lineNumber;
-            this.returnType = returnType;
-            this.varName = varName;
-        }
-    }
 
     // A list to save line number and return type
-    private List<VerifierInfo> verifierInfoList = new ArrayList<>();
+    public List<SymbolicVariableInfo> symbolicVariableInfoList = new ArrayList<>();
 
-    // Integrate two
-
-    private String nodeWriter(int length, boolean noCounterExample){
-        String node = "\n";
-        // If there is no symbolic variable, generate empty witness
-        if(length == 0 || noCounterExample){
-            node += String.format("       <node id=\"n%d\">\n", 0);
-            node += "           <data key=\"entry\">true</data> <data key=\"violation\">true</data>\n";
-            node += "       </node>";
-            return node;
-        }
-        node += String.format("       <node id=\"n%d\">\n", 0);
-        node += "             <data key=\"entry\">true</data>\n";
-        node += "       </node>\n";
-        for(int i = 0; i<length; i++){
-            String nodeId = String.format("       <node id=\"n%d\">", i+1);
-            //System.out.println(nodeId);
-            nodeId += System.lineSeparator();
-            if(i == verifierInfoList.size()-1){
-                nodeId += "             <data key=\"violation\">true</data>";
-                nodeId += System.lineSeparator();
-            }
-            nodeId += "       </node>";
-            nodeId += System.lineSeparator();
-            node += nodeId;
-        }
-        return node;
-    }
-    private String edgeWriter(int length, String fileName){
-        // later, I have to handle the case when length == 0 and string type for assumption
-        String edge = "";
-        for(int i=0; i<length; i++){
-            String edgeId = String.format("       <edge source=\"n%d\" target=\"n%d\">\n", i, i+1);
-            //edgeId += System.lineSeparator();
-            edgeId += String.format("         <data key=\"originfile\">%s.java</data>\n", fileName);
-            //edgeId += System.lineSeparator();
-            edgeId += String.format("         <data key=\"startline\">%d</data>\n", verifierInfoList.get(i).lineNumber);
-            // If variable value is null, it means that this variable doesn't appear in PC
-            // (i.e. it doesn't matters program's correctness. In this case, just put arbitrary default value)
-            if(verifierInfoList.get(i).returnType.equals("double") || verifierInfoList.get(i).returnType.equals("float")){
-                if(verifierInfoList.get(i).varValue == null) edgeId += String.format("         <data key=\"assumption\">%s == %f</data>\n", verifierInfoList.get(i).varName, 2.0);
-                else edgeId += String.format("         <data key=\"assumption\">%s == %f</data>\n", verifierInfoList.get(i).varName, verifierInfoList.get(i).varValue);
-            }
-
-            else if(verifierInfoList.get(i).returnType.equals("boolean")){
-                if(verifierInfoList.get(i).varValue == null) edgeId += String.format("         <data key=\"assumption\">%s == %b</data>\n", verifierInfoList.get(i).varName, false);
-                else edgeId += String.format("         <data key=\"assumption\">%s == %b</data>\n", verifierInfoList.get(i).varName, verifierInfoList.get(i).varValue);
-            }
-            else if(verifierInfoList.get(i).returnType.equals("java.lang.String")){
-                if(verifierInfoList.get(i).varValue == null) edgeId += String.format("         <data key=\"assumption\">%s == %s</data>\n", verifierInfoList.get(i).varName, "\"\"");
-                else edgeId += String.format("         <data key=\"assumption\">%s == %s</data>\n", verifierInfoList.get(i).varName, verifierInfoList.get(i).varValue);
-            }
-
-            else{
-                // Use == to follow standard graphml format
-                if(verifierInfoList.get(i).varValue == null) edgeId += String.format("         <data key=\"assumption\">%s == %d</data>\n", verifierInfoList.get(i).varName, 4);
-                else edgeId += String.format("         <data key=\"assumption\">%s == %d</data>\n", verifierInfoList.get(i).varName, verifierInfoList.get(i).varValue);
-            }
-            //edgeId += System.lineSeparator();
-            edgeId += String.format("         <data key=\"assumption.scope\">java::L%s;</data>\n", assumptionScope);
-            //edgeId += System.lineSeparator();
-            edgeId += "       </edge>\n";
-            edge += edgeId;
-        }
-        return edge;
-    }
-    private void parseSymVar(String pathCondition){
-        // Currently not handling String type
-        // Extract variable name and value
-        Pattern pattern = Pattern.compile("(\\w+)\\[(-?\\d+(\\.\\d+)?([eE][-+]?\\d+)?)\\]");
-        Matcher matcher = pattern.matcher(pathCondition);
+    boolean allowMethodInvocation = false;
 
 
-        // Insert value to list
-        while (matcher.find()) {
-            String pcVariableName = matcher.group(1);
-            String pcVariableValue = matcher.group(2);
-            // There are 3 cases, real number, string and other numeric types
-            if (pcVariableName.contains("double") || pcVariableName.contains("float") || pcVariableName.contains("REAL")) {
-                double value = Double.parseDouble(pcVariableValue); // 실수로 파싱
-                for(int i=0; i<verifierInfoList.size(); i++){
-                    if(verifierInfoList.get(i).varName.equals(pcVariableName)){
-                        verifierInfoList.get(i).varValue = value;
-                        break;
-                    }
-                }
-            }
-            else if (pcVariableName.contains("string")) {
-                for (int i = 0; i < verifierInfoList.size(); i++) {
-                    if (verifierInfoList.get(i).varName.equals(pcVariableName)) {
-                        verifierInfoList.get(i).varValue = pcVariableValue;
-                        break;
-                    }
-                }
-            }
-            else {
-                int value = Integer.parseInt(pcVariableValue);
-                for(int i=0; i<verifierInfoList.size(); i++){
-                    if(verifierInfoList.get(i).varName.equals(pcVariableName)){
-                        // SPF outputs true or false as 1 or 0, respectively. Handle such cases
-                        if(verifierInfoList.get(i).returnType.equals("boolean")){
-                            if(value == 1) verifierInfoList.get(i).varValue = true;
-                            else if(value == 0) verifierInfoList.get(i).varValue = false;
-                            break;
-                        }
-                        else verifierInfoList.get(i).varValue = value;
-                        break;
-                    }
-                }
-            }
-
-        }
-    }
 
     @Override
     public void propertyViolated(Search search) {
@@ -237,7 +150,7 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
         VM vm = search.getVM();
         // Path to the witness template
         // Assume working directory is SPF
-        String inputFilePath = "./jpf-symbc/witness_template/witness_template_minimal.txt";
+        String inputFilePath = "./jpf-symbc/src/main/resources/witness_template/witness_template_minimal.txt";
         // Path to output directory, now it is current directory
         String outputFilePath = "witness.graphml";
 
@@ -249,25 +162,13 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
             }
             cg = prev_cg;
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFilePath));
-             FileWriter writer = new FileWriter(outputFilePath)){
-            String line;
-            while ((line = reader.readLine()) != null) {
-                //System.out.println(line);
-                writer.write(line);
-                writer.write(System.lineSeparator());
-            }
-            //
-            String witnessNode = nodeWriter(verifierInfoList.size(), true);
-            writer.write(witnessNode);
-            writer.write(System.lineSeparator());
 
-            // wrap-up the witness file
-            writer.write( System.lineSeparator() + "  </graph>" + System.lineSeparator());
-            writer.write("</graphml>" + System.lineSeparator());
-        }catch (IOException e){
-            System.out.println("IOException detected: " + e.getMessage());
-        }
+        Node nodeForEmptyWitness = new Node(1, 0, true);
+        String strNode = nodeForEmptyWitness.serializeNode();
+        GraphML emptyWitness = new GraphML(inputFilePath, outputFilePath);
+        String headerForEmptyWitness = emptyWitness.constructHeader();
+        emptyWitness.serializeEmptyWitness(strNode, headerForEmptyWitness);
+
         if ((cg instanceof PCChoiceGenerator) && ((PCChoiceGenerator) cg).getCurrentPC() != null) {
             PathCondition pc = ((PCChoiceGenerator) cg).getCurrentPC();
             String error = search.getLastError().getDetails();
@@ -294,43 +195,28 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                 methodSummary = new MethodSummary();
             methodSummary.addPathCondition(pcPair);
             allSummaries.put(currentMethodName, methodSummary);
-            //System.out.println(verifierInfoList.get(0).lineNumber);
-            //System.out.println(verifierInfoList.get(0).returnType);
+
             String strPathCondition = pc.toString();
-            //List<Integer> temp = parsePC(strPathCondition);
+
             System.out.println("Property Violated: PC is " + pc.toString());
             System.out.println("Property Violated: result is  " + error);
             System.out.println("****************************");
 
 
 
-
-            try (BufferedReader reader = new BufferedReader(new FileReader(inputFilePath));
-                 FileWriter writer = new FileWriter(outputFilePath)) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    //System.out.println(line);
-                    writer.write(line);
-                    writer.write(System.lineSeparator());
-                }
-                // node part
-                String witnessNode = nodeWriter(verifierInfoList.size(), false);
-                //System.out.println(witnessNode);
-                writer.write(witnessNode);
-                writer.write(System.lineSeparator());
-
-                // edge part, match symbolic variable's value
-                parseSymVar(strPathCondition);
-                String edges = edgeWriter(verifierInfoList.size(), fileName);
-                writer.write(edges);
-                writer.write(System.lineSeparator());
-                // wrap-up the witness file
-                writer.write( System.lineSeparator() + "  </graph>" + System.lineSeparator());
-                writer.write("</graphml>" + System.lineSeparator());
-            } catch (IOException e) {
-                System.out.println("IOException detected: " + e.getMessage());
-                //e.printStackTrace();
+            List<Node> nodeList = new ArrayList<>();
+            List<Edge> edgeList = new ArrayList<>();
+            PathConditionParser parser = new PathConditionParser();
+            parser.parseSymVar(strPathCondition, symbolicVariableInfoList);
+            for(int i=0; i<symbolicVariableInfoList.size(); i++){
+                Node node = new Node(symbolicVariableInfoList.size(), i, false);
+                nodeList.add(node);
+                Edge edge = new Edge(i, fileName, symbolicVariableInfoList, allowMethodInvocation, assumptionScope);
+                edgeList.add(edge);
             }
+            GraphML graphML = new GraphML(inputFilePath, outputFilePath);
+            String header = graphML.constructHeader();
+            graphML.serializeWitness(edgeList, nodeList, header);
         }
         // }
     }
@@ -378,7 +264,6 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                 MethodInfo mi = md.getInvokedMethod();
                 ClassInfo ci = mi.getClassInfo();
                 String className = ci.getName();
-
 
                 StackFrame sf = ti.getTopFrame();
                 String shortName = methodName;
@@ -473,11 +358,12 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
 
                     if(interceptSymbolic && strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")){
                         symVarName = symbolicVar.toString();
-                        VerifierInfo Info = new VerifierInfo(symLineNumber, symRetrunType, symVarName);
-                        verifierInfoList.add(Info);
+                        SymbolicVariableInfo Info = new SymbolicVariableInfo(symLineNumber, symRetrunType, symVarName);
+                        symbolicVariableInfoList.add(Info);
                         symLineNumber = 0;
                         symRetrunType = "";
                         symVarName = "";
+                        interceptSymbolic = false;
                     }
 
                     if (((BytecodeUtils.isClassSymbolic(conf, className, mi, methodName))
