@@ -1,5 +1,5 @@
 /**
- * Object that represents the node part of violation witness
+ * Object that represents a single node of the violation witness
  * It has two methods, serializeNode() and serializeAllNodes()
  * Variable numberOfNode denotes the total number of node of violation witness
  * Variable indexOfNode denotes the index of the node
