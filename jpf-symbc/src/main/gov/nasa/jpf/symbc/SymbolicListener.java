@@ -16,37 +16,6 @@
  * limitations under the License.
  */
 
-/**
- * v.nasa.jpf.symbc.witness package
- *
- * Edge edge = new Edge(Node node1, Node node2);
- *  edges.toString()
- *  *              node1.toString()
- *                 node2.toString()
- *
- *
- * class GraphMl
-         * boolean allowMethodAssumptions = false;
-         * graphml.toString()
-         *        template
-         *        edges.print(allowMethodAssumptions)
-         *              node.toString
-         *  graphml.serialize()
-         *          String witnessStr = graphml.toString()
-         *          printToWitnessFile(witnessStr)
- *
- * classes
- *  Node : toString/Serialize method
- *  Edge
- *  GraphMl
- *
- *
- *  SymbolicListener
- *       Edge edge = new Edge(Node node1, Node node2);
- *       GraphMl graphml = new GraphMl(List <Edge> edges)
- *       graphml.serialize();
- *
- */
 
 package gov.nasa.jpf.symbc;
 
@@ -83,8 +52,6 @@ import gov.nasa.jpf.util.Pair;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SymbolicListener extends PropertyListenerAdapter implements PublisherExtension {
 
@@ -238,12 +205,11 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
 
         if (!vm.getSystemState().isIgnored()) {
             Instruction insn = executedInstruction;
-            // SystemState ss = vm.getSystemState();
+
             ThreadInfo ti = currentThread;
             Config conf = vm.getConfig();
             String strInsn = executedInstruction.toString();
-            //System.out.println(strInsn);
-            // Debug.makeSymbolic
+
             if(strInsn.contains("invokestatic") && strInsn.contains("Verifier.nondet")){
                 interceptSymbolic = true;
             }
@@ -363,6 +329,7 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                         symLineNumber = 0;
                         symRetrunType = "";
                         symVarName = "";
+                        // Initialize interceptSymbolic
                         interceptSymbolic = false;
                     }
 
