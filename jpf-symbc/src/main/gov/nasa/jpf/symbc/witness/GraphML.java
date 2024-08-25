@@ -1,3 +1,11 @@
+/**
+ * Object that represents violation witness
+ * It has 3 methods, constructHeader(), serializeWitness() and serializeEmptyWitness()
+ * Two class variables are required : inputFilePath and outputFilePath
+ * inputFilePath denotes the path to the witness template
+ * outputFilePath denotes the path where the violation witness will exist
+ */
+
 package gov.nasa.jpf.symbc.witness;
 
 import java.io.BufferedReader;
@@ -17,7 +25,13 @@ public class GraphML{
             this.outputFilePath = outputFilePath;
         }
 
-        public String constructHeader(){
+    /**
+     * It reads witness template at inputFilePath
+     * Then it assigns basic declaration of violation witness, such as key attribute declaration
+     * to StringBuilder object
+     * @return String consist of basic header information of violation witness(headers, witness type, producer name)
+     */
+    public String constructHeader(){
             StringBuilder header = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new FileReader(inputFilePath))){
                 String line;
@@ -32,6 +46,12 @@ public class GraphML{
             return header.toString();
         }
 
+    /**
+     * Method that serializes violation witness based on 3 parameters
+     * @param edgeList contains edges for violation witness
+     * @param nodeList contains nodes for violation witness
+     * @param header is the String that contains basic header information for violation witness
+     */
         public void serializeWitness(List<Edge> edgeList, List<Node> nodeList, String header){
             try (FileWriter writer = new FileWriter(outputFilePath)){
                 StringBuilder witnessBuilder = new StringBuilder();
@@ -48,7 +68,14 @@ public class GraphML{
             }
         }
 
-        public void serializeEmptyWitness(String node, String header){
+    /**
+     * Method that serializes empty violation witness
+     * This method will be invoked when there is no counterexample or symbolic variable(invocation of Verifier.nondet~())
+     * @param node represents the node for empty witness. It has two keys, which are entry and violation
+     * that denotes start node of violation witness and represents the node that has violation, respectively.
+     * @param header is the String that contains basic header information for violation witness
+     */
+    public void serializeEmptyWitness(String node, String header){
             try (FileWriter writer = new FileWriter(outputFilePath)){
                 StringBuilder emptyWitnessBuilder = new StringBuilder();
 
