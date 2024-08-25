@@ -17,6 +17,12 @@ public class Node{
     public int indexOfNode;
     public boolean noCounterExample;
 
+    public Node(int numberOfNode, int indexOfNode, boolean noCounterExample){
+        this.numberOfNode = numberOfNode;
+        this.indexOfNode = indexOfNode;
+        this.noCounterExample = noCounterExample;
+    }
+
     /**
      * It serializes a single node of violation witness
      * If there is no counterexample or the number of node is zero, it generates the node
@@ -57,12 +63,6 @@ public class Node{
             allNodesBuilder.append(node.serializeNode());
         }
         return allNodesBuilder.toString();
-    }
-
-    public Node(int numberOfNode, int indexOfNode, boolean noCounterExample){
-        this.numberOfNode = numberOfNode;
-        this.indexOfNode = indexOfNode;
-        this.noCounterExample = noCounterExample;
     }
 
 }
