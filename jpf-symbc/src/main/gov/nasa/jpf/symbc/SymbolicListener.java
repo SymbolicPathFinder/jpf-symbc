@@ -181,6 +181,8 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                 Edge edge = new Edge(i, fileName, symbolicVariableInfoList, allowMethodInvocation, assumptionScope);
                 edgeList.add(edge);
             }
+            // Add last node that contains violation key
+            nodeList.add(new Node(symbolicVariableInfoList.size(), symbolicVariableInfoList.size(), false));
             GraphML graphML = new GraphML(inputFilePath, outputFilePath);
             String header = graphML.constructHeader();
             graphML.serializeWitness(edgeList, nodeList, header);

@@ -45,7 +45,7 @@ public class Node{
         if(indexOfNode == 0){
             nodeBuilder.append("             <data key=\"entry\">true</data>\n");
         }
-        else if(indexOfNode == numberOfNode-1){
+        else if(indexOfNode == numberOfNode){
             nodeBuilder.append("             <data key=\"violation\">true</data>\n");
         }
         nodeBuilder.append("       </node>\n");
