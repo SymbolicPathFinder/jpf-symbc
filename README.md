@@ -402,7 +402,7 @@ fi
 ```
 </details>
 
-With the script above, run SPF. Here I ran `jbmc-regression/assert2` on SPF. If you `ls`, you can check generated witness, `witness.graphml`.
+With the script above, run SPF. Here I ran `jbmc-regression/assert2` on SPF.
 
 <details>
 <summary>Console Output<summary/>
@@ -474,6 +474,13 @@ loaded code:        classes=89,methods=1869
 ====================================================== search finished: 24. 8. 26 오후 4:20
 UNSAFE
 ```
+</details>
+
+If you `ls`, you can check generated witness, `witness.graphml`.
+
+<details>
+<summary>Console Output</summary>
+
 ```
 (base) ➜  SPF git:(sv-comp) ✗ ls
 README.md           build.properties    gradlew             hs_err_pid64341.log jpf-core            jpf-symbc           site.properties
