@@ -402,10 +402,11 @@ fi
 ```
 </details>
 
+
 With the script above, run SPF. Here I ran `jbmc-regression/assert2` on SPF.
 
 <details>
-<summary>Console Output<summary/>
+<summary>Console Output</summary>
 
 ```
 (base) ➜  SPF git:(sv-comp) ✗ ./jpf-sv-comp.sh --propertyfile ../wit4java/sv-benchmarks/java/properties/assert_java.prp ../wit4java/sv-benchmarks/java/common ../wit4java/sv-benchmarks/java/jbmc-regression/assert2
