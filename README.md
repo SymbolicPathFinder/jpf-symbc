@@ -317,6 +317,7 @@ Benchamrks for SV-COMP : https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks
 
 Or, you can just run these two command on your terminal.
 `git clone https://github.com/wit4java/wit4java.git`
+
 `git clone https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks.git`
 
 From here, I will assume your directory structure would be like below. All 3 directories are located next to each other.
