@@ -316,7 +316,6 @@ Wit4java : https://github.com/wit4java/wit4java
 Benchamrks for SV-COMP : https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks
 
 Or, you can just run these two command on your terminal.
-
 `git clone https://github.com/wit4java/wit4java.git`
 
 `git clone https://gitlab.com/sosy-lab/benchmarking/sv-benchmarks.git`
@@ -331,106 +330,17 @@ sv-benchmarks
 
 ### 1. Run a benchmark at SV-COMP on SPF
 
-At first, run SPF on certain benchmark. I'm attaching here the script that used at SV-COMP. Don't forget to specify using SymbolicListener at config.
-
-<details>
-<summary>SV-COMP Script</summary>
-
-```bash
-#!/bin/bash
-
-# create site.properties
-SITE_PROPERTIES=site.properties
-echo "jpf-core = `pwd`/jpf-core" > $SITE_PROPERTIES
-echo "jpf-symbc = `pwd`/jpf-symbc" >> $SITE_PROPERTIES
-echo "extensions=\${jpf-core},\${jpf-symbc}" >> $SITE_PROPERTIES
-
-# parse arguments
-declare -a BM
-BM=()
-PROP_FILE=""
-WITNESS_FILE=""
-
-TOOL_BINARY=jpf-core/bin/jpf
-FIND_OPTIONS="-name '*.java'"
-
-while [ -n "$1" ] ; do
-  case "$1" in
-    --32|--64) BIT_WIDTH="${1##--}" ; shift 1 ;;
-    --propertyfile) PROP_FILE="$2" ; shift 2 ;;
-    --graphml-witness) WITNESS_FILE="$2" ; shift 2 ;;
-    --version) date -r jpf-symbc/build/jpf-symbc.jar ; exit 0 ;;
-    *) SRC=(`eval "find $1 $FIND_OPTIONS"`) ; BM=("${BM[@]}" "${SRC[@]}") ; shift 1 ;;
-  esac
-done
-
-if [ -z "${BM[0]}" ] || [ -z "$PROP_FILE" ] ; then
-  echo "Missing benchmark or property file"
-  exit 1
-fi
-
-if [ ! -s "${BM[0]}" ] || [ ! -s "$PROP_FILE" ] ; then
-  echo "Empty benchmark or property file"
-  exit 1
-fi
-
-# we ignore the property file (there is only one property at the moment)
-# we ignore the witness file (not used yet)
-
-LOG=`mktemp -t jpf-log.XXXXXX`
-DIR=`mktemp -d -t jpf-benchmark.XXXXXX`
-trap "rm -rf $DIR" EXIT
-
-# create target directory
-mkdir -p $DIR/target/classes
-
-# build src files from benchmark
-/usr/lib/jvm/java-8-openjdk-amd64/bin/javac -g -cp $DIR/target/classes -d $DIR/target/classes "${BM[@]}"
-
-# create configuration file
-echo "target=Main" > $DIR/config.jpf
-echo "classpath=`pwd`/jpf-symbc/build/classes:$DIR/target/classes" >> $DIR/config.jpf
-echo "symbolic.dp=z3bitvector" >> $DIR/config.jpf
-echo "symbolic.bvlength=64" >> $DIR/config.jpf
-echo "search.depth_limit=200" >> $DIR/config.jpf
-echo "symbolic.strings=true" >> $DIR/config.jpf
-echo "symbolic.string_dp=ABC" >> $DIR/config.jpf
-echo "symbolic.string_dp_timeout_ms=3000" >> $DIR/config.jpf
-echo "symbolic.lazy=on" >> $DIR/config.jpf
-echo "symbolic.arrays=true" >> $DIR/config.jpf
-echo "listener = .symbc.SymbolicListener" >> $DIR/config.jpf
-
-# run SPF
-export LD_LIBRARY_PATH=`pwd`/jpf-symbc/lib:$LD_LIBRARY_PATH
-#jpf-core/bin/jpf $DIR/config.jpf
-if test -z "$JVM_FLAGS"; then
-  JVM_FLAGS="-Xmx1024m -ea"
-fi
-/usr/lib/jvm/java-8-openjdk-amd64/bin/java $JVM_FLAGS -jar `pwd`/jpf-core/build/RunJPF.jar $DIR/config.jpf | tee $LOG
-
-# check the result
-grep "no errors detected" $LOG > /dev/null
-if [ $? -eq 0 ]; then
-  echo "SAFE"
-else
-  grep "^error.*NoUncaughtExceptionsProperty.*AssertionError" $LOG > /dev/null
-  if [ $? -eq 0 ]; then
-    echo "UNSAFE"
-  else
-    echo "UNKNOWN"
-  fi
-fi
-```
-</details>
+At first, run SPF on certain benchmark. Here, I will use `jbmc-regression/assert2`. You can find script for running SPF at `jpf-symbc/bin`. Before run the script, please change path to the jdk based on your machine. For example, if you are using amd64 linux machine, replace `/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/bin/java` with `/usr/lib/jvm/java-8-openjdk-amd64/bin/java` and `/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home/bin/javac` with `/usr/lib/jvm/java-8-openjdk-amd64/bin/javac`. Now you are ready to run SPF with the script. 
 
 
-With the script above, run SPF. Here I ran `jbmc-regression/assert2` on SPF.
+The command for running SPF with script looks like this : `jpf-sv-comp.sh --propertyfile /path/to/property classpath1 classpath2 ...`. For example, if you want to run `jbmc-regression/assert2` with the script, the command would be `./jpf-sv-comp.sh --propertyfile ../sv-benchmarks/java/properties/assert_java.prp ../sv-benchmarks/java/common ../sv-benchmarks/java/jbmc-regression/assert2`.
+
+Here is output for run SPF on `jbmc-regression/assert2`.
 
 <details>
 <summary>Console Output</summary>
 
 ```
-(base) ➜  SPF git:(sv-comp) ✗ ./jpf-sv-comp.sh --propertyfile ../wit4java/sv-benchmarks/java/properties/assert_java.prp ../wit4java/sv-benchmarks/java/common ../wit4java/sv-benchmarks/java/jbmc-regression/assert2
 symbolic.min_int=-2147483648
 symbolic.min_long=-9223372036854775808
 symbolic.min_short=-32768
@@ -443,13 +353,13 @@ symbolic.max_byte=127
 symbolic.max_char=65535
 symbolic.min_double=4.9E-324
 symbolic.max_double=1.7976931348623157E308
-JavaPathfinder core system v8.0 (rev 1e91da896227a94b6a84e3438daf5d18b4dc971b) - (C) 2005-2014 United States Government. All rights reserved.
+JavaPathfinder core system v8.0 (rev 376c2cd72dcd6400b081e8526e38a97859295719) - (C) 2005-2014 United States Government. All rights reserved.
 
 
 ====================================================== system under test
 Main.main()
 
-====================================================== search started: 24. 8. 26 오후 4:20
+====================================================== search started: 24. 9. 7 오전 12:51
 Property Violated: PC is constraint # = 2
 int0[1000] <= CONST_1000 &&
 int0[1000] >= CONST_1000
@@ -459,13 +369,13 @@ Property Violated: result is  "java.lang.AssertionError: i is greater 1000..."
 ====================================================== error 1
 gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
 java.lang.AssertionError: i is greater 1000
-    at Main.main(Main.java:23)
+	at Main.main(Main.java:23)
 
 
 ====================================================== snapshot #1
 thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
   call stack:
-    at Main.main(Main.java:23)
+	at Main.main(Main.java:23)
 
 
 ====================================================== Method Summaries
@@ -493,20 +403,20 @@ instructions:       6414
 max memory:         245MB
 loaded code:        classes=89,methods=1869
 
-====================================================== search finished: 24. 8. 26 오후 4:20
+====================================================== search finished: 24. 9. 7 오전 12:51
 UNSAFE
 ```
 </details>
 
-If you `ls`, you can check generated witness, `witness.graphml`.
+If you `ls` at the directory that you ran SPF, you can check generated witness, `witness.graphml`. For example, if you ran SPF at directory `SPF`, you can see `witness.graphml`.
 
 <details>
 <summary>Console Output</summary>
 
 ```
 (base) ➜  SPF git:(sv-comp) ✗ ls
-README.md           build.properties    gradlew             hs_err_pid64341.log jpf-core            jpf-symbc           site.properties
-build.gradle        gradle              gradlew.bat         hs_err_pid66807.log jpf-sv-comp.sh      settings.gradle     witness.graphml
+README.md        build.properties gradlew          jpf-core         jpf-symbc        site.properties
+build.gradle     gradle           gradlew.bat      jpf-sv-comp.sh   settings.gradle  witness.graphml
 ```
 </details>
 
@@ -514,14 +424,15 @@ build.gradle        gradle              gradlew.bat         hs_err_pid66807.log 
 ### 2. Run witness validator tool
 
 
-Run a witness validator tool such as wit4java. You can download here : https://github.com/wit4java/wit4java/tree/main?tab=readme-ov-file
+Now, let's run wit4java to validate the generated violation witness! To run wit4java, go to `wit4java` directory. The command for run wit4java looks like this : `./wit4java-wrapper.py --witness /path/to/the/witness --local-dir classpath1 classpath2 ...`. For example, if you want to validate `witness.graphml` generated by running SPF on `jbmc-regression/assert2`, the command would be `./wit4java-wrapper.py --witness ../SPF/witness.graphml --local-dir ../sv-benchmarks/java/common ../sv-benchmarks/java/jbmc-regression/assert2`.
+
+Here is output for the command above.
 
 <details>
 <summary>Console Output</summary>
 
 ```
-(base) ➜  wit4java git:(main) ✗ ./wit4java-wrapper.py --witness ../SPF/witness.graphml --local-dir ../wit4java/sv-benchmarks/java/common ../wit4java/sv-benchmarks/java/jbmc-regression/assert2
-./bin/wit4java --local-dir ../wit4java/sv-benchmarks/java/jbmc-regression/assert2 --packages ../wit4java/sv-benchmarks/java/common --witness ../SPF/witness.graphml
+./bin/wit4java --local-dir ../sv-benchmarks/java/jbmc-regression/assert2 --packages ../sv-benchmarks/java/common --witness ../SPF/witness.graphml
 wit4java version: 3.0
 witness:  ../SPF/witness.graphml
 wit4java: Witness Correct
