@@ -439,7 +439,7 @@ wit4java: Witness Correct
 ```
 </details>
 
-You can find commands to run SPF and wit4java at SV-COMP. Here is the link : https://sv-comp.sosy-lab.org/2024/results/results-verified/spf.results.SV-COMP24.table.html#/table
+You can find commands to run SPF on other benchmarks and wit4java at SV-COMP. Click elements at "status" column, then it will show commands. Here is the link : https://sv-comp.sosy-lab.org/2024/results/results-verified/spf.results.SV-COMP24.table.html#/table
 
 <!-- ### 6. Use SPF inside Eclipse
 TODO -->
