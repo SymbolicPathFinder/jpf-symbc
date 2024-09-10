@@ -22,8 +22,8 @@ public final class Verifier {
   }
   
   public static boolean nondetBoolean() {
-    //return Debug.makeSymbolicBoolean("bool"+counter++);
-	return Verify.randomBool();
+    return Debug.makeSymbolicBoolean("bool"+counter++);
+	//return Verify.randomBool();
   }
   
   public static byte nondetByte() {
