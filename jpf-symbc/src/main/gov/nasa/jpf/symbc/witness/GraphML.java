@@ -9,19 +9,21 @@
 package gov.nasa.jpf.symbc.witness;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
 public class GraphML{
-        public String inputFilePath;
+        public InputStream inputStream;
 
         public String outputFilePath;
 
-        public GraphML(String inputFilePath, String outputFilePath){
-            this.inputFilePath = inputFilePath;
+        public GraphML(InputStream inputStream, String outputFilePath){
+            this.inputStream = inputStream;
             this.outputFilePath = outputFilePath;
         }
 
@@ -33,15 +35,17 @@ public class GraphML{
      */
     public String constructHeader(){
             StringBuilder header = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new FileReader(inputFilePath))){
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))){
                 String line;
                 while ((line = reader.readLine()) != null) {
                     header.append(line);
+                    //System.out.println(line);
                     header.append(System.lineSeparator());
                 }
 
             }catch (IOException e){
                 System.out.println("IOException detected: " + e.getMessage());
+                System.out.println("here");
             }
             return header.toString();
         }

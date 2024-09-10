@@ -117,7 +117,9 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
         VM vm = search.getVM();
         // Path to the witness template
         // Assume working directory is SPF
-        String inputFilePath = "./jpf-symbc/src/main/resources/witness_template/witness_template_minimal.txt";
+
+        String resourcePath = "witness_template/witness_template_minimal.txt";
+
         // Path to output directory, now it is current directory
         String outputFilePath = "witness.graphml";
 
@@ -132,9 +134,16 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
 
         Node nodeForEmptyWitness = new Node(1, 0, true);
         String strNode = nodeForEmptyWitness.serializeNode();
-        GraphML emptyWitness = new GraphML(inputFilePath, outputFilePath);
-        String headerForEmptyWitness = emptyWitness.constructHeader();
-        emptyWitness.serializeEmptyWitness(strNode, headerForEmptyWitness);
+        try(InputStream inputStream = SymbolicListener.class.getClassLoader().getResourceAsStream(resourcePath)){
+            if(inputStream == null){
+                throw new IllegalArgumentException("Resource not found : " + resourcePath);
+            }
+            GraphML emptyWitness = new GraphML(inputStream, outputFilePath);
+            String headerForEmptyWitness = emptyWitness.constructHeader();
+            emptyWitness.serializeEmptyWitness(strNode, headerForEmptyWitness);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
 
         if ((cg instanceof PCChoiceGenerator) && ((PCChoiceGenerator) cg).getCurrentPC() != null) {
             PathCondition pc = ((PCChoiceGenerator) cg).getCurrentPC();
@@ -183,9 +192,16 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
             }
             // Add last node that contains violation key
             nodeList.add(new Node(symbolicVariableInfoList.size(), symbolicVariableInfoList.size(), false));
-            GraphML graphML = new GraphML(inputFilePath, outputFilePath);
-            String header = graphML.constructHeader();
-            graphML.serializeWitness(edgeList, nodeList, header);
+            try(InputStream inputStream = SymbolicListener.class.getClassLoader().getResourceAsStream(resourcePath)){
+                if(inputStream == null){
+                    throw new IllegalArgumentException("Resource not found : " + resourcePath);
+                }
+                GraphML graphML = new GraphML(inputStream, outputFilePath);
+                String header = graphML.constructHeader();
+                graphML.serializeWitness(edgeList, nodeList, header);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
         }
         // }
     }
