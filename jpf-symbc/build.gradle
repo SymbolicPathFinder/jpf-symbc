@@ -29,6 +29,7 @@ apply from: "gradle/distribution.gradle"
 apply from: "gradle/source-sets.gradle"
 apply from: "gradle/build-resources.gradle"
 
+
 dependencies {
 
     // Path of jpf-core build directory is declared as a dependencies for jpf-symbc (Line 35-37)
@@ -83,6 +84,7 @@ task createJpfClassesJar(type: Jar) {
     from sourceSets.main.java.outputDir
     from sourceSets.annotations.java.outputDir
     from sourceSets.classes.java.outputDir
+    from sourceSets.main.resources.srcDirs
 }
 
 task createJpfJar(type: Jar) {
@@ -99,6 +101,7 @@ task createJpfJar(type: Jar) {
     from sourceSets.peers.java.outputDir
     from sourceSets.annotations.java.outputDir
     from sourceSets.classes.java.outputDir
+    from sourceSets.main.resources.srcDirs 
 
     manifest {
         attributes "Implementation-Title": "Symbolic Pathfinder system"
