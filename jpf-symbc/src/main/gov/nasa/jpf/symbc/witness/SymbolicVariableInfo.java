@@ -13,7 +13,9 @@ public class SymbolicVariableInfo{
         public int lineNumber;
         public String returnType;
 
-        public String varName;
+        public String varSymName;
+
+        public String varPgmName;
 
         public Object varValue = null;
 

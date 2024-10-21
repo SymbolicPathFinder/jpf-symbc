@@ -5,6 +5,7 @@ import gov.nasa.jpf.symbc.SymbolicListener;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.vm.ApplicationContext;
 import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import java.io.IOException;
@@ -13,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class maintains the witness collection state that is invoked by the listener during execution.
+ * This class maintains the witness collection state that is invoked by the listener during
+ * execution.
  */
 public class WitnessSymbolicState {
 
@@ -35,7 +37,7 @@ public class WitnessSymbolicState {
   // A list to save line number and return type
   public static List<SymbolicVariableInfo> symVarInfoList = new ArrayList<>();
 
-  static boolean allowMethodInvocation = false;
+  static boolean allowMethodInvocation = true;
   // A flag to check whether the information of symbolic variable is already parsed or not.
   static boolean interceptSymbolic = false;
   static boolean witnessAssumptionScopeIsFilled = false;
@@ -48,7 +50,7 @@ public class WitnessSymbolicState {
     StackFrame sf = ti.getTopFrame();
     Object symbolicVar = sf.getOperandAttr();
     if (interceptSymbolic && strIns.contains("nativereturn") && strIns.contains("makeSymbolic")) {
-      symbolicVariableInfo.varName = symbolicVar.toString();
+      symbolicVariableInfo.varSymName = symbolicVar.toString();
       symVarInfoList.add(symbolicVariableInfo);
       interceptSymbolic = false;
     }
@@ -82,6 +84,24 @@ public class WitnessSymbolicState {
       JVMInvokeInstruction md = (JVMInvokeInstruction) instruction;
       extractSymbolicVariableInfo(md);
       interceptSymbolic = true;
+    }
+  }
+
+  public static void collectPgmNameForSymVar(Instruction instruction) {
+    String strInst = instruction.toString();
+    if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
+      int currPgmCounter = instruction.getInstructionIndex();
+      Instruction nextInstruction = instruction.getMethodInfo().getInstructions()[currPgmCounter
+          + 1];
+      int symVarStackSlot = Integer.parseInt(
+          nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1));
+      LocalVarInfo[] methodLocalVars = instruction.getMethodInfo().getLocalVars();
+      for(int i=0; i<methodLocalVars.length; i++){
+        if(methodLocalVars[i].getSlotIndex()==symVarStackSlot){
+          symbolicVariableInfo.varPgmName=methodLocalVars[i].getName();
+          return;
+        }
+      }
     }
   }
 
@@ -125,12 +145,11 @@ public class WitnessSymbolicState {
 
   //  populates the GraphML with the witness information
   public static void populateWitnessGraph(PathCondition pc) {
-    String strPathCondition = pc.toString();
 
     List<Node> nodeList = new ArrayList<>();
     List<Edge> edgeList = new ArrayList<>();
     PathConditionParser parser = new PathConditionParser();
-    parser.parseSymVar(strPathCondition, symVarInfoList);
+    parser.parseSymVar(pc, symVarInfoList);
     for (int i = 0; i < symVarInfoList.size(); i++) {
       Node node = new Node(symVarInfoList.size(), i, false);
       nodeList.add(node);
@@ -151,7 +170,14 @@ public class WitnessSymbolicState {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
 
+  public static boolean witnessHasStringVar() {
+    for (SymbolicVariableInfo symInfo : symVarInfoList) {
+      if (symInfo.returnType.contains("String"))
+        return true;
+    }
+    return false;
   }
 
 }

@@ -64,24 +64,24 @@ public class Edge{
         if(symbolicVariableInfoList.get(indexOfEdge).returnType.equals("double") ||
                 symbolicVariableInfoList.get(indexOfEdge).returnType.equals("float")){
             if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) {
-                edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %f</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, 2.0));
+                edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %f</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, 2.0));
             }
-            else edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %f</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, symbolicVariableInfoList.get(indexOfEdge).varValue));
+            else edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %f</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, symbolicVariableInfoList.get(indexOfEdge).varValue));
         }
 
         else if(symbolicVariableInfoList.get(indexOfEdge).returnType.equals("boolean")){
-            if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %b</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, true));
-            else edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %b</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, symbolicVariableInfoList.get(indexOfEdge).varValue));
+            if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %b</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, true));
+            else edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %b</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, symbolicVariableInfoList.get(indexOfEdge).varValue));
         }
 
         else if(symbolicVariableInfoList.get(indexOfEdge).returnType.equals("java.lang.String")){
             if(allowMethodInvocation){
-                if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s.equals(%s)</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, "\"\""));
-                else edgeBuilder.append(String.format("         <data key=\"assumption\">%s.equals(%s)</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName,symbolicVariableInfoList.get(indexOfEdge).varValue));
+                if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s.equals(%s)</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, "\"\""));
+                else edgeBuilder.append(String.format("         <data key=\"assumption\">%s.equals(%s)</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, symbolicVariableInfoList.get(indexOfEdge).varValue));
             }
             else{
-                if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s==%s</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, "\"\""));
-                else edgeBuilder.append(String.format("         <data key=\"assumption\">%s==%s</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, symbolicVariableInfoList.get(indexOfEdge).varValue));
+                if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s==%s</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, "\"\""));
+                else edgeBuilder.append(String.format("         <data key=\"assumption\">%s==%s</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, symbolicVariableInfoList.get(indexOfEdge).varValue));
             }
         }
 
@@ -89,8 +89,8 @@ public class Edge{
             // Here, the type of symbolic variable should be integer or char.
             assert(symbolicVariableInfoList.get(indexOfEdge).returnType.equals("int") ||
                     symbolicVariableInfoList.get(indexOfEdge).returnType.equals("char"));
-            if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %d</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, 4));
-            else edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %d</data>\n", symbolicVariableInfoList.get(indexOfEdge).varName, symbolicVariableInfoList.get(indexOfEdge).varValue));
+            if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %d</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, 4));
+            else edgeBuilder.append(String.format("         <data key=\"assumption\">%s == %d</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, symbolicVariableInfoList.get(indexOfEdge).varValue));
         }
 
         edgeBuilder.append(String.format("         <data key=\"assumption.scope\">java::L%s;</data>\n", assumptionScope));
