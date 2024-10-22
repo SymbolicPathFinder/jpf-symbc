@@ -41,16 +41,6 @@ public class PathConditionParser {
         }
 
       }
-      // For String type we do not to do the parsing the solution already exists in the spc
-//            else if (pcVariableName.contains("string")) {
-//                for (int i = 0; i < symbolicVariableInfoList.size(); i++) {
-//                    if (symbolicVariableInfoList.get(i).varName.equals(pcVariableName)) {
-//                        symbolicVariableInfoList.get(i).varValue = pc.spc.solution.get(pcVariableName);
-//                        break;
-//                    }
-//                }
-//
-//            }
       // Other types
       else {
         int value = Integer.parseInt(pcVariableValue);
@@ -75,6 +65,9 @@ public class PathConditionParser {
     for(SymbolicVariableInfo symInfo: symbolicVariableInfoList){
       if (symInfo.returnType.contains("String")) {
         symInfo.varValue = pc.spc.solution.get(symInfo.varSymName);
+        break;
+      } if(symInfo.returnType.equals("boolean")){
+        symInfo.varValue = Integer.parseInt(pc.spc.solution.get(symInfo.varSymName)) < 0?"false":"true";
         break;
       }
 

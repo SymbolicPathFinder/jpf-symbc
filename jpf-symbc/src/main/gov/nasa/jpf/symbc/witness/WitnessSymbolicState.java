@@ -51,7 +51,8 @@ public class WitnessSymbolicState {
     Object symbolicVar = sf.getOperandAttr();
     if (interceptSymbolic && strIns.contains("nativereturn") && strIns.contains("makeSymbolic")) {
       symbolicVariableInfo.varSymName = symbolicVar.toString();
-      symVarInfoList.add(symbolicVariableInfo);
+      if(!symVarInfoList.contains(symbolicVariableInfo))
+        symVarInfoList.add(symbolicVariableInfo);
       interceptSymbolic = false;
     }
   }
@@ -90,6 +91,7 @@ public class WitnessSymbolicState {
   public static void collectPgmNameForSymVar(Instruction instruction) {
     String strInst = instruction.toString();
     if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
+      symbolicVariableInfo=new SymbolicVariableInfo();
       int currPgmCounter = instruction.getInstructionIndex();
       Instruction nextInstruction = instruction.getMethodInfo().getInstructions()[currPgmCounter
           + 1];
