@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  */
 public class PreProcessGraph {
   static Logger logger = LogManager.getLogger("stringsolver");
-	public static final int MAXIMUM_LENGTH = 30;
+	public static final int MAXIMUM_LENGTH = 125;
 	private static SymbolicConstraintsGeneral scg;
 	
 	//TODO: Add support for NoCharAt and LastIndexOf
@@ -52,8 +52,8 @@ public class PreProcessGraph {
 	 * 
 	 * Returns false if the current graph is unsatisfiable.
 	 * 
-	 * @param g
-	 * @param currentPC
+	 * @param stringGraph
+	 * @param pathCondition
 	 * @return
 	 */
 	public static boolean preprocess (StringGraph stringGraph, PathCondition pathCondition) {
