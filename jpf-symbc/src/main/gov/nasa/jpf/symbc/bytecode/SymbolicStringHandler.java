@@ -801,10 +801,10 @@ public class SymbolicStringHandler {
 	 */
 
 	public Instruction handleInit(JVMInvokeInstruction invInst,  ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
 
 		String cname = invInst.getInvokedMethodClassName();
 		if (cname.equals("java.lang.StringBuilder") || cname.equals("java.lang.StringBuffer")) {
-			StackFrame sf = th.getModifiableTopFrame();
 			StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
 			SymbolicStringBuilder sym_v2 = (SymbolicStringBuilder) sf.getOperandAttr(1);
 			if (sym_v1 == null) {
@@ -816,11 +816,24 @@ public class SymbolicStringHandler {
 				sf.setOperandAttr(sym_v2);
 				return invInst.getNext();
 			}
-		} else {
+		} else if (cname.equals("java.lang.String")) {
+//			System.out.println("stop right here");
+			StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
+			Object sym_v2 = sf.getOperandAttr(1);
+
+			if (sym_v1 != null && sym_v2==null) { // case where a new string is based on a symbolic one
+//				sf.setOperandAttr(1, sym_v1);
+				sf.pop(); /* string object */
+				sf.pop(); /* one Symbolic String Object */
+
+				sf.setOperandAttr(sym_v1);
+				return invInst.getNext();
+			}
+
+		}
 			// Corina TODO: we should allow symbolic string analysis to kick in only when desired
 			//throw new RuntimeException("Warning Symbolic String Analysis: Initialization type not handled in symbc/bytecode/SymbolicStringHandler init");
 			return null;
-		}
 	}
 
 	/***************************** Symbolic Big Decimal Routines end ****************/
