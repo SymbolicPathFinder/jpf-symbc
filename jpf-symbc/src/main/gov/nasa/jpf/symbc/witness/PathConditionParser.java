@@ -76,14 +76,11 @@ public class PathConditionParser {
       if (solution != null) {
         if (symInfo.returnType.contains("String")) {
           symInfo.varValue = solution;
-          break;
         } else if (symInfo.returnType.contains("int")) {
           symInfo.varValue = solution;
-          break;
         } else if (symInfo.returnType.equals("boolean")) {
           symInfo.varValue =
               Integer.parseInt(solution) == 0 ? "false" : "true";
-          break;
         }
       }
     }
