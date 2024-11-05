@@ -51,6 +51,10 @@ public class WitnessSymbolicState {
     Object symbolicVar = sf.getOperandAttr();
     if (interceptSymbolic && strIns.contains("nativereturn") && strIns.contains("makeSymbolic")) {
       symbolicVariableInfo.varSymName = symbolicVar.toString();
+      if(symbolicVariableInfo.varPgmName==null){
+        // case where we couldn't find the program name of a variable, as in the case where the verifier invocation was within and expression, for example like an arrayIndex
+        symbolicVariableInfo.varPgmName = symbolicVariableInfo.varSymName;
+      }
       if (!symVarInfoList.contains(symbolicVariableInfo))
         symVarInfoList.add(symbolicVariableInfo);
       interceptSymbolic = false;
@@ -92,7 +96,11 @@ public class WitnessSymbolicState {
     String strInst = instruction.toString();
     if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
       symbolicVariableInfo = new SymbolicVariableInfo();
-      int symVarStackSlot = findStackSlot(instruction);
+      Integer symVarStackSlot = findStackSlot(instruction);
+      if(symVarStackSlot == null){
+        // we failed to find a stackslot, it could just be a temp variable, we just return.
+        return;
+      }
       LocalVarInfo[] methodLocalVars = instruction.getMethodInfo().getLocalVars();
       for (int i = 0; i < methodLocalVars.length; i++) {
         if (methodLocalVars[i].getSlotIndex() == symVarStackSlot) {
@@ -108,7 +116,7 @@ public class WitnessSymbolicState {
    *
    * @return
    */
-  static int findStackSlot(Instruction instruction) {
+  static Integer findStackSlot(Instruction instruction) {
     Instruction[] instructions = instruction.getMethodInfo().getInstructions();
     int pgmCounter = instruction.getInstructionIndex() + 1;
     Instruction nextInstruction = instructions[pgmCounter];
@@ -116,6 +124,8 @@ public class WitnessSymbolicState {
       pgmCounter++;
       nextInstruction = instructions[pgmCounter];
     }
+    if(!nextInstruction.toString().contains("_"))
+      return null;
     int storeStackSlot = Integer.parseInt(
         nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1));
     return storeStackSlot;
