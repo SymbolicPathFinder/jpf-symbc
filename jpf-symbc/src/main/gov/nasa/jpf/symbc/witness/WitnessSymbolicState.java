@@ -51,7 +51,7 @@ public class WitnessSymbolicState {
     Object symbolicVar = sf.getOperandAttr();
     if (interceptSymbolic && strIns.contains("nativereturn") && strIns.contains("makeSymbolic")) {
       symbolicVariableInfo.varSymName = symbolicVar.toString();
-      if(!symVarInfoList.contains(symbolicVariableInfo))
+      if (!symVarInfoList.contains(symbolicVariableInfo))
         symVarInfoList.add(symbolicVariableInfo);
       interceptSymbolic = false;
     }
@@ -91,20 +91,34 @@ public class WitnessSymbolicState {
   public static void collectPgmNameForSymVar(Instruction instruction) {
     String strInst = instruction.toString();
     if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
-      symbolicVariableInfo=new SymbolicVariableInfo();
-      int currPgmCounter = instruction.getInstructionIndex();
-      Instruction nextInstruction = instruction.getMethodInfo().getInstructions()[currPgmCounter
-          + 1];
-      int symVarStackSlot = Integer.parseInt(
-          nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1));
+      symbolicVariableInfo = new SymbolicVariableInfo();
+      int symVarStackSlot = findStackSlot(instruction);
       LocalVarInfo[] methodLocalVars = instruction.getMethodInfo().getLocalVars();
-      for(int i=0; i<methodLocalVars.length; i++){
-        if(methodLocalVars[i].getSlotIndex()==symVarStackSlot){
-          symbolicVariableInfo.varPgmName=methodLocalVars[i].getName();
+      for (int i = 0; i < methodLocalVars.length; i++) {
+        if (methodLocalVars[i].getSlotIndex() == symVarStackSlot) {
+          symbolicVariableInfo.varPgmName = methodLocalVars[i].getName();
           return;
         }
       }
     }
+  }
+
+  /**
+   * finds the nearest store instruction forward, and return its stack slot.
+   *
+   * @return
+   */
+  static int findStackSlot(Instruction instruction) {
+    Instruction[] instructions = instruction.getMethodInfo().getInstructions();
+    int pgmCounter = instruction.getInstructionIndex() + 1;
+    Instruction nextInstruction = instructions[pgmCounter];
+    while (!nextInstruction.toString().contains("store")) {
+      pgmCounter++;
+      nextInstruction = instructions[pgmCounter];
+    }
+    int storeStackSlot = Integer.parseInt(
+        nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1));
+    return storeStackSlot;
   }
 
   /**

@@ -36,6 +36,7 @@ public class TranslateToZ3str3 {
 			System.out.println("Satisfiable: " + o.isSAT());
 			for (String k : o.getModel().keySet()) {
 				System.out.println(k + " => " + o.getModel().get(k));
+//				this replacement needs to be disabled since we want to carry quotation marks when printing witnesses
 //				solution.put(k, o.getModel().get(k).replaceAll("^\"|\"$", ""));
 				solution.put(k, o.getModel().get(k));
 			}
