@@ -89,7 +89,7 @@ public class Edge{
             }
         }
 
-        else{
+        else{ //TODO: be conservative and not generate a witness if we cannot find a solution for the symbolic variable, i.e., do not print default value.
             // Here, the type of symbolic variable should be integer or char.
             assert(symbolicVariableInfoList.get(indexOfEdge).returnType.equals("int") ||
                     symbolicVariableInfoList.get(indexOfEdge).returnType.equals("char"));

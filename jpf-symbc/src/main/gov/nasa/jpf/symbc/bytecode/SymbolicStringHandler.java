@@ -103,8 +103,9 @@ public class SymbolicStringHandler {
 				|| cname.equals("java.lang.Byte")
 				|| cname.equals("java.lang.Char")
 				|| cname.equals("java.lang.Boolean")
-				|| cname.equals("java.lang.Object")) {
-	        
+				|| cname.equals("java.lang.Object")
+				|| cname.equals("java.lang.Character")) {
+
 			StackFrame sf = th.getModifiableTopFrame();
 
 			int numStackSlots = invInst.getArgSize();
@@ -338,7 +339,17 @@ public class SymbolicStringHandler {
 					handleIsEmpty(invInst, th);
 					return invInst.getNext(th);
 				}
-			} else {
+			} else if(shortName.equals("isLetter")) {
+                ChoiceGenerator<?> cg;
+                if (!th.isFirstStepInsn()) { // first time around
+                    cg = new PCChoiceGenerator(5);
+                    th.getVM().setNextChoiceGenerator(cg);
+                    return invInst;
+                } else {
+                    handleIsLetter(invInst, th);
+                    return invInst.getNext(th);
+                }
+            } else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
 			}
@@ -347,6 +358,117 @@ public class SymbolicStringHandler {
 			return null;
 		}
 
+	}
+
+	private void handleIsLetter(JVMInvokeInstruction invInst, ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+		Object sym_v = sf.getOperandAttr(0);
+    ChoiceGenerator<?> cg;
+
+    cg = th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+    PathCondition pc;
+    ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+    while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+      prev_cg = prev_cg.getPreviousChoiceGenerator();
+    }
+
+    if (prev_cg == null) {
+      pc = new PathCondition();
+    } else {
+      pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+    }
+
+    assert pc != null;
+    if((Integer) cg.getNextChoice() == 0){
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GE, (IntegerExpression) sym_v, new IntegerConstant(65));
+          pc._addDet(Comparator.LE, (IntegerExpression) sym_v, new IntegerConstant(90));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false: "unsupported is letter case";
+        } else{
+          assert false: "unsupported is letter case";
+        }
+      }
+    } else if((Integer) cg.getNextChoice() == 1){
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GE, (IntegerExpression) sym_v, new IntegerConstant(97));
+          pc._addDet(Comparator.LE, (IntegerExpression) sym_v, new IntegerConstant(122));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false: "unsupported is letter case";
+        } else{
+          assert false: "unsupported is letter case";
+        }
+      }
+    } else if((Integer) cg.getNextChoice() == 2){
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.LT, (IntegerExpression) sym_v, new IntegerConstant(65));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false: "unsupported is letter case";
+        } else{
+          assert false: "unsupported is letter case";
+        }
+      }
+    } else if((Integer) cg.getNextChoice() == 3){
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(90));
+          pc._addDet(Comparator.LT, (IntegerExpression) sym_v, new IntegerConstant(97));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false: "unsupported is letter case";
+        } else{
+          assert false: "unsupported is letter case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 4){
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(122));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false: "unsupported is letter case";
+        } else{
+          assert false: "unsupported is letter case";
+        }
+      }
+    }
 	}
 
 	private boolean handleCharAt (JVMInvokeInstruction invInst, ThreadInfo th) {

@@ -120,11 +120,12 @@ public class WitnessSymbolicState {
     Instruction[] instructions = instruction.getMethodInfo().getInstructions();
     int pgmCounter = instruction.getInstructionIndex() + 1;
     Instruction nextInstruction = instructions[pgmCounter];
-    while (!nextInstruction.toString().contains("store")) {
-      pgmCounter++;
-      nextInstruction = instructions[pgmCounter];
-    }
-    if(!nextInstruction.toString().contains("_"))
+    // we are assuming here that the next instruction would be the store of the verifier invocation, if this is not the case, then the invocation of the verifier must have occurred as a subexpression, in which case, we cannot tie it with a slot, or a particular program name. So we return, and give the program name the same name as the symbolic name.
+//    while (!nextInstruction.toString().contains("store")) {
+//      pgmCounter++;
+//      nextInstruction = instructions[pgmCounter];
+//    }
+    if(!nextInstruction.toString().contains("store_"))
       return null;
     int storeStackSlot = Integer.parseInt(
         nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1));
