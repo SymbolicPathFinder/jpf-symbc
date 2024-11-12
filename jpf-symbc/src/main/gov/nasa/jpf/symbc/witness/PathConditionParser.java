@@ -75,7 +75,7 @@ public class PathConditionParser {
       String solution = pc.spc.solution.get(symInfo.varSymName);
       if (solution != null) {
         if (symInfo.returnType.contains("String")) {
-          symInfo.varValue = solution;
+          symInfo.varValue = solution.replaceAll("\\\\", "\\\\\\\\"); //esca                                     ping backslashes so that they appear in the witness string
         } else if (symInfo.returnType.contains("int")) {
           symInfo.varValue = solution;
         } else if (symInfo.returnType.equals("boolean")) {

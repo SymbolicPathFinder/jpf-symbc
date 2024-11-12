@@ -349,6 +349,26 @@ public class SymbolicStringHandler {
                     handleIsLetter(invInst, th);
                     return invInst.getNext(th);
                 }
+            } else if(shortName.equals("toUpperCase")){
+                ChoiceGenerator<?> cg;
+                if (!th.isFirstStepInsn()) { // first time around
+                    cg = new PCChoiceGenerator(5);
+                    th.getVM().setNextChoiceGenerator(cg);
+                    return invInst;
+                } else {
+                    handleToUpperCase(invInst, th);
+                    return invInst.getNext(th);
+                }
+            } else if(shortName.equals("toLowerCase")){
+                ChoiceGenerator<?> cg;
+                if (!th.isFirstStepInsn()) { // first time around
+                    cg = new PCChoiceGenerator(5);
+                    th.getVM().setNextChoiceGenerator(cg);
+                    return invInst;
+                } else {
+                    handleToLowerCase(invInst, th);
+                    return invInst.getNext(th);
+                }
             } else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
@@ -359,6 +379,224 @@ public class SymbolicStringHandler {
 		}
 
 	}
+
+
+  public void handleToUpperCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
+
+    StackFrame sf = th.getModifiableTopFrame();
+    Object sym_v = sf.getOperandAttr(0);
+    ChoiceGenerator<?> cg;
+
+    cg = th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+    PathCondition pc;
+    ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+    while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+      prev_cg = prev_cg.getPreviousChoiceGenerator();
+    }
+
+    if (prev_cg == null) {
+      pc = new PathCondition();
+    } else {
+      pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+    }
+
+    assert pc != null;
+    if((Integer) cg.getNextChoice() == 0) {  // already an upper case from A - Z
+      if (sym_v != null) {
+        if (sym_v instanceof SymbolicInteger) {
+          pc._addDet(Comparator.GE, (IntegerExpression) sym_v, new IntegerConstant(65));
+          pc._addDet(Comparator.LE, (IntegerExpression) sym_v, new IntegerConstant(90));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        } else if (sym_v instanceof StringSymbolic) {
+          assert false : "unsupported toUpper case";
+        } else {
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 1){ // is a lower case, then change it to upper case
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GE, (IntegerExpression) sym_v, new IntegerConstant(97));
+          pc._addDet(Comparator.LE, (IntegerExpression) sym_v, new IntegerConstant(122));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            IntegerExpression toUpperExp = new BinaryLinearIntegerExpression((IntegerExpression) sym_v, Operator.MINUS, new IntegerConstant(32));
+            sf.setOperandAttr(toUpperExp);
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false : "unsupported toUpper case";
+        } else{
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 2){ // is not in letter range less than 65, then leave things as is
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.LT, (IntegerExpression) sym_v, new IntegerConstant(65));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false : "unsupported toUpper case";
+        } else{
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 3){ // is not in letter range between 90-97
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(90));
+          pc._addDet(Comparator.LT, (IntegerExpression) sym_v, new IntegerConstant(97));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false : "unsupported toUpper case";
+        } else{
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 4) { // is not in letter greater than 122
+      if (sym_v != null) {
+        if (sym_v instanceof SymbolicInteger) {
+          pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(122));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        } else if (sym_v instanceof StringSymbolic) {
+          assert false : "unsupported toUpper case";
+        } else {
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }
+  }
+
+  public void handleToLowerCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
+
+    StackFrame sf = th.getModifiableTopFrame();
+    Object sym_v = sf.getOperandAttr(0);
+    ChoiceGenerator<?> cg;
+
+    cg = th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+    PathCondition pc;
+    ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+    while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+      prev_cg = prev_cg.getPreviousChoiceGenerator();
+    }
+
+    if (prev_cg == null) {
+      pc = new PathCondition();
+    } else {
+      pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+    }
+
+    assert pc != null;
+    if((Integer) cg.getNextChoice() == 0) {  // already an upper case from A - Z
+      if (sym_v != null) {
+        if (sym_v instanceof SymbolicInteger) {
+          pc._addDet(Comparator.GE, (IntegerExpression) sym_v, new IntegerConstant(65));
+          pc._addDet(Comparator.LE, (IntegerExpression) sym_v, new IntegerConstant(90));
+          IntegerExpression toLowerExp = new BinaryLinearIntegerExpression((IntegerExpression) sym_v, Operator.PLUS, new IntegerConstant(32));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            sf.setOperandAttr(toLowerExp);          }
+        } else if (sym_v instanceof StringSymbolic) {
+          assert false : "unsupported toUpper case";
+        } else {
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 1){ // is a lower case, then change it to upper case
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GE, (IntegerExpression) sym_v, new IntegerConstant(97));
+          pc._addDet(Comparator.LE, (IntegerExpression) sym_v, new IntegerConstant(122));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false : "unsupported toUpper case";
+        } else{
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 2){ // is not in letter range less than 65, then leave things as is
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.LT, (IntegerExpression) sym_v, new IntegerConstant(65));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false : "unsupported toUpper case";
+        } else{
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 3){ // is not in letter range between 90-97
+      if(sym_v!=null){
+        if(sym_v instanceof SymbolicInteger){
+          pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(90));
+          pc._addDet(Comparator.LT, (IntegerExpression) sym_v, new IntegerConstant(97));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        }else if(sym_v instanceof StringSymbolic){
+          assert false : "unsupported toUpper case";
+        } else{
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }else if((Integer) cg.getNextChoice() == 4) { // is not in letter greater than 122
+      if (sym_v != null) {
+        if (sym_v instanceof SymbolicInteger) {
+          pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(122));
+          if (!pc.simplify()) {// not satisfiable
+            th.getVM().getSystemState().setIgnored(true);
+          } else {
+            // pc.solve();
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+            // System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
+          }
+        } else if (sym_v instanceof StringSymbolic) {
+          assert false : "unsupported toUpper case";
+        } else {
+          assert false : "unsupported toUpper case";
+        }
+      }
+    }
+  }
 
 	private void handleIsLetter(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
@@ -398,7 +636,7 @@ public class SymbolicStringHandler {
           assert false: "unsupported is letter case";
         }
       }
-    } else if((Integer) cg.getNextChoice() == 1){
+    } else if((Integer) cg.getNextChoice() == 1){ // is a lower case, then change it to upper case
       if(sym_v!=null){
         if(sym_v instanceof SymbolicInteger){
           pc._addDet(Comparator.GE, (IntegerExpression) sym_v, new IntegerConstant(97));
@@ -416,7 +654,7 @@ public class SymbolicStringHandler {
           assert false: "unsupported is letter case";
         }
       }
-    } else if((Integer) cg.getNextChoice() == 2){
+    } else if((Integer) cg.getNextChoice() == 2){ // is not in letter range less than 65
       if(sym_v!=null){
         if(sym_v instanceof SymbolicInteger){
           pc._addDet(Comparator.LT, (IntegerExpression) sym_v, new IntegerConstant(65));
@@ -433,7 +671,7 @@ public class SymbolicStringHandler {
           assert false: "unsupported is letter case";
         }
       }
-    } else if((Integer) cg.getNextChoice() == 3){
+    } else if((Integer) cg.getNextChoice() == 3){  // is not in letter range between 90-97
       if(sym_v!=null){
         if(sym_v instanceof SymbolicInteger){
           pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(90));
@@ -451,7 +689,7 @@ public class SymbolicStringHandler {
           assert false: "unsupported is letter case";
         }
       }
-    }else if((Integer) cg.getNextChoice() == 4){
+    }else if((Integer) cg.getNextChoice() == 4){  // is not in letter greater than 122
       if(sym_v!=null){
         if(sym_v instanceof SymbolicInteger){
           pc._addDet(Comparator.GT, (IntegerExpression) sym_v, new IntegerConstant(122));
@@ -559,7 +797,7 @@ public class SymbolicStringHandler {
 			if (sym_v1 != null) {
 				if (sym_v2 != null) { // both are symbolic values
 					if (s2char)
-						result = sym_v1._indexOf((IntegerExpression)sym_v2);
+						result = sym_v1._indexOf((IntegerExpression) sym_v2);
 					else
 						result = sym_v1._indexOf((StringExpression) sym_v2);
 				} else { // sym_v2 is null
