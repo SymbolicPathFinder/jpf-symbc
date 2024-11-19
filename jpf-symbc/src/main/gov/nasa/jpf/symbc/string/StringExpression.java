@@ -104,8 +104,10 @@ public abstract class StringExpression extends Expression {
 	  //PathCondition.flagSolved = quickSwitch;
 	  return result;
   }
-
-  public IntegerExpression _length() {
+  
+  public IntegerExpression _length() {// if we encounter a symbolic string for which we've created a symbolic length, we just return that.
+		if(length!=null && length.get(this)!=null)
+			return length.get(this);
 	  SymbolicLengthInteger result = new SymbolicLengthInteger("Length_" + lengthcount + "_", 0, PreProcessGraph.MAXIMUM_LENGTH, this);
       lengthcount++;
 	  if (length == null) {
@@ -436,6 +438,7 @@ public RealExpression _RvalueOf() {
 	@Override
 	public int compareTo(Expression expr) {
 		// FIXME unimplemented method
+		//One way of fixing that could be by concretrizing the length of the string, then doing the comparison over that fixed length
 		return 0;
 	}
  
