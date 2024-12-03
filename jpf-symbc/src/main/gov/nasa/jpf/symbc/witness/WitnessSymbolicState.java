@@ -125,10 +125,10 @@ public class WitnessSymbolicState {
 //      pgmCounter++;
 //      nextInstruction = instructions[pgmCounter];
 //    }
-    if(!nextInstruction.toString().contains("store_"))
+    if(!nextInstruction.toString().contains("store"))
       return null;
     int storeStackSlot = Integer.parseInt(
-        nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1));
+        nextInstruction.toString().substring(nextInstruction.toString().indexOf("store") + 6));
     return storeStackSlot;
   }
 
