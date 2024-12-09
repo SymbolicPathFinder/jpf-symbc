@@ -128,6 +128,11 @@ public class SymbolicStringHandler {
 					
 				}
 			}
+            if(invInst instanceof INVOKESTATIC && cname.equals("java.lang.String") && invInst.getInvokedMethod().getName().equals("valueOf") ){
+                ElementInfo ei = th.getElementInfo(sf.peek());
+                if(ei!=null && ei.hasFieldAttr()) //to handle the case where we have String.valueOf(O) where O is a concrete object that has symbolic fields, i.e., a charArray where the charArray is concrete but the chars are symbolic
+                    return true;
+            }
 			return false;
 		} else if (cname.equals("java.net.URLDecoder")) {
       		throw new RuntimeException("Error: Unsupported string class, " + cname);
@@ -2817,9 +2822,9 @@ public class SymbolicStringHandler {
 			int startRef, int endRef) {
 		
 		StringExpression result;
-		
-		//'end' is the first parameter (something with stack representation, maybe?) 
-		if(sym_start == null && sym_end == null) { 
+
+		//'end' is the first parameter (something with stack representation, maybe?)
+		if(sym_start == null && sym_end == null) {
 			result = sym_str._subString(endRef, startRef);
 		} else if (sym_start == null) {
 			result = sym_str._subString(sym_end, startRef);

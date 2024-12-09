@@ -15,6 +15,6 @@ public class Main {
     String s = cs.toString();
     int i = -1;
     if (s.equals("case1")) i = cs.length();
-    assert i == -1 || i == 5;
+    assert i == -1 || i == 4;
   }
 }
