@@ -128,6 +128,11 @@ public class SymbolicStringHandler {
 					
 				}
 			}
+            if(invInst instanceof INVOKESTATIC && cname.equals("java.lang.String") && invInst.getInvokedMethod().getName().equals("valueOf") ){
+                ElementInfo ei = th.getElementInfo(sf.peek());
+                if(ei!=null && ei.hasFieldAttr()) //to handle the case where we have String.valueOf(O) where O is a concrete object that has symbolic fields, i.e., a charArray where the charArray is concrete but the chars are symbolic
+                    return true;
+            }
 			return false;
 		} else if (cname.equals("java.net.URLDecoder")) {
       		throw new RuntimeException("Error: Unsupported string class, " + cname);
@@ -1685,7 +1690,7 @@ public class SymbolicStringHandler {
 				return handleDoubleValueOf(invInst, th);
 			} else if (argTypes[0].equals("char")) {
 				return handleCharValueOf(invInst, th);
-			} else if (argTypes[0].equals("chararray")) {
+			} else if (argTypes[0].equals("chararray") || argTypes[0].equals("char[]")) {
 				return handleCharArrayValueOf(invInst, th);
 			} else if (argTypes[0].equals("boolean")) {
 				return handleBooleanValueOf(invInst, th);
@@ -2558,9 +2563,42 @@ public class SymbolicStringHandler {
 		return null;
 	}
 
+  /**
+   * handle the case where we have a String.valueOf(charArrayObject)
+   * TODO: should handle runtime exception here.
+   * @param invInst
+   * @param th
+   * @return
+   */
 	public Instruction handleCharArrayValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
-		throw new RuntimeException("ERROR: symbolic string method not Implemented - CharArrayValueof");
-	}
+    StackFrame sf = th.getTopFrame();
+    ElementInfo ei = th.getElementInfo(sf.peek());
+    StringSymbolic symbolicStr = new StringSymbolic();
+    StringExpression resultExpr = symbolicStr;
+    if (ei != null
+        && ei.hasFieldAttr()) { //to handle the case where we have String.valueOf(O) where O is a concrete object that has symbolic fields, i.e., a charArray where the charArray is concrete but the chars are symbolic
+      //we make a new symbolic string that is constrained by the elements of the char array.
+      char[] concreteChar = ei.asCharArray();
+      for (int i = 0; i < concreteChar.length; i++) {
+        Object fieldAttr = ei.getElementAttr(i);
+        if (fieldAttr != null) {
+          resultExpr = resultExpr._concat((IntegerExpression) fieldAttr);
+        } else { //some of the fields are concrete
+          resultExpr = resultExpr._concat(new StringConstant(Character.toString(concreteChar[i])));
+        }
+      }
+      sf.pop();
+      int objRef = th.getHeap().newString("", th).getObjectRef(); /*
+       * dummy
+       * String
+       * Object
+       */
+      sf.push(objRef, true);
+      sf.setOperandAttr(resultExpr);
+       return null;
+    }
+    throw new RuntimeException("ERROR: symbolic string method not Implemented - CharArrayValueof");
+  }
 
 	public Instruction handleObjectValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
