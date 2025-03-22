@@ -38,7 +38,7 @@
 package java.lang;
 
 public class Math {
-	public static final double PI = 3.14159265358979323846;
+	public static final double PI = 3.141592653589793;
 
 	public static double abs ( double a) {
 	    return (a < 0.0) ? -a : a;
@@ -58,7 +58,7 @@ public class Math {
 
       //	 TODO:
 	  public static double max ( double a, double b) {
-		if (!(a == a))
+		if (a != a)
 			return a;
 		if (a == b)
 			return (1.0d / a > 0) ? a : b;
@@ -67,7 +67,7 @@ public class Math {
 
 	  // TODO: need to model NaN et al.
 	  public static float max ( float a, float b) {
-		if (!(a == a))
+		if (a != a)
 			return a;
 		if (a == b)
 			return (1.0f / a > 0) ? a : b;
@@ -84,7 +84,7 @@ public class Math {
 
 	  // TODO:
 	  public static double min ( double a, double b) {
-		if (!(a == a))
+		if (a != a)
 			return a;
 		if (a == b)
 			return (1.0d / a > 0) ? a : b;
@@ -93,7 +93,7 @@ public class Math {
 
 	  // TODO:
 	  public static float min ( float a, float b) {
-		 if (!(a == a))
+		 if (a != a)
 			 return a;
 		 if (a == b)
 			 return (1.0f / a > 0) ? a : b;
