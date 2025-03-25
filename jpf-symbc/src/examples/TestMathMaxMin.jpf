@@ -1,0 +1,8 @@
+target=TestMathMaxMin
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+#symbolic.method=TestMathMaxMin.testMax(con#con)
+#listener=gov.nasa.jpf.symbc.concolic.ConcreteExecutionListener
+#listener=gov.nasa.jpf.symbc.SymbolicListener
+#search.multiple_errors=true
