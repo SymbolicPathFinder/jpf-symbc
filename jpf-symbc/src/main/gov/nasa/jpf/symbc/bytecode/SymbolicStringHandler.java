@@ -2216,6 +2216,10 @@ public class SymbolicStringHandler {
 			} else { //stringbuilder
 				handled = handleStringBuilderAppend3(invInst, th);
 			}
+		} else if(argTypes[0].equals("char[]") && argTypes.length == 3) {
+			//TODO need to handleCharArrayAppend3()
+		} else if(argTypes[0].equals("char[]")) {
+			handleCharArrayAppend(invInst, th);
 		} else if (argTypes[0].equals("java.lang.String")) {
 			handleStringAppend(invInst, th);
 		} else if ((argTypes[0].equals("java.lang.StringBuilder")) || (argTypes[0].equals("java.lang.StringBuffer"))) {
@@ -2685,6 +2689,45 @@ public class SymbolicStringHandler {
 		}
 	}
 
+	public void handleCharArrayAppend(JVMInvokeInstruction invInst, ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+		Object sym_v1 = sf.getOperandAttr(0);
+		SymbolicStringBuilder sym_v2 = (SymbolicStringBuilder) sf.getOperandAttr(1);
+
+		if (sym_v2 == null) {
+			sym_v2 = new SymbolicStringBuilder();
+		}
+		if ((sym_v1 == null) && (sym_v2.getstr() == null)) {
+			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand");
+		} else {
+			int s1 = sf.pop();
+			int s2 = sf.pop();
+
+			if(sym_v1 == null) {
+				ElementInfo charArrayEI = th.getElementInfo(s1);
+				char[] charArray = charArrayEI.asCharArray();
+				String val = new String(charArray);
+				sym_v2._append(val);
+				sf.push(s2, true);
+			} else if(sym_v2.getstr() == null) {
+				ElementInfo e1 = th.getElementInfo(s2);
+				String val = getStringEquiv(e1);
+				sym_v2.putstr(new StringConstant(val));
+				StringExpression charArrayExpr = (StringExpression) sym_v1;
+				sym_v2._append(charArrayExpr);
+
+				sf.push(s2, true);
+			} else {
+				StringExpression charArrayExpr = (StringExpression) sym_v1;
+				sym_v2._append(charArrayExpr);
+
+				sf.push(s2, true);
+			}
+		}
+
+		sf.setOperandAttr(sym_v2);
+	}
+
 	/*
 	 * String s1 = AbstractionUtilityMethods.unknownString(); String s2 =
 	 * AbstractionUtilityMethods.unknownString(); String s4 =
@@ -2778,6 +2821,8 @@ public class SymbolicStringHandler {
 			sf.setOperandAttr(sym_v2);
 		}
 	}
+
+
 
 	public String getStringEquiv(ElementInfo ei) {
 		String objectType = ei.getType();
