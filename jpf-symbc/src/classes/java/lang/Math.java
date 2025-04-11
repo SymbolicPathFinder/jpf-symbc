@@ -38,6 +38,22 @@
 package java.lang;
 
 public class Math {
+
+	/**
+	 * The value of <i><b>PI</b></i> as specified (IEEE 754 standards).
+	 * <p>
+	 * The Java {@code double} type has a precision of 52 significand bits (mantissa), which is about 15–17 decimal digits.
+	 * For this particular value, it will use 15 digits to represent the mantissa.
+	 * <p>
+	 * We might see <i><b>PI</b></i> defined with ({@code 3.14159265358979323846}) in some
+	 * OpenJDK versions (e.g., JDK 8 or Adoptium builds), but
+	 * the extra digits ({@code 23846}) will get truncated and would not affect the actual stored value.
+	 * This was removed in later JDKs like JDK 19.
+	 *
+	 * @see <a href="https://github.com/openjdk/jdk8u-dev/blob/master/jdk/src/share/classes/java/lang/Math.java#L123">OpenJDK jdk8u-dev</a>
+	 * @see <a href="https://github.com/adoptium/jdk8u/blob/master/jdk/src/share/classes/java/lang/Math.java">Adoptium jdk8u</a>
+	 * @see <a href="https://github.com/openjdk/jdk19u/blob/master/src/java.base/share/classes/java/lang/Math.java#L144">OpenJDK jdk19u</a>
+	 */
 	public static final double PI = 3.141592653589793;
 
 	public static double abs ( double a) {
@@ -87,7 +103,7 @@ public class Math {
 		if (a != a)
 			return a;
 		if (a == b)
-			return (1.0d / a > 0) ? a : b;
+			return (1.0d / a < 0) ? a : b;
 		return (a <= b) ? a : b;
 	  }
 
@@ -96,7 +112,7 @@ public class Math {
 		 if (a != a)
 			 return a;
 		 if (a == b)
-			 return (1.0f / a > 0) ? a : b;
+			 return (1.0f / a < 0) ? a : b;
 		 return (a <= b) ? a : b;
 	  }
 

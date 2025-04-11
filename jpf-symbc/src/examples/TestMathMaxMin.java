@@ -33,10 +33,10 @@ public class TestMathMaxMin {
 
         /* This will pass as exact bit representations of 0.0 and -0.0 are not equal.
            But earlier If we kept -0.0 as the first argument it was returning -0.0, which is wrong. */
-        assert Double.doubleToRawLongBits(Math.max(-0.0, 0.0)) == Double.doubleToRawLongBits(0.0) : "Test case Failed as Expected";
+        assert Double.doubleToRawLongBits(Math.max(-0.0, 0.0)) == Double.doubleToRawLongBits(0.0) : "Test case Failed";
 
         // This will fail
-        assert Double.doubleToRawLongBits(Math.max(0.0, -0.0)) == Double.doubleToRawLongBits(-0.0) : "Test case Failed";
+        assert Double.doubleToRawLongBits(Math.max(0.0, -0.0)) == Double.doubleToRawLongBits(-0.0) : "Test case Failed as Expected";
 
         /* This will fail as expected which is the right behaviour, earlier Math.max() returned 5.0
            Similar to the case above. */
@@ -45,9 +45,9 @@ public class TestMathMaxMin {
         // Eventually this will pass now
         assert Double.doubleToRawLongBits(Math.max(5.0, Double.NaN)) == Double.doubleToRawLongBits(Double.NaN) : "Test case Failed";
 
-        // Additional Test Cases. Similar to the cases above.
-        System.out.println(Math.max(Double.NaN, Double.POSITIVE_INFINITY)); // earlier this returned +Infinity, but should be NaN
-        System.out.println(Math.max(Double.NaN, Double.NEGATIVE_INFINITY)); // earlier this returned -Infinity, but should be NaN
+        // Additional Tests, similar to the cases above.
+        assert Double.doubleToRawLongBits(Math.max(Double.NaN, Double.POSITIVE_INFINITY)) == Double.doubleToRawLongBits(Double.NaN) : "Test case Failed"; // earlier this returned +Infinity, but should be NaN
+        assert Double.doubleToRawLongBits(Math.max(Double.NaN, Double.NEGATIVE_INFINITY)) == Double.doubleToRawLongBits(Double.NaN) : "Test case Failed"; // earlier this returned -Infinity, but should be NaN
 
     }
 
@@ -59,10 +59,13 @@ public class TestMathMaxMin {
     public static void testFloatMax() {
 
         // Tests similar to the cases above.
-        System.out.println(Math.max(0.0f, -0.0f)); // 0.0
-        System.out.println(Math.max(-0.0f, 0.0f)); // 0.0
-        System.out.println(Math.max(Float.NaN, 4.5)); // NaN
-        System.out.println(Math.max(4.5, Float.NaN)); // NaN
+        assert Math.max(0.0f, -0.0f) == 0.0 : "Test case Failed"; // 0.0
+
+        assert Float.floatToRawIntBits(Math.max(-0.0f, 0.0f)) == Float.floatToRawIntBits(0.0f) : "Test case Failed"; // 0.0
+
+        assert Float.floatToRawIntBits(Math.max(Float.NaN, 4.5f)) == Float.floatToRawIntBits(Float.NaN) : "Test case Failed"; // NaN
+
+        assert Float.floatToRawIntBits(Math.max(Float.NaN, Float.POSITIVE_INFINITY)) == Float.floatToRawIntBits(Float.NaN) : "Test case Failed"; // NaN
     }
 
 
@@ -72,12 +75,18 @@ public class TestMathMaxMin {
 
     public static void testDoubleMin() {
 
-        // Earlier this was returning 0.0, -0.0, 4.5, NaN and 9.0
-        System.out.println(Math.min(0.0, -0.0)); // 0.0
-        System.out.println(Math.min(-0.0, 0.0)); // 0.0
-        System.out.println(Math.min(Double.NaN, 4.5)); // NaN
-        System.out.println(Math.min(4.5, Double.NaN)); // NaN
-        System.out.println(Math.min(5.0, 9.0)); // 5.0
+         /* Earlier this was returning 0.0, -0.0, 4.5, 9.0 and -Infinity
+            min => should be a <= b not a >= b */
+        assert Double.doubleToRawLongBits(Math.min(0.0, -0.0)) == Double.doubleToRawLongBits(-0.0) : "Test case Failed"; // -0.0
+
+        assert Double.doubleToRawLongBits(Math.min(-0.0, 0.0)) == Double.doubleToRawLongBits(-0.0) : "Test case Failed"; // -0.0
+
+        assert Double.doubleToRawLongBits(Math.min(Double.NaN, 4.5)) == Double.doubleToRawLongBits(Double.NaN) : "Test case Failed"; // NaN
+
+        assert Math.min(5.0, 9.0) == 5.0 : "Test case Failed"; // 5.0
+
+        //Additional Test case
+        assert Double.doubleToRawLongBits(Math.min(Double.NaN, Double.NEGATIVE_INFINITY)) == Double.doubleToRawLongBits(Double.NaN) : "Test case Failed"; // NaN
     }
 
 
@@ -88,10 +97,11 @@ public class TestMathMaxMin {
     public static void testFloatMin() {
 
         // Tests similar to the cases above.
-        System.out.println(Math.min(0.0f, -0.0f)); // 0.0
-        System.out.println(Math.min(-0.0f, 0.0f)); // 0.0
-        System.out.println(Math.min(Float.NaN, 4.5)); // NaN
-        System.out.println(Math.min(4.5, Float.NaN)); // NaN
+        assert Float.floatToRawIntBits(Math.min(0.0f, -0.0f)) == Float.floatToRawIntBits(-0.0f) : "Test case Failed"; // -0.0
+
+        assert Float.floatToRawIntBits(Math.min(Float.NaN, 4.5f)) == Float.floatToRawIntBits(Float.NaN) : "Test case Failed"; // NaN
+
+        assert Float.floatToRawIntBits(Math.min(Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY)) == Float.floatToRawIntBits(Float.NEGATIVE_INFINITY) : "Test case Failed"; // -Infinity
     }
 
     public static void main(String[] args) {
