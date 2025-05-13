@@ -7,6 +7,7 @@ These are general notes on integrating string solvers into SPF. While there are 
 ### Accessing the solver from Java ###
 
 First, the solver must be accessible through Java, ideally through a .jar file placed in the lib directory. In the case of a solver that is written in a language other than Java, this .jar file acts as a wrapper around the native language solver methods and objects using the Java Native Interface, JNI. These methods will be called by the solver translation code developed specifically for the given solver.
+The solver's jar path should also be included in jpf.properties as a jpf-symbc.native_classpath entry so that the JPF classloader can find it.
 
 Example .jar files:  
 __com.microsoft.z3.jar__  
