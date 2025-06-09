@@ -54,7 +54,7 @@ import java.util.Map.Entry;
 // types come in and out of each particular dp !!!!!!!!!!!!!!!
 
 public class SymbolicConstraintsGeneral {
-    List<ProblemGeneral> solvers;
+    protected List<ProblemGeneral> solvers;
     protected ProblemGeneral pb;
     protected Boolean result; // tells whether result is satisfiable or not
 
@@ -153,15 +153,15 @@ public class SymbolicConstraintsGeneral {
                 result = pb.solve();
             }
 
-            if (SymbolicInstructionFactory.debugMode)
-                System.out.println("numeric PC: " + pc + " -> " + result + "\n");
+        if (SymbolicInstructionFactory.debugMode)
+            System.out.println("numeric PC: " + pc + " -> " + result + "\n");
 
-            if (SymbolicInstructionFactory.regressMode) {
-                String output = "##NUMERIC PC: ";
-                output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
-                output = output + " " + pc;
-                System.out.println(output);
-            }
+        if (SymbolicInstructionFactory.regressMode) {
+            String output = "##NUMERIC PC: ";
+            output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
+            output = output + " " + pc;
+            System.out.println(output);
+        }
 
             if (result == null) {
                 continue;
@@ -210,7 +210,6 @@ public class SymbolicConstraintsGeneral {
                 ((ProblemZ3Optimize) solver).cleanup();
             }
         }
-
     }
 
     public boolean solve(PathCondition pc) {
