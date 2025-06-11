@@ -109,7 +109,10 @@ public class PathCondition implements Comparable<PathCondition> {
         pc_new.count = this.count;
         pc_new.spc = this.spc.make_copy(pc_new); // TODO: to review
         pc_new.solverCalls = this.solverCalls;
-        pc_new.arrayExpressions = this.arrayExpressions;
+        pc_new.arrayExpressions = new HashMap<>();
+        for(Map.Entry<String, ArrayExpression> entry : this.arrayExpressions.entrySet()) {
+            pc_new.arrayExpressions.put(entry.getKey(), new ArrayExpression(entry.getValue()));
+        }
         return pc_new;
     }
 
