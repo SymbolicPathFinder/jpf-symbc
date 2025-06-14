@@ -45,6 +45,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map.Entry;
 
 // generalized to use different constraint solvers/decision procedures
@@ -52,6 +54,7 @@ import java.util.Map.Entry;
 // types come in and out of each particular dp !!!!!!!!!!!!!!!
 
 public class SymbolicConstraintsGeneral {
+    List<ProblemGeneral> solvers;
     protected ProblemGeneral pb;
     protected Boolean result; // tells whether result is satisfiable or not
 
@@ -76,92 +79,98 @@ public class SymbolicConstraintsGeneral {
 
         // if (SymbolicInstructionFactory.debugMode)
         // System.out.println("checking: PC "+pc);
-
+        solvers = new ArrayList<>();
         String[] dp = SymbolicInstructionFactory.dp;
         if (dp == null) { // default: use choco
             pb = new ProblemChoco();
-        } else if (dp[0].equalsIgnoreCase("choco")) {
-            pb = new ProblemChoco();
-            // } else if(dp[0].equalsIgnoreCase("choco2")){
-            // pb = new ProblemChoco2();
-        } else if (dp[0].equalsIgnoreCase("coral")) {
-            pb = new ProblemCoral();
-        } else if (dp[0].equalsIgnoreCase("iasolver")) {
-            pb = new ProblemIAsolver();
-        } else if (dp[0].equalsIgnoreCase("cvc3")) {
-            pb = new ProblemCVC3();
-        } else if (dp[0].equalsIgnoreCase("cvc3bitvec")) {
-            pb = new ProblemCVC3BitVector();
-        } else if (dp[0].equalsIgnoreCase("yices")) {
-            pb = new ProblemYices();
-        } else if (dp[0].equalsIgnoreCase("z3")) {
-            pb = new ProblemZ3();
-        } else if (dp[0].equalsIgnoreCase("z3inc")) {
-            pb = new ProblemZ3Incremental();
-        } else if (dp[0].equalsIgnoreCase("z3bitvectorinc")) {
-            pb = new ProblemZ3BitVectorIncremental();
-        } else if (dp[0].equalsIgnoreCase("debug")) {
-            pb = new DebugSolvers(pc);
-        } else if (dp[0].equalsIgnoreCase("compare")) {
-            pb = new ProblemCompare(pc, this);
-        } else if (dp[0].equalsIgnoreCase("z3bitvector")) {
-            pb = new ProblemZ3BitVector();
-        } else if (dp[0].equalsIgnoreCase("z3optimize")) {
-            pb = new ProblemZ3Optimize();
-        }
-        // added option to have no-solving
-        // as a result symbolic execution will explore an over-approximation of the
-        // program paths
-        // equivalent to a CFG analysis
-        else if (dp[0].equalsIgnoreCase("no_solver")) {
-            return true;
-        } else
-            throw new RuntimeException(
-                    "## Error: unknown decision procedure symbolic.dp=" + dp[0] + "\n(use choco or IAsolver or CVC3)");
-
-        /*
-         * Parse path condition to solver. Note: do not override the actual pb
-         * variable in case the result is null. The cleanup afterwards will not
-         * work otherwise and the solver gets filled up with wrong assertions,
-         * e.g. with Z3.
-         */
-        ProblemGeneral tempPb = PCParser.parse(pc, pb);
-
-        if (tempPb == null)
-            result = Boolean.FALSE;
-        else {
-            pb = tempPb;
-
-            // YN: z3 optimize
-            if (Observations.lastObservedSymbolicExpression != null) {
-                if (pb instanceof ProblemZ3Optimize) {
-                    ((ProblemZ3Optimize) pb).maximize(
-                            PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+        } else {
+            for(String s : dp) {
+                if (s.equalsIgnoreCase("choco")) {
+                    solvers.add(new ProblemChoco());
+                    // } else if(dp[0].equalsIgnoreCase("choco2")){
+                    // pb = new ProblemChoco2();
+                } else if (s.equalsIgnoreCase("coral")) {
+                    solvers.add(new ProblemCoral());
+                } else if (s.equalsIgnoreCase("iasolver")) {
+                    solvers.add(new ProblemIAsolver());
+                } else if (s.equalsIgnoreCase("cvc3")) {
+                    solvers.add(new ProblemCVC3());
+                } else if (s.equalsIgnoreCase("cvc3bitvec")) {
+                    solvers.add(new ProblemCVC3BitVector());
+                } else if (s.equalsIgnoreCase("yices")) {
+                    solvers.add(new ProblemYices());
+                } else if (s.equalsIgnoreCase("z3")) {
+                    solvers.add(new ProblemZ3());
+                } else if (s.equalsIgnoreCase("z3inc")) {
+                    solvers.add(new ProblemZ3Incremental());
+                } else if (s.equalsIgnoreCase("z3bitvectorinc")) {
+                    solvers.add(new ProblemZ3BitVectorIncremental());
+                } else if (s.equalsIgnoreCase("debug")) {
+                    solvers.add(new DebugSolvers(pc));
+                } else if (s.equalsIgnoreCase("compare")) {
+                    solvers.add(new ProblemCompare(pc, this));
+                } else if (s.equalsIgnoreCase("z3bitvector")) {
+                    solvers.add(new ProblemZ3BitVector());
+                } else if (s.equalsIgnoreCase("z3optimize")) {
+                    solvers.add(new ProblemZ3Optimize());
                 }
+                // added option to have no-solving
+                // as a result symbolic execution will explore an over-approximation of the
+                // program paths
+                // equivalent to a CFG analysis
+                else if (s.equalsIgnoreCase("no_solver")) {
+                    return true;
+                } else
+                    throw new RuntimeException(
+                            "## Error: unknown decision procedure symbolic.dp=" + dp[0] + "\n(use choco or IAsolver or CVC3)");
+            }
+        }
+
+
+
+        for(int i = 0; i < solvers.size(); i++) {
+            pb = solvers.get(i);
+
+            if (SymbolicInstructionFactory.debugMode) {
+                System.out.println("Using solver: " + pb.getClass().getSimpleName());
             }
 
-            result = pb.solve();
-        }
+            ProblemGeneral tempPb = PCParser.parse(pc, pb);
 
-        if (SymbolicInstructionFactory.debugMode)
-            System.out.println("numeric PC: " + pc + " -> " + result + "\n");
+            if (tempPb == null)
+                continue;
+            else {
+                pb = tempPb;
 
-        if (SymbolicInstructionFactory.regressMode) {
-            String output = "##NUMERIC PC: ";
-            output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
-            output = output + " " + pc;
-            System.out.println(output);
-        }
+                // YN: z3 optimize
+                if (Observations.lastObservedSymbolicExpression != null) {
+                    if (pb instanceof ProblemZ3Optimize) {
+                        ((ProblemZ3Optimize) pb).maximize(
+                                PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+                    }
+                }
 
-        if (result == null) {
-            return false;
-        }
-        if (result == Boolean.TRUE) {
-            return true;
-        } else {
-            return false;
-        }
+                result = pb.solve();
+            }
 
+            if (SymbolicInstructionFactory.debugMode)
+                System.out.println("numeric PC: " + pc + " -> " + result + "\n");
+
+            if (SymbolicInstructionFactory.regressMode) {
+                String output = "##NUMERIC PC: ";
+                output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
+                output = output + " " + pc;
+                System.out.println(output);
+            }
+
+            if (result == null) {
+                continue;
+            }
+            if (result == Boolean.TRUE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isSatisfiableGreen(PathCondition pc) {
@@ -187,17 +196,21 @@ public class SymbolicConstraintsGeneral {
     }
 
     public void cleanup() {
-        if (pb instanceof ProblemCVC3) {
-            ((ProblemCVC3) pb).cleanup();
-        } else if (pb instanceof ProblemCoral) {
-            ((ProblemCoral) pb).cleanup();
-        } else if (pb instanceof ProblemZ3) {
-            ((ProblemZ3) pb).cleanup();
-        } else if (pb instanceof ProblemZ3BitVector) {
-            ((ProblemZ3BitVector) pb).cleanup();
-        } else if (pb instanceof ProblemZ3Optimize) {
-            ((ProblemZ3Optimize) pb).cleanup();
+        for(int i = 0; i < solvers.size(); i++) {
+            ProblemGeneral solver = solvers.get(i);
+            if (solver instanceof ProblemCVC3) {
+                ((ProblemCVC3) solver).cleanup();
+            } else if (solver instanceof ProblemCoral) {
+                ((ProblemCoral) solver).cleanup();
+            } else if (solver instanceof ProblemZ3) {
+                ((ProblemZ3) solver).cleanup();
+            } else if (solver instanceof ProblemZ3BitVector) {
+                ((ProblemZ3BitVector) solver).cleanup();
+            } else if (solver instanceof ProblemZ3Optimize) {
+                ((ProblemZ3Optimize) solver).cleanup();
+            }
         }
+
     }
 
     public boolean solve(PathCondition pc) {
