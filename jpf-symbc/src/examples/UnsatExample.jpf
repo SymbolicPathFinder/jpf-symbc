@@ -1,0 +1,7 @@
+target=UnsatExample
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = UnsatExample.test(sym)
+
+symbolic.dp=z3,choco
+symbolic.debug=true
