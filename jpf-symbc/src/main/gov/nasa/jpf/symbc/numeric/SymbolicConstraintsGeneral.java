@@ -135,22 +135,36 @@ public class SymbolicConstraintsGeneral {
                 System.out.println("Using solver: " + pb.getClass().getSimpleName());
             }
 
-            ProblemGeneral tempPb = PCParser.parse(pc, pb);
+            try {
+                ProblemGeneral tempPb = PCParser.parse(pc, pb);
 
-            if (tempPb == null)
-                continue;
-            else {
-                pb = tempPb;
+                if (tempPb == null)
+                    continue;
+                else {
+                    pb = tempPb;
 
-                // YN: z3 optimize
-                if (Observations.lastObservedSymbolicExpression != null) {
-                    if (pb instanceof ProblemZ3Optimize) {
-                        ((ProblemZ3Optimize) pb).maximize(
-                                PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+                    // YN: z3 optimize
+                    if (Observations.lastObservedSymbolicExpression != null) {
+                        if (pb instanceof ProblemZ3Optimize) {
+                            ((ProblemZ3Optimize) pb).maximize(
+                                    PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+                        }
                     }
-                }
 
-                result = pb.solve();
+                    result = pb.solve();
+                }
+            } catch (Exception e) {
+                // throw an exception if no solver is able to produce a result
+                if(i == solvers.size()-1 && result == null) {
+                    throw new RuntimeException(
+                            "Error: no solver could parse or solve the path condition: " + pc + "\n");
+                } else {
+                    if(SymbolicInstructionFactory.debugMode) {
+                        System.err.println("Exception in parsing or solving with solver " + pb.getClass().getSimpleName() + ": " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                    continue;
+                }
             }
 
             if (SymbolicInstructionFactory.debugMode)
@@ -196,6 +210,9 @@ public class SymbolicConstraintsGeneral {
     }
 
     public void cleanup() {
+        if(solvers == null) {
+            return;
+        }
         for(int i = 0; i < solvers.size(); i++) {
             ProblemGeneral solver = solvers.get(i);
             if (solver instanceof ProblemCVC3) {
