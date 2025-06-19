@@ -72,7 +72,6 @@ public class Math {
 	    return (a < 0) ? -a : a;
 	  }
 
-      //	 TODO:
 	  public static double max ( double a, double b) {
 		if (a != a)
 			return a;
@@ -81,7 +80,6 @@ public class Math {
 		return (a >= b) ? a : b;
 	  }
 
-	  // TODO: need to model NaN et al.
 	  public static float max ( float a, float b) {
 		if (a != a)
 			return a;
@@ -98,7 +96,6 @@ public class Math {
 		return (a >= b) ? a : b;
 	  }
 
-	  // TODO:
 	  public static double min ( double a, double b) {
 		if (a != a)
 			return a;
@@ -106,8 +103,7 @@ public class Math {
 			return (1.0d / a < 0) ? a : b;
 		return (a <= b) ? a : b;
 	  }
-
-	  // TODO:
+	  
 	  public static float min ( float a, float b) {
 		 if (a != a)
 			 return a;
