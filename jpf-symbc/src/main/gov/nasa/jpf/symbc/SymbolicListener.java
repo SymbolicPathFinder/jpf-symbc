@@ -3,16 +3,16 @@
  * Administrator of the National Aeronautics and Space Administration.
  * All rights reserved.
  *
- * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License, 
+ * Symbolic Pathfinder (jpf-symbc) is licensed under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- * 
- *        http://www.apache.org/licenses/LICENSE-2.0. 
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0.
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
@@ -239,7 +239,7 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
     }
     @Override
     public void instructionExecuted(VM vm, ThreadInfo currentThread, Instruction nextInstruction,
-            Instruction executedInstruction) {
+                                    Instruction executedInstruction) {
 
         if (!vm.getSystemState().isIgnored()) {
             Instruction insn = executedInstruction;
@@ -265,6 +265,39 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                 if(strInsn.contains("invokestatic") && strInsn.contains("Verifier.nondet")){
                     interceptSymbolic = true;
                 }
+
+                // --- Begin: Handle Verifier.nondetString for null/not-null choices ---
+                if (className.contains("Verifier") && methodName.equals("nondetString")) {
+                    if (!ti.isFirstStepInsn()) {
+                        ChoiceGenerator<?> cg = new PCChoiceGenerator(2);
+                        ti.getVM().setNextChoiceGenerator(cg);
+                        return;
+                    } else {
+                        ChoiceGenerator<?> cg = ti.getVM().getChoiceGenerator();
+                        int choice = (Integer) cg.getNextChoice();
+                        if (choice == 0) {
+                            PathCondition pc = null;
+                            ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+                            while (prev_cg != null && !(prev_cg instanceof PCChoiceGenerator)) {
+                                prev_cg = prev_cg.getPreviousChoiceGenerator();
+                            }
+                            if (prev_cg == null) {
+                                pc = new PathCondition();
+                            } else {
+                                pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+                            }
+                            if (pc == null || pc.simplify()) {
+                                ti.createAndThrowException("java.lang.NullPointerException");
+                            } else {
+                                ti.getVM().getSystemState().setIgnored(true);
+                            }
+                            return;
+                        } else {
+                            // Not null: proceed as usual
+                        }
+                    }
+                }
+                // --- End: Handle Verifier.nondetString for null/not-null choices ---
 
                 StackFrame sf = ti.getTopFrame();
                 String shortName = methodName;
@@ -382,11 +415,11 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                                 pa.solve(pc, solver);
                             } else
                                 pc.solve();
-                            
+
                             if (!PathCondition.flagSolved) {
                                 return;
                             }
-                           
+
 
                             // after the following statement is executed, the pc loses its solution
 
@@ -467,20 +500,20 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                              * pa.solve(pc,solver); } else pc.solve();
                              */
 
-                            
-                              String pcString = pc.toString(); pcPair = new Pair<String,String>(pcString,returnString);
-                              MethodSummary methodSummary = allSummaries.get(longName); Vector<Pair> pcs =
-                              methodSummary.getPathConditions(); if ((!pcs.contains(pcPair)) &&
-                              (pcString.contains("SYM"))) { methodSummary.addPathCondition(pcPair); }
-                              
-                              if(allSummaries.get(longName)!=null) // recursive call longName = longName +
-                              methodSummary.hashCode(); // differentiate the key for recursive calls
-                              allSummaries.put(longName,methodSummary); if (SymbolicInstructionFactory.debugMode) {
-                              System.out.println("*************Summary***************");
-                              System.out.println("PC is:"+pc.toString()); if(result!=null){
-                              System.out.println("Return is:  "+result);
-                              System.out.println("***********************************"); } }
-                              // YN
+
+                            String pcString = pc.toString(); pcPair = new Pair<String,String>(pcString,returnString);
+                            MethodSummary methodSummary = allSummaries.get(longName); Vector<Pair> pcs =
+                                    methodSummary.getPathConditions(); if ((!pcs.contains(pcPair)) &&
+                                    (pcString.contains("SYM"))) { methodSummary.addPathCondition(pcPair); }
+
+                            if(allSummaries.get(longName)!=null) // recursive call longName = longName +
+                                methodSummary.hashCode(); // differentiate the key for recursive calls
+                            allSummaries.put(longName,methodSummary); if (SymbolicInstructionFactory.debugMode) {
+                                System.out.println("*************Summary***************");
+                                System.out.println("PC is:"+pc.toString()); if(result!=null){
+                                    System.out.println("Return is:  "+result);
+                                    System.out.println("***********************************"); } }
+                            // YN
                         }
                     }
                 }
@@ -565,7 +598,7 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                             testCase = testCase + actualValue + ",";
                         else
                             testCase = testCase + SymbolicInteger.UNDEFINED + "(don't care),";// not correct in concolic
-                                                                                              // mode
+                        // mode
                     }
                 }
                 if (testCase.endsWith(","))
@@ -644,10 +677,10 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                             testCase = testCase + "<td>" + actualValue + "</td>";
                         else
                             testCase = testCase + "<td>" + SymbolicInteger.UNDEFINED + "(don't care)</td>"; // not
-                                                                                                            // correct
-                                                                                                            // in
-                                                                                                            // concolic
-                                                                                                            // mode
+                        // correct
+                        // in
+                        // concolic
+                        // mode
                     }
                 }
 
