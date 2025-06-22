@@ -27,18 +27,21 @@ import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.VM;
 
+import java.util.Set;
+
 public class IncrementalListener extends PropertyListenerAdapter {
   
   public static IncrementalSolver solver;
   
   public IncrementalListener(Config config, JPF jpf) {
-    String stringDp = SymbolicInstructionFactory.dp[0];
-    if(stringDp.equalsIgnoreCase("z3inc")){
+//    TODO: What if both are in symbolic.dp
+    Set<String> dpSet = SymbolicInstructionFactory.dpSet;
+    if(dpSet.contains("z3inc")){
       solver = new ProblemZ3Incremental();
-    }  else if(stringDp.equalsIgnoreCase("z3bitvectorinc")){
+    }  else if(dpSet.contains("z3bitvectorinc")){
       solver = new ProblemZ3BitVectorIncremental();
     } else {
-      System.err.println("Trying to use incremental listener, but solver " + stringDp + " does not support incremental solving (try z3inc or z3bitvectorinc)");
+      System.err.println("Trying to use incremental listener, but no solver in symbolic.dp supports incremental solving (try z3inc or z3bitvectorinc)");
       jpf.removeListener(this);
     }
 

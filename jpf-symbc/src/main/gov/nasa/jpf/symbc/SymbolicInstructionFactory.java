@@ -29,6 +29,10 @@ import gov.nasa.jpf.util.ClassInfoFilter;
 import gov.nasa.jpf.vm.ClassInfo;
 import gov.nasa.jpf.vm.Instruction;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.InstructionFactory {
 
@@ -539,6 +543,7 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	      }
 
 	static public String[] dp;
+	static public Set<String> dpSet;
 
 	/* Symbolic String configuration */
 	static public String[] string_dp;
@@ -665,7 +670,19 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				dp = new String[1];
 				dp[0] = "choco";
 			}
-			if (debugMode) System.out.println("symbolic.dp="+dp[0]);
+			dpSet = new HashSet<>();
+			for(String s : dp) {
+				if(dpSet.contains(s.toLowerCase())) {
+					throw new IllegalArgumentException("Duplicate solver in symbolic.dp: " + s);
+				}
+				dpSet.add(s.toLowerCase());
+			}
+
+			if(dpSet.contains("no_solver") && dpSet.size() > 1) {
+				throw new IllegalArgumentException("The 'no_solver' option cannot be used together with other solvers.");
+			}
+
+			if (debugMode) System.out.println("symbolic.dp="+ Arrays.toString(dp));
 
 			stringTimeout = conf.getInt("symbolic.string_dp_timeout_ms");
 			if (debugMode) System.out.println("symbolic.string_dp_timeout_ms="+stringTimeout);
@@ -754,12 +771,12 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				heuristicPartitionMode = false;
 			}
 
-			if(dp[0].equalsIgnoreCase("choco") || dp[0].equalsIgnoreCase("debug") || dp[0].equalsIgnoreCase("compare") || dp == null) { // default is choco
+			if(dpSet.contains("choco") || dpSet.contains("debug") || dpSet.contains("compare")) {
 			  ProblemChoco.timeBound = conf.getInt("symbolic.choco_time_bound", 30000);
 			  if (debugMode) System.out.println("symbolic.choco_time_bound="+ProblemChoco.timeBound);
 			}
 			//load CORAL's parameters
-			if (dp[0].equalsIgnoreCase("coral") || dp[0].equalsIgnoreCase("debug") || dp[0].equalsIgnoreCase("compare")) {
+			if (dpSet.contains("coral") || dpSet.contains("debug") || dpSet.contains("compare")) {
 				ProblemCoral.configure(conf);
 			}
 
