@@ -682,6 +682,10 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				throw new IllegalArgumentException("The 'no_solver' option cannot be used together with other solvers.");
 			}
 
+			if(dpSet.contains("compare") && dpSet.size() > 1) {
+				throw new IllegalArgumentException("The 'compare' option cannot be used together with other solvers.");
+			}
+
 			if (debugMode) System.out.println("symbolic.dp="+ Arrays.toString(dp));
 
 			stringTimeout = conf.getInt("symbolic.string_dp_timeout_ms");

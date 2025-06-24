@@ -54,9 +54,9 @@ import java.util.Map.Entry;
 // types come in and out of each particular dp !!!!!!!!!!!!!!!
 
 public class SymbolicConstraintsGeneral {
-    List<ProblemGeneral> solvers;
+    protected List<ProblemGeneral> solvers;
     protected ProblemGeneral resultSolver;
-    protected Boolean result; // tells whether result is satisfiable or not
+    protected Boolean result;
 
     public boolean isSatisfiable(PathCondition pc) {
         if (pc == null || pc.count == 0) {
@@ -70,6 +70,7 @@ public class SymbolicConstraintsGeneral {
                     + SymbolicInstructionFactory.maxPcLength + ".  Pretending it is unsatisfiable.");
             return false;
         }
+
         if (SymbolicInstructionFactory.maxPcMSec > 0 && System.currentTimeMillis()
                 - SymbolicInstructionFactory.startSystemMillis > SymbolicInstructionFactory.maxPcMSec) {
             System.out.println("## Warning: Exploration time exceeds symbolic.max_pc_msec="
@@ -122,7 +123,7 @@ public class SymbolicConstraintsGeneral {
                         "## Error: unknown decision procedure symbolic.dp contains " + s + "\n(use choco or IAsolver or CVC3)");
         }
 
-        for(int i = 0; i < solvers.size(); i++) {
+        for (int i = 0; i < solvers.size(); i++) {
             resultSolver = solvers.get(i);
 
             if (SymbolicInstructionFactory.debugMode) {
@@ -131,48 +132,46 @@ public class SymbolicConstraintsGeneral {
 
             try {
                 ProblemGeneral tempPb = PCParser.parse(pc, resultSolver);
+
                 if (tempPb == null) {
                     result = Boolean.FALSE;
-                }
-                else {
-                    resultSolver = tempPb;
+                } else {
                     // YN: z3 optimize
                     if (Observations.lastObservedSymbolicExpression != null) {
                         if (resultSolver instanceof ProblemZ3Optimize) {
                             ((ProblemZ3Optimize) resultSolver).maximize(
-                                    PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+                                    PCParser.getExpression(
+                                            (IntegerExpression) Observations.lastObservedSymbolicExpression));
                         }
                     }
                     result = resultSolver.solve();
                 }
+
+                break;
+
             } catch (Exception e) {
+                if (SymbolicInstructionFactory.debugMode) {
+                    System.err.println("Exception in parsing or solving with solver "
+                            + resultSolver.getClass().getSimpleName() + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
                 // throw an exception if no solver is able to produce a result
-                if(i == solvers.size()-1) {
+                if (i == solvers.size() - 1) {
                     throw new RuntimeException(
                             "Error: no solver could parse or solve the path condition: " + pc + "\n");
-                } else {
-                    if(SymbolicInstructionFactory.debugMode) {
-                        System.err.println("Exception in parsing or solving with solver " + resultSolver.getClass().getSimpleName() + ": " + e.getMessage());
-                        e.printStackTrace();
-                    }
-                    continue;
                 }
             }
+        }
 
-            if (SymbolicInstructionFactory.debugMode)
-                System.out.println("numeric PC: " + pc + " -> " + result + "\n");
 
-            if (SymbolicInstructionFactory.regressMode) {
-                String output = "##NUMERIC PC: ";
-                output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
-                output = output + " " + pc;
-                System.out.println(output);
-            }
+        if (SymbolicInstructionFactory.debugMode)
+            System.out.println("numeric PC: " + pc + " -> " + result + "\n");
 
-            if (result == null) {
-                result = Boolean.FALSE;
-            }
-            break;
+        if (SymbolicInstructionFactory.regressMode) {
+            String output = "##NUMERIC PC: ";
+            output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
+            output = output + " " + pc;
+            System.out.println(output);
         }
 
         return result == Boolean.TRUE ? true : false;
@@ -201,24 +200,22 @@ public class SymbolicConstraintsGeneral {
     }
 
     public void cleanup() {
-        if(solvers == null) {
-            return;
-        }
-        for(int i = 0; i < solvers.size(); i++) {
-            ProblemGeneral solver = solvers.get(i);
-            if (solver instanceof ProblemCVC3) {
-                ((ProblemCVC3) solver).cleanup();
-            } else if (solver instanceof ProblemCoral) {
-                ((ProblemCoral) solver).cleanup();
-            } else if (solver instanceof ProblemZ3) {
-                ((ProblemZ3) solver).cleanup();
-            } else if (solver instanceof ProblemZ3BitVector) {
-                ((ProblemZ3BitVector) solver).cleanup();
-            } else if (solver instanceof ProblemZ3Optimize) {
-                ((ProblemZ3Optimize) solver).cleanup();
+        if (solvers != null) {
+            for (int i = 0; i < solvers.size(); i++) {
+                ProblemGeneral solver = solvers.get(i);
+                if (solver instanceof ProblemCVC3) {
+                    ((ProblemCVC3) solver).cleanup();
+                } else if (solver instanceof ProblemCoral) {
+                    ((ProblemCoral) solver).cleanup();
+                } else if (solver instanceof ProblemZ3) {
+                    ((ProblemZ3) solver).cleanup();
+                } else if (solver instanceof ProblemZ3BitVector) {
+                    ((ProblemZ3BitVector) solver).cleanup();
+                } else if (solver instanceof ProblemZ3Optimize) {
+                    ((ProblemZ3Optimize) solver).cleanup();
+                }
             }
         }
-
     }
 
     public boolean solve(PathCondition pc) {
@@ -360,7 +357,7 @@ public class SymbolicConstraintsGeneral {
                     SymbolicReal pcVar = e.getKey();
                     Object dpVar = e.getValue();
                     double e_value = resultSolver.getRealValue(dpVar); // may be undefined: throws an exception
-                    pcVar.solution = e_value; 
+                    pcVar.solution = e_value;
                     result.put(pcVar.getName(), e_value);
                 }
             } catch (Exception exp) {

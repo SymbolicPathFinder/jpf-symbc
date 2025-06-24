@@ -652,7 +652,7 @@ public class ProblemCoral extends ProblemGeneral {
 	 */
 	public Boolean solve() {
 		Solver solver = solverKind.get();
-		Boolean result = null;
+		Boolean result = false;
 		try {
 			sol = solveIt(pc, solver);
 			/**
@@ -664,6 +664,8 @@ public class ProblemCoral extends ProblemGeneral {
 				result = true;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
+        	throw new RuntimeException("## Error Coral: " + e);
 		}
 //		finally {
 //			System.out.printf(">>> %s %s %s\n", pc.toString(), sol, result);
