@@ -58,7 +58,7 @@ public class SymbolicConstraintsGeneral {
     protected ProblemGeneral resultSolver;
     protected Boolean result;
 
-    public boolean isSatisfiable(PathCondition pc) {
+    public boolean isSatisfiable(PathCondition pc){
         if (pc == null || pc.count == 0) {
             if (SymbolicInstructionFactory.debugMode)
                 System.out.println("## Warning: empty path condition");
@@ -157,7 +157,7 @@ public class SymbolicConstraintsGeneral {
                 }
                 // throw an exception if no solver is able to produce a result
                 if (i == solvers.size() - 1) {
-                    throw new RuntimeException(
+                    throw new NoSolverSucceededException(
                             "Error: no solver could parse or solve the path condition: " + pc + "\n");
                 }
             }
