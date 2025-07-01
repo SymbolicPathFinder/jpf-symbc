@@ -24,6 +24,8 @@ import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.symbc.numeric.*;
 import gov.nasa.jpf.symbc.numeric.Comparator;
+import gov.nasa.jpf.symbc.string.StringConstant;
+import gov.nasa.jpf.symbc.string.StringExpression;
 import gov.nasa.jpf.vm.*;
 
 import gov.nasa.jpf.jvm.bytecode.ARETURN;
@@ -266,39 +268,6 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                     interceptSymbolic = true;
                 }
 
-                // --- Begin: Handle Verifier.nondetString for null/not-null choices ---
-                if (className.contains("Verifier") && methodName.equals("nondetString")) {
-                    if (!ti.isFirstStepInsn()) {
-                        ChoiceGenerator<?> cg = new PCChoiceGenerator(2);
-                        ti.getVM().setNextChoiceGenerator(cg);
-                        return;
-                    } else {
-                        ChoiceGenerator<?> cg = ti.getVM().getChoiceGenerator();
-                        int choice = (Integer) cg.getNextChoice();
-                        if (choice == 0) {
-                            PathCondition pc = null;
-                            ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
-                            while (prev_cg != null && !(prev_cg instanceof PCChoiceGenerator)) {
-                                prev_cg = prev_cg.getPreviousChoiceGenerator();
-                            }
-                            if (prev_cg == null) {
-                                pc = new PathCondition();
-                            } else {
-                                pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
-                            }
-                            if (pc == null || pc.simplify()) {
-                                ti.createAndThrowException("java.lang.NullPointerException");
-                            } else {
-                                ti.getVM().getSystemState().setIgnored(true);
-                            }
-                            return;
-                        } else {
-                            // Not null: proceed as usual
-                        }
-                    }
-                }
-                // --- End: Handle Verifier.nondetString for null/not-null choices ---
-
                 StackFrame sf = ti.getTopFrame();
                 String shortName = methodName;
                 String longName = mi.getLongName();
@@ -387,13 +356,78 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
                     StackFrame sf = ti.getTopFrame();
                     Object symbolicVar = sf.getOperandAttr();
 
+//                    if(interceptSymbolic && strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")){
+//                        symbolicVariableInfo.varName = symbolicVar.toString();
+//                        symbolicVariableInfoList.add(symbolicVariableInfo);
+//
+//                        // Resetting interceptSymbolic
+//                        interceptSymbolic = false;
+//                    }
+
                     if(interceptSymbolic && strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")){
+
+                        // Check if this is a String type symbolic variable
+                        if(symbolicVariableInfo.returnType != null && symbolicVariableInfo.returnType.equals("java.lang.String")) {
+
+                            // Create choice generator for null/not-null if not already created
+                            ChoiceGenerator<?> cg = vm.getChoiceGenerator();
+                            if (!(cg instanceof PCChoiceGenerator) || ti.isFirstStepInsn()) {
+                                PCChoiceGenerator pcCG = new PCChoiceGenerator(2);
+                                vm.setNextChoiceGenerator(pcCG);
+                                return;
+                            }
+
+                            if (cg instanceof PCChoiceGenerator) {
+                                PCChoiceGenerator pcCG = (PCChoiceGenerator) cg;
+                                int choice = pcCG.getNextChoice();
+
+                                PathCondition pc = pcCG.getCurrentPC();
+                                if (pc == null) {
+                                    pc = new PathCondition();
+                                } else {
+                                    pc = pc.make_copy();
+                                }
+
+                                if (symbolicVar instanceof StringExpression) {
+                                    StringExpression symString = (StringExpression) symbolicVar;
+
+                                    if (choice == 0) {
+                                        pc._addDet(Comparator.EQ, symString, new StringConstant(""));
+
+                                        if (pc.simplify()) {
+                                            pcCG.setCurrentPC(pc);
+                                            ti.createAndThrowException("java.lang.NullPointerException", "Symbolic string is null");
+                                            return;
+                                        } else {
+                                            vm.getSystemState().setIgnored(true);
+                                            return;
+                                        }
+
+                                    } else {
+                                        pc._addDet(Comparator.NE, symString, new StringConstant(""));
+
+                                        if (pc.simplify()) {
+                                            pcCG.setCurrentPC(pc);
+                                        } else {
+                                            vm.getSystemState().setIgnored(true);
+                                            return;
+                                        }
+                                    }
+                                } else {
+                                    System.out.println("DEBUG: symbolicVar is not StringExpression, it's: " +
+                                            (symbolicVar != null ? symbolicVar.getClass().getName() : "null"));
+                                    System.out.println("DEBUG: symbolicVar value: " + symbolicVar);
+                                }
+                            }
+                        }
+
                         symbolicVariableInfo.varName = symbolicVar.toString();
                         symbolicVariableInfoList.add(symbolicVariableInfo);
 
-                        // Resetting interceptSymbolic
+                        // Reset interceptSymbolic
                         interceptSymbolic = false;
                     }
+
 
                     if (((BytecodeUtils.isClassSymbolic(conf, className, mi, methodName))
                             || BytecodeUtils.isMethodSymbolic(conf, mi.getFullName(), numberOfArgs, null))) {
