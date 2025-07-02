@@ -364,69 +364,47 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
 //                        interceptSymbolic = false;
 //                    }
 
-                    if(interceptSymbolic && strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")){
 
-                        // Check if this is a String type symbolic variable
-                        if(symbolicVariableInfo.returnType != null && symbolicVariableInfo.returnType.equals("java.lang.String")) {
 
-                            // Create choice generator for null/not-null if not already created
+                    if (interceptSymbolic && strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")) {
+                        if (symbolicVariableInfo.returnType != null && symbolicVariableInfo.returnType.equals("java.lang.String")) {
+
                             ChoiceGenerator<?> cg = vm.getChoiceGenerator();
                             if (!(cg instanceof PCChoiceGenerator) || ti.isFirstStepInsn()) {
-                                PCChoiceGenerator pcCG = new PCChoiceGenerator(2);
+                                PCChoiceGenerator pcCG = new PCChoiceGenerator(2); // 0 = null, 1 = non-null
                                 vm.setNextChoiceGenerator(pcCG);
                                 return;
                             }
 
-                            if (cg instanceof PCChoiceGenerator) {
-                                PCChoiceGenerator pcCG = (PCChoiceGenerator) cg;
-                                int choice = pcCG.getNextChoice();
+                            PCChoiceGenerator pcCG = (PCChoiceGenerator) cg;
+                            int choice = pcCG.getNextChoice();
 
-                                PathCondition pc = pcCG.getCurrentPC();
-                                if (pc == null) {
-                                    pc = new PathCondition();
-                                } else {
-                                    pc = pc.make_copy();
-                                }
+                            PathCondition pc = pcCG.getCurrentPC();
+                            if (pc == null) pc = new PathCondition(); else pc = pc.make_copy();
 
-                                if (symbolicVar instanceof StringExpression) {
-                                    StringExpression symString = (StringExpression) symbolicVar;
+                            System.out.println("[CG] Choice made: " + choice);
+                            System.out.println("[PC] Path condition before adding constraint: " + pc);
 
-                                    if (choice == 0) {
-                                        pc._addDet(Comparator.EQ, symString, new StringConstant(""));
+                            if (symbolicVar instanceof StringExpression) {
+                                StringExpression symStr = (StringExpression) symbolicVar;
 
-                                        if (pc.simplify()) {
-                                            pcCG.setCurrentPC(pc);
-                                            ti.createAndThrowException("java.lang.NullPointerException", "Symbolic string is null");
-                                            return;
-                                        } else {
-                                            vm.getSystemState().setIgnored(true);
-                                            return;
-                                        }
-
+                                if (choice == 0) {
+                                    System.out.println("[Listener] Null path chosen");
+                                    pc._addDet(Comparator.EQ, symStr, null);
+                                    if (pc.simplify()) {
+                                        pcCG.setCurrentPC(pc);
                                     } else {
-                                        pc._addDet(Comparator.NE, symString, new StringConstant(""));
-
-                                        if (pc.simplify()) {
-                                            pcCG.setCurrentPC(pc);
-                                        } else {
-                                            vm.getSystemState().setIgnored(true);
-                                            return;
-                                        }
+                                        vm.getSystemState().setIgnored(true);
+                                        return;
                                     }
-                                } else {
-                                    System.out.println("DEBUG: symbolicVar is not StringExpression, it's: " +
-                                            (symbolicVar != null ? symbolicVar.getClass().getName() : "null"));
-                                    System.out.println("DEBUG: symbolicVar value: " + symbolicVar);
                                 }
                             }
+                            symbolicVariableInfo.varName = symbolicVar.toString();
+                            symbolicVariableInfoList.add(symbolicVariableInfo);
+                            interceptSymbolic = false;
                         }
-
-                        symbolicVariableInfo.varName = symbolicVar.toString();
-                        symbolicVariableInfoList.add(symbolicVariableInfo);
-
-                        // Reset interceptSymbolic
-                        interceptSymbolic = false;
                     }
+
 
 
                     if (((BytecodeUtils.isClassSymbolic(conf, className, mi, methodName))
