@@ -23,8 +23,7 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.symbc.numeric.*;
-import gov.nasa.jpf.symbc.numeric.Comparator;
-import gov.nasa.jpf.symbc.string.StringConstant;
+import gov.nasa.jpf.symbc.string.StringComparator;
 import gov.nasa.jpf.symbc.string.StringExpression;
 import gov.nasa.jpf.vm.*;
 
@@ -54,8 +53,6 @@ import gov.nasa.jpf.util.Pair;
 
 import java.io.*;
 import java.util.*;
-
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 public class SymbolicListener3 extends PropertyListenerAdapter implements PublisherExtension {
 
@@ -114,11 +111,15 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
     boolean allowMethodInvocation = false;
     // A flag to check whether the information of symbolic variable is already parsed or not.
     boolean interceptSymbolic = false;
+    boolean isCheckingNull=false;
     boolean witnessAssumptionScopeIsFilled = false;
     String fileName = "";
     String assumptionScope = "";
-    private Map<String, Integer> instructionCountMap = new HashMap<>();
-    private Map<String, Integer> stringInsCountMap = new HashMap<>();
+    private final Map<String, Integer> instructionCountMap = new HashMap<>();
+    private final Map<String, Integer> stringInsCountMap = new HashMap<>();
+    private int makeSymbolicBranchCount = 0;
+    private int nullChoiceCount = 0;
+    private int nonNullChoiceCount = 0;
 
 
     @Override
@@ -256,13 +257,18 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
             Config conf = vm.getConfig();
             String strInsn = executedInstruction.toString();
             stringInsCountMap.merge(strInsn, 1, Integer::sum);
-
+//            if(strInsn.contains("nativereturn")) {
+//                    makeSymbolicBranchCount++;
+//            }
 
             if(!witnessAssumptionScopeIsFilled){
                 parseAssumptionScope(ti);
                 witnessAssumptionScopeIsFilled = true;
             }
             if (insn instanceof JVMInvokeInstruction) {
+//                if(strInsn.contains("nativereturn")) {
+//                    makeSymbolicBranchCount++;
+//                }
                 JVMInvokeInstruction md = (JVMInvokeInstruction) insn;
                 String methodName = md.getInvokedMethodName();
                 int numberOfArgs = md.getArgumentValues(ti).length;
@@ -352,6 +358,9 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
                     allSummaries.put(longName, methodSummary);
                 }
             } else if (insn instanceof JVMReturnInstruction) {
+//                if(strInsn.contains("nativereturn")) {
+//                    makeSymbolicBranchCount++;
+//                }
                 MethodInfo mi = insn.getMethodInfo();
                 ClassInfo ci = mi.getClassInfo();
                 if (null != ci) {
@@ -362,53 +371,68 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
 
                     StackFrame sf = ti.getTopFrame();
                     Object symbolicVar = sf.getOperandAttr();
-
-//                    if(interceptSymbolic && strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")){
-//                        symbolicVariableInfo.varName = symbolicVar.toString();
-//                        symbolicVariableInfoList.add(symbolicVariableInfo);
-//
-//                        // Resetting interceptSymbolic
-//                        interceptSymbolic = false;
-//                    }
-
-
-
                     if (interceptSymbolic && strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")) {
+                        if(strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")) {
+                            makeSymbolicBranchCount++;
+                        }
+//                        makeSymbolicBranchCount++;
                         if (symbolicVariableInfo.returnType != null && symbolicVariableInfo.returnType.equals("java.lang.String")) {
-
+                            PathCondition pc;
+                            if(strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")) {
+                                makeSymbolicBranchCount++;
+                            }
                             ChoiceGenerator<?> cg = vm.getChoiceGenerator();
-                            if (!(cg instanceof PCChoiceGenerator) || ti.isFirstStepInsn()) {
-                                PCChoiceGenerator pcCG = new PCChoiceGenerator(2); // 0 = null, 1 = non-null
+                            if (!ti.isFirstStepInsn()) {
+                                PCChoiceGenerator pcCG = new PCChoiceGenerator(1); // 0 = null, 1 = non-null
                                 vm.setNextChoiceGenerator(pcCG);
+                                isCheckingNull=true;
+                                if(strInsn.contains("nativereturn") && strInsn.contains("makeSymbolic")) {
+                                    makeSymbolicBranchCount++;
+                                }
                                 return;
                             }
-
-                            PCChoiceGenerator pcCG = (PCChoiceGenerator) cg;
-                            int choice = pcCG.getNextChoice();
-
-                            PathCondition pc = pcCG.getCurrentPC();
-                            if (pc == null) pc = new PathCondition(); else pc = pc.make_copy();
-
-                            System.out.println("[CG] Choice made: " + choice);
-                            System.out.println("[PC] Path condition before adding constraint: " + pc);
-
+                            if(strInsn.contains("makeSymbolic")) {
+                                makeSymbolicBranchCount++;
+                            }
+                            ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+                            while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+                                prev_cg = prev_cg.getPreviousChoiceGenerator();
+                            }
+                            if (prev_cg == null) {
+                                pc = new PathCondition();
+                            } else {
+                                pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+                            }
+                            assert pc != null;
+                            isCheckingNull=false;
+                            // pc.solve(); //we only solve the p
                             if (symbolicVar instanceof StringExpression) {
                                 StringExpression symStr = (StringExpression) symbolicVar;
+                                int choice = (Integer) cg.getNextChoice();
 
                                 if (choice == 0) {
+                                    nullChoiceCount++;
                                     System.out.println("[Listener] Null path chosen");
-                                    pc._addDet(Comparator.EQ, symStr, null);
-                                    if (pc.simplify()) {
-                                        pcCG.setCurrentPC(pc);
+                                    pc.spc._addDet(StringComparator.EQUALS, symStr, "null");
+                                    if (!pc.simplify()) {
+                                        pc.spc._addDet(StringComparator.NOTEQUALS, symStr, "null");
                                     } else {
-                                        vm.getSystemState().setIgnored(true);
+                                        ((PCChoiceGenerator) cg).setCurrentPC(pc);
+                                        System.out.println("NullPointerException should be thrown here.");
+                                        //runtime exception for null value
                                         return;
                                     }
+                                } else {
+                                    nonNullChoiceCount++;
+                                    System.out.println("[Listener] Non-null path chosen");
                                 }
                             }
-                            symbolicVariableInfo.varName = symbolicVar.toString();
-                            symbolicVariableInfoList.add(symbolicVariableInfo);
-                            interceptSymbolic = false;
+
+                            if(!isCheckingNull){
+                                symbolicVariableInfo.varName = symbolicVar.toString();
+                                symbolicVariableInfoList.add(symbolicVariableInfo);
+                                interceptSymbolic = false;
+                            }
                         }
                     }
 
@@ -722,6 +746,12 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
 
     }
 
+    private String escape(String text) {
+        return text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+    }
+
     private void writeInstructionCountHtmlReport(String filePath) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
             writer.println("<!DOCTYPE html>");
@@ -761,13 +791,13 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
             writer.println("    <span class='tab-button' id='btn-string' onclick=\"showTab('string')\">Full Instruction View</span>");
             writer.println("  </div>");
 
-            // Class view
+            // Class
             writer.println("  <div id='class' class='tab-content'>");
             writer.println("    <table>");
             writer.println("      <thead><tr><th>Instruction Type</th><th>Count</th></tr></thead>");
             writer.println("      <tbody>");
             for (Map.Entry<String, Integer> entry : instructionCountMap.entrySet()) {
-                String instruction = escapeHtml(entry.getKey());
+                String instruction = escape(entry.getKey());
                 int count = entry.getValue();
                 writer.printf("        <tr><td>%s</td><td class='count'>%d</td></tr>%n", instruction, count);
             }
@@ -775,13 +805,13 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
             writer.println("    </table>");
             writer.println("  </div>");
 
-            // Full string view
+            // Full string \
             writer.println("  <div id='string' class='tab-content'>");
             writer.println("    <table>");
             writer.println("      <thead><tr><th>Instruction</th><th>Count</th></tr></thead>");
             writer.println("      <tbody>");
             for (Map.Entry<String, Integer> entry : stringInsCountMap.entrySet()) {
-                String strInstruction = escapeHtml(entry.getKey());
+                String strInstruction = escape(entry.getKey());
                 int count = entry.getValue();
                 writer.printf("        <tr><td>%s</td><td class='count'>%d</td></tr>%n", strInstruction, count);
             }
@@ -824,6 +854,9 @@ public class SymbolicListener3 extends PropertyListenerAdapter implements Publis
             printMethodSummaryHTML(pw, methodSummary);
         }
         writeInstructionCountHtmlReport("instruction_count.html");
+        System.out.println("makeSymbolicBranchCount = " + makeSymbolicBranchCount);
+        System.out.println("nullChoiceCount = " + nullChoiceCount);
+        System.out.println("nonNullChoiceCount = " + nonNullChoiceCount);
     }
 
     protected class MethodSummary {
