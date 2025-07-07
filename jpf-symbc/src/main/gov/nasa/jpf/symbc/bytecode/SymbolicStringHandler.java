@@ -182,7 +182,7 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals ("contains")) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					cg = new PCChoiceGenerator(2);
+					cg = new PCChoiceGenerator(3);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
@@ -835,13 +835,11 @@ public class SymbolicStringHandler {
 			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleStartsWith");
 		} else {
 			ChoiceGenerator<?> cg;
-			boolean conditionValue;
+			int currentChocie = 0;
 
 			cg = th.getVM().getChoiceGenerator();
 			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
-			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
-
-			// System.out.println("conditionValue: " + conditionValue);
+			currentChocie = (Integer) cg.getNextChoice();
 
 			int s1 = sf.pop();
 			int s2 = sf.pop();
@@ -864,7 +862,7 @@ public class SymbolicStringHandler {
 
 			assert pc != null;
 
-			if (conditionValue) {
+			if (currentChocie == 2) {
 				if (sym_v1 != null) {
 					if (sym_v2 != null) { // both are symbolic values
 						pc.spc._addDet(comp, sym_v1, sym_v2);
@@ -885,7 +883,7 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 					// System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
 				}
-			} else {
+			} else if(currentChocie == 1) {
 				if (sym_v1 != null) {
 					if (sym_v2 != null) { // both are symbolic values
 						pc.spc._addDet(comp.not(), sym_v1, sym_v2);
@@ -905,9 +903,22 @@ public class SymbolicStringHandler {
 				} else {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
+			} else if(currentChocie == 0) {
+				if (sym_v2 != null) {
+					pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+				}
+				if(!pc.simplify()) {
+					th.getVM().getSystemState().setIgnored(true);
+				} else {
+					th.createAndThrowException("java.lang.NullPointerException");
+				}
 			}
 
-			sf.push(conditionValue ? 1 : 0, true);
+			if(currentChocie == 1) {
+				sf.push(0, true);
+			} else if (currentChocie == 2) {
+				sf.push(1, true);
+			}
 
 		}
 
