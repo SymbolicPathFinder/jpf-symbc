@@ -182,7 +182,7 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals ("contains")) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					cg = new PCChoiceGenerator(2);
+					cg = new PCChoiceGenerator(3);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
@@ -835,11 +835,13 @@ public class SymbolicStringHandler {
 			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleStartsWith");
 		} else {
 			ChoiceGenerator<?> cg;
-			boolean conditionValue;
+			// boolean conditionValue;
+			int currentChocie = 0;
 
 			cg = th.getVM().getChoiceGenerator();
 			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
-			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+			currentChocie = (Integer) cg.getNextChoice();
+			// conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
 
 			// System.out.println("conditionValue: " + conditionValue);
 
@@ -864,7 +866,13 @@ public class SymbolicStringHandler {
 
 			assert pc != null;
 
-			if (conditionValue) {
+			if (currentChocie == 2) {
+				System.out.println();
+				System.out.println("============================");
+				System.out.println("When the choice is 2");
+				System.out.println("From the choice 2");
+				System.out.println("============================");
+				System.out.println();
 				if (sym_v1 != null) {
 					if (sym_v2 != null) { // both are symbolic values
 						pc.spc._addDet(comp, sym_v1, sym_v2);
@@ -885,7 +893,13 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 					// System.out.println(((PCChoiceGenerator) cg).getCurrentPC());
 				}
-			} else {
+			} else if(currentChocie == 1) {
+				System.out.println();
+				System.out.println("============================");
+				System.out.println("When choice is 1");
+				System.out.println("From the choice 1");
+				System.out.println("============================");
+				System.out.println();
 				if (sym_v1 != null) {
 					if (sym_v2 != null) { // both are symbolic values
 						pc.spc._addDet(comp.not(), sym_v1, sym_v2);
@@ -900,14 +914,35 @@ public class SymbolicStringHandler {
 					String val = e1.asString();
 					pc.spc._addDet(comp.not(), val, sym_v2);
 				}
-				if (!pc.simplify()) {// not satisfiable
+				if (!pc.simplify()) { // not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
+			} else if(currentChocie == 0) {
+				if (sym_v1 != null) {
+					pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+				}
+				if(!pc.simplify()) {
+					th.getVM().getSystemState().setIgnored(true);
+				} else {
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+					System.out.println("============================");
+					System.out.println("When the choice is 0");
+					System.out.println("Null Pointer Exception");
+					System.out.println("============================");
+					System.out.println();
+					th.createAndThrowException("java.lang.NullPointerException");
+					// th.getVM().getSystemState().setIgnored(true);
+				}
 			}
 
-			sf.push(conditionValue ? 1 : 0, true);
+			//sf.push(conditionValue ? 1 : 0, true);
+			if(currentChocie == 1) {
+				sf.push(0, true);
+			} else if (currentChocie == 2) {
+				sf.push(1, true);
+			}
 
 		}
 
