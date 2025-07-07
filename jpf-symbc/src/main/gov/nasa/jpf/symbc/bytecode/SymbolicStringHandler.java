@@ -920,13 +920,12 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else if(currentChocie == 0) {
-				if (sym_v1 != null) {
-					pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+				if (sym_v2 != null) {
+					pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
 				}
 				if(!pc.simplify()) {
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
-					((PCChoiceGenerator) cg).setCurrentPC(pc);
 					System.out.println("============================");
 					System.out.println("When the choice is 0");
 					System.out.println("Null Pointer Exception");
