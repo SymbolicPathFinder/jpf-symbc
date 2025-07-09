@@ -53,13 +53,23 @@ package gov.nasa.jpf.symbc.bytecode;
 
 
 import gov.nasa.jpf.symbc.numeric.*;
-import gov.nasa.jpf.vm.*;
+import gov.nasa.jpf.vm.ChoiceGenerator;
+import gov.nasa.jpf.vm.ClassInfo;
+import gov.nasa.jpf.vm.ClassLoaderInfo;
+import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
+import gov.nasa.jpf.vm.Instruction;
+import gov.nasa.jpf.vm.MethodInfo;
+import gov.nasa.jpf.vm.SystemState;
+import gov.nasa.jpf.vm.Types;
+import gov.nasa.jpf.vm.VM;
+import gov.nasa.jpf.vm.StackFrame;
+import gov.nasa.jpf.vm.MJIEnv;
+import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
-
-import javax.xml.bind.Element;
 
 
 public class SymbolicStringHandler {
