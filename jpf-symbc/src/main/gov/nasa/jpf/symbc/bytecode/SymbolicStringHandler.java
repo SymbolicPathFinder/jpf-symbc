@@ -53,22 +53,13 @@ package gov.nasa.jpf.symbc.bytecode;
 
 
 import gov.nasa.jpf.symbc.numeric.*;
-import gov.nasa.jpf.vm.ChoiceGenerator;
-import gov.nasa.jpf.vm.ClassInfo;
-import gov.nasa.jpf.vm.ClassLoaderInfo;
-import gov.nasa.jpf.vm.ElementInfo;
-import gov.nasa.jpf.vm.FieldInfo;
-import gov.nasa.jpf.vm.Instruction;
-import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.SystemState;
-import gov.nasa.jpf.vm.Types;
-import gov.nasa.jpf.vm.VM;
-import gov.nasa.jpf.vm.StackFrame;
-import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.*;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
 import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
+
+import javax.xml.bind.Element;
 
 
 public class SymbolicStringHandler {
@@ -920,19 +911,23 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else if(currentChocie == 0) {
-				if (sym_v2 != null) {
-					pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+				if (s1 == MJIEnv.NULL ||  s2 == MJIEnv.NULL) { // when null s1 or s2 will be equal to 0
+					throw new IllegalArgumentException("Passing null reference");
+				} else {
+					if (sym_v1 != null) { // it is symbolic "string1"
+						if (sym_v2 != null) { // it is also symbolic "string0"
+							pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+						} else { // it means only the sym_v1 "string0"
+							pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+						}
+					} else { // if sym_v1 is null then this will be "string0"
+						pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+					}
 				}
-				if(!pc.simplify()) {
+				if (!pc.simplify()) { // not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
-					System.out.println("============================");
-					System.out.println("When the choice is 0");
-					System.out.println("Null Pointer Exception");
-					System.out.println("============================");
-					System.out.println();
 					th.createAndThrowException("java.lang.NullPointerException");
-					// th.getVM().getSystemState().setIgnored(true);
 				}
 			}
 
