@@ -904,10 +904,16 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else if(currentChocie == 0) {
-				if (sym_v2 != null) {
+				if (sym_v1 != null) { // it is symbolic "string1"
+					if (sym_v2 != null) { // it is also symbolic "string0"
+						pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+					} else { // it means only the sym_v1 "string0"
+						pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+					}
+				} else { // if sym_v1 is null then this will be "string0"
 					pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
 				}
-				if(!pc.simplify()) {
+				if (!pc.simplify()) { // not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
 					th.createAndThrowException("java.lang.NullPointerException");
