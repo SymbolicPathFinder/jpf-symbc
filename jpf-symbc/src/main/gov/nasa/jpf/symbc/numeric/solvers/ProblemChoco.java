@@ -59,8 +59,12 @@ public class ProblemChoco extends ProblemGeneral {
 	public IntDomainVar makeIntVar(String name, long min, long max) {
 		// Choco recommends staying within Integer.MIN_VALUE / 100 and Integer.MAX_VALUE / 100
 		// to avoid arithmetic overflows during constraint propagation.
-		if(min < (Integer.MIN_VALUE / 100)) min = Integer.MIN_VALUE / 100;
-		if(max > (Integer.MAX_VALUE / 100)) max = Integer.MAX_VALUE / 100;
+		if (min < (Integer.MIN_VALUE / 100) || max > (Integer.MAX_VALUE / 100)) {
+			throw new IllegalArgumentException(String.format(
+					"## Error Choco Invalid bounds for '%s': [%d, %d] exceed safe range [%d, %d] for Choco.",
+					name, min, max, Integer.MIN_VALUE / 100, Integer.MAX_VALUE / 100
+			));
+		}
 		return pb.makeBoundIntVar(name, (int) min, (int) max);
 	}
 
