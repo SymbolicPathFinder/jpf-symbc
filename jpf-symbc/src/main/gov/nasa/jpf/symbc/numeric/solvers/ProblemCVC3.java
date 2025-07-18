@@ -94,7 +94,11 @@ public class ProblemCVC3 extends ProblemGeneral {
 	//if min or max are passed in as null objects to the vc
 	//it will use minus and plus infinity
 	public Object makeIntVar(String name, long min, long max) {
-		assert(min>=Integer.MIN_VALUE && max<=Integer.MAX_VALUE);
+
+		if (min < Integer.MIN_VALUE || max > Integer.MAX_VALUE) {
+			throw new IllegalArgumentException("## Error CVC3: min and max must be within Integer range");
+		}
+
 		try{
 			Type sType = vc.subrangeType(vc.ratExpr((int) min),
                     vc.ratExpr((int) max));
