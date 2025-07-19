@@ -72,6 +72,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 			if(vc != null) vc.delete();
 	        flags = ValidityChecker.createFlags(null);
 	        flags.setFlag("dagify-exprs",false);
+//			flags.setFlag("timeout",1000);
 	        vc = ValidityChecker.create(flags);
 	       // System.out.println("validity checker is initialized");
 		} catch (Exception e) {
@@ -774,15 +775,13 @@ public class ProblemCVC3 extends ProblemGeneral {
 	            //System.out.println("Unsatisfiable (Valid)\n");
 				vc.pop();
 	            return false;
-	        }
-	        else if (result == SatResult.SATISFIABLE) {
+	        } else if (result == SatResult.SATISFIABLE) {
 	        	model = vc.getConcreteModel();
 	        	vc.pop();
 	           // System.out.println("Satisfiable (Invalid)\n");
 	            return true;
-	        }else{
-	        	vc.pop();
-	        	return false;
+	        } else {
+	        	throw new RuntimeException("## Error CVC3: Unexpected CVC3 status: " + result);
 	        }
         }catch(Exception e){
         	e.printStackTrace();
