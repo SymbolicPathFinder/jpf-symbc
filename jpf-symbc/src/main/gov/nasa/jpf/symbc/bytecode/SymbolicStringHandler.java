@@ -66,7 +66,6 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
-import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
 
@@ -142,7 +141,7 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals("equals")) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					cg = new PCChoiceGenerator(2);
+					cg = new PCChoiceGenerator(3);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
@@ -162,7 +161,7 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals("endsWith")) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					cg = new PCChoiceGenerator(2);
+					cg = new PCChoiceGenerator(3);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
@@ -172,7 +171,7 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals("startsWith")) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
-					cg = new PCChoiceGenerator(2);
+					cg = new PCChoiceGenerator(3);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
@@ -304,7 +303,7 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals("isEmpty")) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()){
-					cg = new PCChoiceGenerator(2);
+					cg = new PCChoiceGenerator(3);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
