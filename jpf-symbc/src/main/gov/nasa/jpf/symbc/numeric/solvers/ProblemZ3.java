@@ -130,8 +130,12 @@ public class ProblemZ3 extends ProblemGeneral {
 				return expr;
 			} else {
 				RealExpr expr = ctx.mkRealConst(name);
-				solver.add(ctx.mkGe(expr, ctx.mkReal("" + min)));
-				solver.add(ctx.mkLe(expr, ctx.mkReal("" + max)));
+				// Convert to plain decimal string to avoid scientific notation
+				// (e.g., 1.0E-10 → "0.0000000001")
+				String minDecimalStr = java.math.BigDecimal.valueOf(min).toPlainString();
+				String maxDecimalStr = java.math.BigDecimal.valueOf(max).toPlainString();
+				solver.add(ctx.mkGe(expr, ctx.mkReal(minDecimalStr)));
+				solver.add(ctx.mkLe(expr, ctx.mkReal(maxDecimalStr)));
 				return expr;
 			}
 		} catch (Exception e) {
@@ -668,7 +672,7 @@ public class ProblemZ3 extends ProblemGeneral {
     }
 
 	public Boolean solve() {
-//		System.out.println(solver.toString());
+		System.out.println(solver.toString());
         try {
 			Status status = solver.check();
 			switch (status) {

@@ -112,25 +112,21 @@ public class ProblemCVC3 extends ProblemGeneral {
 	}
 
 
-
 	public Object makeRealVar(String name, double min, double max) {
-
-		//WARNING: need to downcast double to int - I don't see
-		// a way in CVC3 to create a sub-range for real types
-		//other choice is not to bound and use vc.realType() to
-		//create the expression
-		int minInt = (int)min;
-		int maxInt = (int)max;
-		try{
-			//Expr x = vc.varExpr(name, vc.realType());
-			Type sType = vc.subrangeType(vc.ratExpr(minInt),
-                    vc.ratExpr(maxInt));
-			return vc.varExpr(name, sType);
+		try {
+			Expr x = vc.varExpr(name,vc.realType());
+			// Convert to plain decimal string to avoid scientific notation
+			// (e.g., 1.0E-10 → "0.0000000001")
+			String minDecimalStr = java.math.BigDecimal.valueOf(min).toPlainString();
+			String maxDecimalStr = java.math.BigDecimal.valueOf(max).toPlainString();
+			Expr upperBound = vc.leExpr(x, vc.ratExpr(maxDecimalStr));
+			Expr lowerBound = vc.geExpr(x, vc.ratExpr(minDecimalStr));
+			this.post(vc.andExpr(lowerBound, upperBound));
+            return x;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
-
-	    }
+		}
 	}
 
 	public Object eq(long value, Object exp){
@@ -767,7 +763,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 			if (pb==null)
 				return true;
 			//Expr ex = test();
-			//System.out.println("Query: " + pb.toString());
+			System.out.println("Query: " + pb.toString());
 			vc.push();
 			SatResult result = vc.checkUnsat(pb);
 			//QueryResult result = vc.query(eq); //does not seem to work properly
