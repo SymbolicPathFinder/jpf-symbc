@@ -1,0 +1,13 @@
+target=TestChocoIntRangeAndTimeout
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+symbolic.method = TestChocoIntRangeAndTimeout.test(sym)
+symbolic.dp=choco
+
+#symbolic.min_int=-2147483648
+#symbolic.max_int=2147483647
+symbolic.min_int=-21474836
+symbolic.max_int=21474836
+
+symbolic.debug=true
+listener = .symbc.SymbolicListener
