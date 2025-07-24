@@ -1,7 +1,4 @@
-#target=npe.IfnullTest
-#target=npe.IfnonnullTest
 target=npe.StringContainsTest
-
 
 classpath=${jpf-symbc}/build/examples
 symbolic.dp=z3bitvector
@@ -18,14 +15,5 @@ symbolic.jrarrays=true
 veritestingMode = 5
 recursiveDepth= 200
 singlePathOptimization=true
-#listener = .symbc.VeritestingListener
 listener = .symbc.SymbolicListener
-#,.symbc.SymbolicListener
-
-#symbolic.string_dp_timeout_ms=3000
-#symbolic.string_dp=igen
-#symbolic.dp=z3bitvectorinc
-#symbolic.arrays=true
-#,gov.nasa.jpf.symbc.sequences.SymbolicSequenceListener
-#symbolic.optimizechoices=false
 symbolic.debug=true
