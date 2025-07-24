@@ -1363,11 +1363,11 @@ public class SymbolicStringHandler {
 		} else {
 			IntegerExpression sym_v2 = sym_v1._length();
 			ChoiceGenerator<?> cg;
-			boolean conditionValue;
+			int conditionValue = 0;
 			cg = th.getVM().getChoiceGenerator();
 
 			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
-			conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+			conditionValue = (Integer) cg.getNextChoice();
 
 			sf.pop();
 			PathCondition pc;
@@ -1385,23 +1385,34 @@ public class SymbolicStringHandler {
 
 			assert pc != null;
 
-			if(conditionValue){
+			if(conditionValue == 2){
 				pc._addDet(Comparator.EQ, sym_v2, (IntegerExpression)(new IntegerConstant(0)));
 				if(!pc.simplify()) {
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
-			}else{
+			}else if (conditionValue == 1){
 				pc._addDet(Comparator.NE, sym_v2, (IntegerExpression)(new IntegerConstant(0)));
 				if(!pc.simplify()) {
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
+			} else if(conditionValue == 0) {
+				pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+				if(!pc.simplify()) {
+					th.getVM().getSystemState().setIgnored(true);
+				} else {
+					th.createAndThrowException("java.lang.NullPointerException");
+				}
 			}
 
-			sf.push(conditionValue ? 1 : 0, true);
+			if(conditionValue == 1) {
+				sf.push(0, true);
+			} else if (conditionValue == 2) {
+				sf.push(1, true);
+			}
 		}
 	}
 
