@@ -52,6 +52,7 @@ package gov.nasa.jpf.symbc.bytecode;
 
 
 
+import gov.nasa.jpf.Config;
 import gov.nasa.jpf.symbc.numeric.*;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
@@ -836,6 +837,10 @@ public class SymbolicStringHandler {
 			ChoiceGenerator<?> cg;
 			int currentChocie = 0;
 
+			Config conf = th.getVM().getConfig();
+			String[] re = conf.getStringArray("runtime.exception");
+			boolean re_flag = re != null && re[0].equalsIgnoreCase("true");
+
 			cg = th.getVM().getChoiceGenerator();
 			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
 			currentChocie = (Integer) cg.getNextChoice();
@@ -915,7 +920,20 @@ public class SymbolicStringHandler {
 				if (!pc.simplify()) { // not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
-					th.createAndThrowException("java.lang.NullPointerException");
+					if (sym_v1 != null) {
+						if (sym_v2 != null) {
+							pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+						} else {
+							pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+						}
+					} else {
+						pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+					}
+					if (!pc.simplify()) { // not satisfiable
+						th.getVM().getSystemState().setIgnored(true);
+					} else {
+						th.createAndThrowException("java.lang.NullPointerException");
+					}
 				}
 			}
 
