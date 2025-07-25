@@ -38,6 +38,7 @@
 package gov.nasa.jpf.symbc.numeric.solvers;
 
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.*;
 
 //TODO: problem: we do not distinguish between ints and reals?
@@ -127,8 +128,8 @@ public class ProblemZ3 extends ProblemGeneral {
 				return expr;
 			} else {
 				RealExpr expr = ctx.mkRealConst(name);
-				solver.add(ctx.mkGe(expr, ctx.mkReal("" + min)));
-				solver.add(ctx.mkLe(expr, ctx.mkReal("" + max)));
+				solver.add(ctx.mkGe(expr, ctx.mkReal(toPlainDecimalString(min))));
+				solver.add(ctx.mkLe(expr, ctx.mkReal(toPlainDecimalString(max))));
 				return expr;
 			}
 		} catch (Exception e) {
@@ -692,7 +693,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPEq(ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkEq(ctx.mkReal("" + value), (Expr) exp);
+				return ctx.mkEq(ctx.mkReal(toPlainDecimalString(value)), (Expr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -706,7 +707,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPEq((FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkEq((Expr) exp, ctx.mkReal("" + value));
+				return ctx.mkEq((Expr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -720,7 +721,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkNot(ctx.mkFPEq(ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp));
 			} else {
-				return ctx.mkNot(ctx.mkEq(ctx.mkReal("" + value), (Expr) exp));
+				return ctx.mkNot(ctx.mkEq(ctx.mkReal(toPlainDecimalString(value)), (Expr) exp));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -734,7 +735,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkNot(ctx.mkFPEq((FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64())));
 			} else {
-				return ctx.mkNot(ctx.mkEq((Expr) exp, ctx.mkReal("" + value)));
+				return ctx.mkNot(ctx.mkEq((Expr) exp, ctx.mkReal(toPlainDecimalString(value))));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -748,7 +749,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPLEq(ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkLe(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkLe(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -762,7 +763,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPLEq((FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkLe((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkLe((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -776,7 +777,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPGEq(ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkGe(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkGe(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -790,7 +791,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPGEq((FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkGe((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkGe((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -804,7 +805,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPLt(ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkLt(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkLt(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -818,7 +819,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPLt((FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkLt((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkLt((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -832,7 +833,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPGt(ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkGt(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkGt(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -846,7 +847,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPGt((FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkGt((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkGt((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -860,7 +861,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPAdd(ctx.mkFPRoundNearestTiesToEven(), ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkAdd(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkAdd(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -874,7 +875,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPAdd(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkAdd((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkAdd((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -888,7 +889,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkSub(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkSub(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -902,7 +903,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPSub(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkSub((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkSub((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -916,7 +917,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPMul(ctx.mkFPRoundNearestTiesToEven(), ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkMul(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkMul(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -930,7 +931,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPMul(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkMul((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkMul((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -944,7 +945,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), ctx.mkFPNumeral(value, ctx.mkFPSort64()), (FPExpr) exp);
 			} else {
-				return ctx.mkDiv(ctx.mkReal("" + value), (ArithExpr) exp);
+				return ctx.mkDiv(ctx.mkReal(toPlainDecimalString(value)), (ArithExpr) exp);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -958,7 +959,7 @@ public class ProblemZ3 extends ProblemGeneral {
 			if (useFpForReals) {
 				return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp, ctx.mkFPNumeral(value, ctx.mkFPSort64()));
 			} else {
-				return ctx.mkDiv((ArithExpr) exp, ctx.mkReal("" + value));
+				return ctx.mkDiv((ArithExpr) exp, ctx.mkReal(toPlainDecimalString(value)));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1187,11 +1188,17 @@ public class ProblemZ3 extends ProblemGeneral {
     @Override
     public Object makeRealConst(double value) {
         try {
-            return ctx.mkReal("" + value);
+            return ctx.mkReal(toPlainDecimalString(value));
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3 : Exception caught in Z3 JNI: " + e);
         }
     }
+
+	// Convert to plain decimal string to avoid scientific notation
+	// (e.g., 1.0E-10 → "0.0000000001")
+	private String toPlainDecimalString(double val) {
+		return BigDecimal.valueOf(val).toPlainString();
+	}
 
 }

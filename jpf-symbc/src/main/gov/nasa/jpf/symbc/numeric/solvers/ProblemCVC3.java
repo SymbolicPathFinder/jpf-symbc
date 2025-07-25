@@ -41,6 +41,7 @@ package gov.nasa.jpf.symbc.numeric.solvers;
 // still needs a lot of work: do not use!
 
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -109,23 +110,16 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 
 	public Object makeRealVar(String name, double min, double max) {
-
-		//WARNING: need to downcast double to int - I don't see
-		// a way in CVC3 to create a sub-range for real types
-		//other choice is not to bound and use vc.realType() to
-		//create the expression
-		int minInt = (int)min;
-		int maxInt = (int)max;
-		try{
-			//Expr x = vc.varExpr(name, vc.realType());
-			Type sType = vc.subrangeType(vc.ratExpr(minInt),
-                    vc.ratExpr(maxInt));
-			return vc.varExpr(name, sType);
+		try {
+			Expr x = vc.varExpr(name,vc.realType());
+			Expr upperBound = vc.leExpr(x, vc.ratExpr(toPlainDecimalString(max)));
+			Expr lowerBound = vc.geExpr(x, vc.ratExpr(toPlainDecimalString(min)));
+			this.post(vc.andExpr(lowerBound, upperBound));
+			return x;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
-
-	    }
+		}
 	}
 
 	public Object eq(long value, Object exp){
@@ -160,7 +154,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object eq(double value, Object exp){
 		try{
-			return  vc.eqExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.eqExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -170,7 +164,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object eq(Object exp, double value){
 		try{
-			return  vc.eqExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.eqExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -220,7 +214,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object neq(double value, Object exp){
 		try{
-			return  vc.notExpr(vc.eqExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp));
+			return  vc.notExpr(vc.eqExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -230,7 +224,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object neq(Object exp, double value){
 		try{
-			return  vc.notExpr(vc.eqExpr((Expr)exp, vc.ratExpr(Double.toString(value), base)));
+			return  vc.notExpr(vc.eqExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base)));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -270,7 +264,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object leq(double value, Object exp){
 		try{
-			return  vc.leExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.leExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -280,7 +274,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object leq(Object exp, double value){
 		try{
-			return  vc.leExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.leExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -320,7 +314,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object geq(double value, Object exp){
 		try{
-			return  vc.geExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.geExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -330,7 +324,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object geq(Object exp, double value){
 		try{
-			return  vc.geExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.geExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -370,7 +364,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object lt(double value, Object exp){
 		try{
-			return  vc.ltExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.ltExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -380,7 +374,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object lt(Object exp, double value){
 		try{
-			return  vc.ltExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.ltExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -431,7 +425,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object gt(double value, Object exp){
 		try{
-			return  vc.gtExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.gtExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -441,7 +435,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object gt(Object exp, double value){
 		try{
-			return  vc.gtExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.gtExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -481,7 +475,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object plus(double value, Object exp) {
 		try{
-			return  vc.plusExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.plusExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -490,7 +484,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object plus(Object exp, double value) {
 		try{
-			return  vc.plusExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.plusExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -526,7 +520,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object minus(double value, Object exp) {
 		try{
-			return  vc.minusExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.minusExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -535,7 +529,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 
 	public Object minus(Object exp, double value) {
 		try{
-			return  vc.minusExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.minusExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -570,7 +564,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 	}
 	public Object mult(double value, Object exp) {
 		try{
-			return  vc.multExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.multExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -578,7 +572,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 	}
 	public Object mult(Object exp, double value) {
 		try{
-			return  vc.multExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.multExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -615,7 +609,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 	}
 	public Object div(double value, Object exp) {
 		try{
-			return  vc.divideExpr(vc.ratExpr(Double.toString(value), base), (Expr)exp);
+			return  vc.divideExpr(vc.ratExpr(toPlainDecimalString(value), base), (Expr)exp);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -623,7 +617,7 @@ public class ProblemCVC3 extends ProblemGeneral {
 	}
 	public Object div(Object exp, double value) {
 		try{
-			return  vc.divideExpr((Expr)exp, vc.ratExpr(Double.toString(value), base));
+			return  vc.divideExpr((Expr)exp, vc.ratExpr(toPlainDecimalString(value), base));
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("## Error CVC3: Exception caught in CVC3 JNI: \n" + e);
@@ -911,6 +905,12 @@ public class ProblemCVC3 extends ProblemGeneral {
 	public Object rem(Object exp1, long exp2) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	// Convert to plain decimal string to avoid scientific notation
+	// (e.g., 1.0E-10 → "0.0000000001")
+	private String toPlainDecimalString(double val) {
+		return BigDecimal.valueOf(val).toPlainString();
 	}
 
 }
