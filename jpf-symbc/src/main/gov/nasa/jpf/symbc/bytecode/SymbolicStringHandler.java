@@ -196,15 +196,7 @@ public class SymbolicStringHandler {
 					return handled;
 				}
 			} else if (shortName.equals("length")) {
-				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) {
-					cg = new PCChoiceGenerator(2);
-					th.getVM().setNextChoiceGenerator(cg);
-					return invInst;
-				} else {
-					handleLength(invInst, th);
-					return invInst.getNext(th);
-				}
+				handleLength(invInst, th);
 			} else if (shortName.equals("indexOf")) {
 				handleIndexOf(invInst, th);
 			} else if (shortName.equals("lastIndexOf")) {
@@ -223,7 +215,15 @@ public class SymbolicStringHandler {
 					return handled;
 				}
 			} else if (shortName.equals("trim")) {
-				handleTrim(invInst, th);
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) {
+					cg = new PCChoiceGenerator(2);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleTrim(invInst, th);
+					return invInst.getNext(th);
+				}
 			} else if (shortName.equals("substring")) {
 				Instruction handled = handleSubString(invInst, th);
 				if (handled != null) {
@@ -371,46 +371,15 @@ public class SymbolicStringHandler {
 	public void handleLength(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
 		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
-
 		if (sym_v1 == null) {
-			throw new RuntimeException("ERROR: symbolic string method must have symbolic operand: handleLength");
+			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleLength");
 		} else {
-			ChoiceGenerator<?> cg;
-			boolean conditionValue;
-			cg = th.getVM().getChoiceGenerator();
-
-			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
-			conditionValue = (Integer) cg.getNextChoice() != 0;
-
 			sf.pop();
-			PathCondition pc;
-
-			ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
-			while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
-				prev_cg = prev_cg.getPreviousChoiceGenerator();
-			}
-
-			if (prev_cg == null)
-				pc = new PathCondition();
-			else
-				pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
-
-			assert pc != null;
-
-			if (conditionValue) {
-				((PCChoiceGenerator) cg).setCurrentPC(pc);
-				IntegerExpression sym_length = sym_v1._length();
-				sf.push(0, false); // Push placeholder value
-				sf.setOperandAttr(sym_length);
-			} else {
-				pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
-				if (!pc.simplify()) {
-					th.getVM().getSystemState().setIgnored(true);
-				} else {
-					th.createAndThrowException("java.lang.NullPointerException");
-				}
-			}
+			sf.push(0, false); /* dont care value for length */
+			IntegerExpression sym_v2 = sym_v1._length();
+			sf.setOperandAttr(sym_v2);
 		}
+
 	}
 
 	public void handleIndexOf(JVMInvokeInstruction invInst, ThreadInfo th) {
@@ -1251,19 +1220,48 @@ public class SymbolicStringHandler {
 		// throw new RuntimeException("ERROR: symbolic string method not Implemented - Trim");
 		StackFrame sf = th.getModifiableTopFrame();
 		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
-		int s1 = sf.pop();
 
-		if (sym_v1 == null) {
-			ElementInfo e1 = th.getElementInfo(s1);
-			String val1 = e1.asString();
-			sym_v1 = new StringConstant(val1);
+		ChoiceGenerator<?> cg;
+		boolean conditionValue;
+		cg = th.getVM().getChoiceGenerator();
+
+		assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+		conditionValue = (Integer) cg.getNextChoice() != 0;
+		int s1 = sf.pop();
+		PathCondition pc;
+
+		ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+		while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+			prev_cg = prev_cg.getPreviousChoiceGenerator();
+		}
+
+		if (prev_cg == null)
+			pc = new PathCondition();
+		else
+			pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+
+		assert pc != null;
+
+		if(conditionValue) {
+			if (sym_v1 == null) {
+				ElementInfo e1 = th.getElementInfo(s1);
+				String val1 = e1.asString();
+				sym_v1 = new StringConstant(val1);
+			}
+		} else {
+			pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+			if (!pc.simplify()) {
+				th.getVM().getSystemState().setIgnored(true);
+			} else {
+				th.createAndThrowException("java.lang.NullPointerException");
+			}
 		}
 		StringExpression result = sym_v1._trim();
 
 		ElementInfo  objRef = th.getHeap().newString("", th); /*
-																																 * dummy String
-																																 * Object
-																																 */
+		 * dummy String
+		 * Object
+		 */
 		sf.push(objRef.getObjectRef(), true);
 		sf.setOperandAttr(result);
 	}
