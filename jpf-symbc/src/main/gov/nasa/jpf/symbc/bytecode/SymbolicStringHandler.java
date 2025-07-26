@@ -214,7 +214,15 @@ public class SymbolicStringHandler {
 					return handled;
 				}
 			} else if (shortName.equals("trim")) {
-				handleTrim(invInst, th);
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) {
+					cg = new PCChoiceGenerator(2);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleTrim(invInst, th);
+					return invInst.getNext(th);
+				}
 			} else if (shortName.equals("substring")) {
 				Instruction handled = handleSubString(invInst, th);
 				if (handled != null) {
@@ -1219,19 +1227,49 @@ public class SymbolicStringHandler {
 		// throw new RuntimeException("ERROR: symbolic string method not Implemented - Trim");
 		StackFrame sf = th.getModifiableTopFrame();
 		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
-		int s1 = sf.pop();
 
-		if (sym_v1 == null) {
-			ElementInfo e1 = th.getElementInfo(s1);
-			String val1 = e1.asString();
-			sym_v1 = new StringConstant(val1);
+		ChoiceGenerator<?> cg;
+		boolean conditionValue;
+		cg = th.getVM().getChoiceGenerator();
+
+		assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+		conditionValue = (Integer) cg.getNextChoice() != 0;
+		int s1 = sf.pop();
+		PathCondition pc;
+
+		ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+		while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+			prev_cg = prev_cg.getPreviousChoiceGenerator();
+		}
+
+		if (prev_cg == null)
+			pc = new PathCondition();
+		else
+			pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+
+		assert pc != null;
+
+		if(conditionValue) {
+			if (sym_v1 == null) {
+				ElementInfo e1 = th.getElementInfo(s1);
+				String val1 = e1.asString();
+				sym_v1 = new StringConstant(val1);
+			}
+		} else {
+			pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+			if (!pc.simplify()) {
+				th.getVM().getSystemState().setIgnored(true);
+			} else {
+				th.createAndThrowException("java.lang.NullPointerException");
+			}
 		}
 		StringExpression result = sym_v1._trim();
 
 		ElementInfo  objRef = th.getHeap().newString("", th); /*
-																																 * dummy String
-																																 * Object
-																																 */
+																																     * dummy
+																																	 * String
+																																	 * Object
+																																	 */
 		sf.push(objRef.getObjectRef(), true);
 		sf.setOperandAttr(result);
 	}
