@@ -1,4 +1,4 @@
-target=TestChocoIntRangeAndTimeout
+target=solvers.choco.TestChocoIntRangeAndTimeout
 classpath=${jpf-symbc}/build/examples
 sourcepath=${jpf-symbc}/src/examples
 symbolic.method = TestChocoIntRangeAndTimeout.test(sym)

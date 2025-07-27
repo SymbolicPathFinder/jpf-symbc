@@ -1,3 +1,5 @@
+package solvers.choco;
+
 import org.sosy_lab.sv_benchmarks.Verifier;
 
 public class TestChocoIntRangeAndTimeout {
