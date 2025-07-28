@@ -20,9 +20,9 @@ package npe;
 
 import org.sosy_lab.sv_benchmarks.Verifier;
 
-public class StringContainsTest {
+public class StringEndsWithTest {
     public static void main(String[] args) {
-        // Tests for String.contains() method with symbolic execution to check for null pointer exception
+        // Tests for String.endsWith() method with symbolic execution to check for null pointer exception
         // Each test explores different variation add individual methods to run specific test scenarios
     }
 
@@ -30,7 +30,7 @@ public class StringContainsTest {
     public static void testBothConcrete() {
         String arg = "Hello World";
         String str = "SPF";
-        if (str.contains(arg)) {
+        if (str.endsWith(arg)) {
             System.out.println("Test 1: Then Side");
         } else {
             System.out.println("Test 1: Else Side");
@@ -41,7 +41,7 @@ public class StringContainsTest {
     public static void testBothSymbolic() {
         String arg = Verifier.nondetString();
         String str = Verifier.nondetString();
-        if (str.contains(arg)) {
+        if (str.endsWith(arg)) {
             System.out.println("Test 2: Then Side");
         } else {
             System.out.println("Test 2: Else Side");
@@ -52,7 +52,7 @@ public class StringContainsTest {
     public static void testArgConcreteStrSymbolic() {
         String arg = "Hello World";
         String str = Verifier.nondetString();
-        if (str.contains(arg)) {
+        if (str.endsWith(arg)) {
             System.out.println("Test 3: Then Side");
         } else {
             System.out.println("Test 3: Else Side");
@@ -60,13 +60,12 @@ public class StringContainsTest {
     }
 
     // Test 4: str is concrete, arg is symbolic
-    // The call str.contains(arg) throws a NullPointerException when arg will be null
-    // because String.contains(CharSequence s) internally does | return indexOf(s.toString()) > -1 |,
-    // and if arg is null, this results in a NullPointerException
+    // The call str.endsWith(arg) throws a NullPointerException when arg will be null
+    // endsWith method internally attempts to do this | return startsWith(suffix, value.length - suffix.value.length) |
     public static void testConcreteOnSymbolic() {
         String str = Verifier.nondetString();
         String arg = "HELLO WORLD";
-        if(arg.contains(str)) {
+        if(arg.endsWith(str)) {
             System.out.println("Test 4: Then Side");
         } else {
             System.out.println("Test 4: Else Side");

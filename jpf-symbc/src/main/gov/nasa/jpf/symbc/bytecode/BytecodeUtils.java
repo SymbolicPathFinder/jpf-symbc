@@ -214,7 +214,7 @@ public class BytecodeUtils {
         boolean symstrings_flag = (symstrings != null && symstrings[0].equalsIgnoreCase("true")) ? true : false;
         if (symstrings_flag) {
 
-            SymbolicStringHandler a = new SymbolicStringHandler();
+            SymbolicStringHandler a = new SymbolicStringHandler(th);
             Instruction handled = a.handleSymbolicStrings(invInst, th);
             if (handled != null) { // go to next instruction as symbolic string operation was done
                 // System.out.println("Symbolic string analysis!!!"+invInst);
