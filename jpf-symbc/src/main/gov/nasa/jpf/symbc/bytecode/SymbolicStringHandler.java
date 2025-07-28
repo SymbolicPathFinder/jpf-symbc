@@ -79,6 +79,14 @@ public class SymbolicStringHandler {
 
 	public static final int intValueOffset = 5;
 
+    private final boolean re_flag;
+
+	public SymbolicStringHandler(ThreadInfo th) {
+        Config conf = th.getVM().getConfig();
+        String[] re = conf.getStringArray("runtime.exception");
+		this.re_flag = re != null && re[0].equalsIgnoreCase("true");
+	}
+
 	/* this method checks if a method has as argument any symbolic strings */
 	
 	public boolean isMethodStringSymbolic(JVMInvokeInstruction invInst, ThreadInfo th) {
@@ -215,15 +223,7 @@ public class SymbolicStringHandler {
 					return handled;
 				}
 			} else if (shortName.equals("trim")) {
-				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) {
-					cg = new PCChoiceGenerator(2);
-					th.getVM().setNextChoiceGenerator(cg);
-					return invInst;
-				} else {
-					handleTrim(invInst, th);
-					return invInst.getNext(th);
-				}
+				handleTrim(invInst, th);
 			} else if (shortName.equals("substring")) {
 				Instruction handled = handleSubString(invInst, th);
 				if (handled != null) {
@@ -846,10 +846,6 @@ public class SymbolicStringHandler {
 			ChoiceGenerator<?> cg;
 			int currentChocie = 0;
 
-			Config conf = th.getVM().getConfig();
-			String[] re = conf.getStringArray("runtime.exception");
-			boolean re_flag = re != null && re[0].equalsIgnoreCase("true");
-
 			cg = th.getVM().getChoiceGenerator();
 			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
 			currentChocie = (Integer) cg.getNextChoice();
@@ -927,8 +923,6 @@ public class SymbolicStringHandler {
 						} else {
 							pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
 						}
-					} else {
-						pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
 					}
 					if (!pc.simplify()) { // not satisfiable
 						th.getVM().getSystemState().setIgnored(true);
@@ -1220,41 +1214,12 @@ public class SymbolicStringHandler {
 		// throw new RuntimeException("ERROR: symbolic string method not Implemented - Trim");
 		StackFrame sf = th.getModifiableTopFrame();
 		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
-
-		ChoiceGenerator<?> cg;
-		boolean conditionValue;
-		cg = th.getVM().getChoiceGenerator();
-
-		assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
-		conditionValue = (Integer) cg.getNextChoice() != 0;
 		int s1 = sf.pop();
-		PathCondition pc;
 
-		ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
-		while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
-			prev_cg = prev_cg.getPreviousChoiceGenerator();
-		}
-
-		if (prev_cg == null)
-			pc = new PathCondition();
-		else
-			pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
-
-		assert pc != null;
-
-		if(conditionValue) {
-			if (sym_v1 == null) {
-				ElementInfo e1 = th.getElementInfo(s1);
-				String val1 = e1.asString();
-				sym_v1 = new StringConstant(val1);
-			}
-		} else {
-			pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
-			if (!pc.simplify()) {
-				th.getVM().getSystemState().setIgnored(true);
-			} else {
-				th.createAndThrowException("java.lang.NullPointerException");
-			}
+		if (sym_v1 == null) {
+			ElementInfo e1 = th.getElementInfo(s1);
+			String val1 = e1.asString();
+			sym_v1 = new StringConstant(val1);
 		}
 		StringExpression result = sym_v1._trim();
 
@@ -1408,11 +1373,15 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else if(conditionValue == 0) {
-				pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
-				if(!pc.simplify()) {
+				if(!re_flag) {
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
-					th.createAndThrowException("java.lang.NullPointerException");
+					pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+					if(!pc.simplify()) {
+						th.getVM().getSystemState().setIgnored(true);
+					} else {
+						th.createAndThrowException("java.lang.NullPointerException");
+					}
 				}
 			}
 

@@ -25,8 +25,6 @@ public class StringContainsTest {
         // Tests for String.contains() method with symbolic execution to check for null pointer exception
         // Each test explores different variation add individual methods to run specific test scenarios
         // Note: Assignments like arg = null assign a concrete null literal, not symbolic.
-        // In contrast, conditions like str == null or str != null add branching when str is symbolic,
-        // meaning both null and non-null paths are explored for str.
     }
 
     // Test 1: Both strings concrete
@@ -68,7 +66,7 @@ public class StringContainsTest {
     public static void testArgSymbolicStrNull() {
         String arg = Verifier.nondetString();
         String str = null;
-        if (arg.contains(str)) {
+        if (arg.contains(null)) {
             System.out.println("Test 4: Then Side");
         } else {
             System.out.println("Test 4: Else Side");
@@ -109,164 +107,23 @@ public class StringContainsTest {
         }
     }
 
-    // Test 8: if str is not null - branch check (arg != null) => (IFNULL)
-    // Branching occurs because str is symbolic and can be either null or not null
-    public static void testNotNull1() {
-        String arg = "Hello";
-        String str = Verifier.nondetString();
-        if (str != null) {
-            System.out.println("str is not null");
-            if (str.contains(arg)) {
-                System.out.println("Test 8: Then Side");
-            } else {
-                System.out.println("Test 8: Else Side");
-            }
-        } else {
-            System.out.println("str is null");
-        }
-    }
-
-    // Test 9: if str is not null - branch check (arg == null) => (IFNULL)
-    // Branching occurs because str is symbolic and can be either null or not null
-    public static void testNotNull2() {
-        String arg = "Hello";
-        String str = Verifier.nondetString();
-        if (str != null) {
-            System.out.println("str is not null");
-        } else {
-            System.out.println("str is null");
-            if (str.contains(arg)) {
-                System.out.println("Test 9: Then Side");
-            } else {
-                System.out.println("Test 9: Else Side");
-            }
-        }
-    }
-
-    // Test 10: if str is not null - branch check (arg != null) and (arg == null) => (IFNULL)
-    // Branching occurs because str is symbolic and can be either null or not null
-    public static void testNotNull3() {
-        String arg = "Hello";
-        String str = Verifier.nondetString();
-        if (str != null) {
-            System.out.println("str is not null");
-            if (str.contains(arg)) {
-                System.out.println("Test 10: Then Side");
-            } else {
-                System.out.println("Test 10: Else Side");
-            }
-        } else {
-            System.out.println("str is null");
-            if (str.contains(arg)) {
-                System.out.println("Test 10: Then Side");
-            } else {
-                System.out.println("Test 10: Else Side");
-            }
-        }
-    }
-
-    // Test 11: if str null - branch check (arg != null) => (IFNONNULL)
-    // Branching occurs because str is symbolic and can be either null or not null
-    public static void testNull1() {
-        String arg = "Hello";
-        String str = Verifier.nondetString();
-        if (str == null) {
-            System.out.println("str is null");
-        } else {
-            System.out.println("str is not null");
-            if (str.contains(arg)) {
-                System.out.println("Test 11: Then Side");
-            } else {
-                System.out.println("Test 11: Else Side");
-            }
-        }
-    }
-
-    // Test 12: if str null - branch check (arg == null) => (IFNONNULL)
-    // Branching occurs because str is symbolic and can be either null or not null
-    public static void testNull2() {
-        String arg = "Hello";
-        String str = Verifier.nondetString();
-        if (str == null) {
-            System.out.println("str is null");
-            if (str.contains(arg)) {
-                System.out.println("Test 12: Then Side");
-            } else {
-                System.out.println("Test 12: Else Side");
-            }
-        } else {
-            System.out.println("str is not null");
-        }
-    }
-
-    // Test 13: if str null - branch check (arg == null) and (arg != null) => (IFNONNULL)
-    // Branching occurs because str is symbolic and can be either null or not null
-    public static void testNull3() {
-        String arg = "Hello";
-        String str = Verifier.nondetString();
-        if (str == null) {
-            System.out.println("str is null");
-            if (str.contains(arg)) {
-                System.out.println("Test 13: Then Side");
-            } else {
-                System.out.println("Test 13: Else Side");
-            }
-        } else {
-            System.out.println("str is not null");
-            if (str.contains(arg)) {
-                System.out.println("Test 13: Then Side");
-            } else {
-                System.out.println("Test 13: Else Side");
-            }
-        }
-    }
-
-    // Test 14: self contains check
+    // Test 8: self contains check
     public static void testSelf() {
         String str = Verifier.nondetString();
         if(str.contains(str)) {
-            System.out.println("Test 14: Then Side");
+            System.out.println("Test 8: Then Side");
         } else {
-            System.out.println("Test 14: Else Side");
+            System.out.println("Test 8: Else Side");
         }
     }
 
-    // Test 15: self contains check - branch check (arg != null) => (IFNULL)
-    public static void testSelfNotNull() {
-        String str = Verifier.nondetString();
-        if (str != null) {
-            if (str.contains(str)) {
-                System.out.println("Test 15: Then Side");
-            } else {
-                System.out.println("Test 15: Else Side");
-            }
-        } else {
-            System.out.println("Test 15: str is null");
-        }
-    }
-
-    // Test 16: self contains check - branch check (arg == null) => (IFNONNULL)
-    public static void testSelfNull() {
-        String str = Verifier.nondetString();
-        if (str == null) {
-            if (str.contains(str)) {
-                System.out.println("Test 16: Then Side");
-            } else {
-                System.out.println("Test 16: Else Side");
-            }
-        } else {
-            System.out.println("Test 16: str is not null");
-        }
-    }
-
-
-    // Test 17: using assert with one variable which is symbolic
+    // Test 9: using assert with one variable which is symbolic
     public static void testAssert1() {
         String str = Verifier.nondetString();
         assert (str.contains("Hello"));
     }
 
-    // Test 18: using assert with two variables, both symbolic
+    // Test 10: using assert with two variables, both symbolic
     public static void testAssert2() {
         String str = Verifier.nondetString();
         String arg = Verifier.nondetString();
