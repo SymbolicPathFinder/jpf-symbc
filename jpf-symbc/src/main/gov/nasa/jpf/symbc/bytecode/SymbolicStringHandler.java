@@ -914,15 +914,31 @@ public class SymbolicStringHandler {
 				}
 			} else if(currentChocie == 0) {
 				// if the runtime.exception flag is set to false, skip choice 0 (null check choice)
-				if(!re_flag) {
+				if (!re_flag) {
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
-					if (sym_v1 != null) {
-						if (sym_v2 != null) {
+
+					if (sym_v1 != null) { // it is symbolic "string1"
+						if (sym_v2 != null) { // it is also symbolic "string0"
+							// Both symbolic
 							pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
 						} else {
-							pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+							/*
+							 * When a concrete string calls equals() on null:
+							 *   - "Hello World".equals(null) returns FALSE (not NPE)
+							 *   - This is because String.equals() is overridden to handle null
+							 *   - It performs content comparison, not reference comparison
+							 *   - Other methods will still raise NPE, because of their semantics and internal working.
+							 */
+							if (comp == StringComparator.EQUALS) {
+								th.getVM().getSystemState().setIgnored(true);
+								return;
+							} else { // only sym_v1 is symbolic
+								pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+							}
 						}
+					} else { // if sym_v1 is null then sym_v2 is symbolic "string0"
+						pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
 					}
 					if (!pc.simplify()) { // not satisfiable
 						th.getVM().getSystemState().setIgnored(true);
@@ -937,9 +953,7 @@ public class SymbolicStringHandler {
 			} else if (currentChocie == 2) {
 				sf.push(1, true);
 			}
-
 		}
-
 	}
 
 	public void handleEqualsIgnoreCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
