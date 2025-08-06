@@ -845,6 +845,10 @@ public class SymbolicStringHandler {
 			ChoiceGenerator<?> cg;
 			int currentChocie = 0;
 
+			String mname = invInst.getInvokedMethodName();
+			String shortName = mname.substring(0, mname.indexOf("("));
+			boolean isEqualsMethod = shortName.equals("equals");
+
 			cg = th.getVM().getChoiceGenerator();
 			assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
 			currentChocie = (Integer) cg.getNextChoice();
@@ -881,8 +885,12 @@ public class SymbolicStringHandler {
 					}
 				} else {
 					ElementInfo e1 = th.getElementInfo(s1);
-					String val = e1.asString();
-					pc.spc._addDet(comp, val, sym_v2);
+					if(e1 != null) {
+						String val = e1.asString();
+						pc.spc._addDet(comp, val, sym_v2);
+					} else {
+						pc.spc._addDet(comp, "null", sym_v2);
+					}
 				}
 				if (!pc.simplify()) {// not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
@@ -903,8 +911,12 @@ public class SymbolicStringHandler {
 					}
 				} else {
 					ElementInfo e1 = th.getElementInfo(s1);
-					String val = e1.asString();
-					pc.spc._addDet(comp.not(), val, sym_v2);
+					if(e1 != null) {
+						String val = e1.asString();
+						pc.spc._addDet(comp.not(), val, sym_v2);
+					} else {
+						pc.spc._addDet(comp.not(), "null", sym_v2);
+					}
 				}
 				if (!pc.simplify()) {// not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
@@ -924,33 +936,40 @@ public class SymbolicStringHandler {
 				if (!pc.simplify()) { // not satisfiable
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
-
-					if (sym_v1 != null) { // it is symbolic "string1"
-						if (sym_v2 != null) { // it is also symbolic "string0"
-							// Both symbolic
+					if(isEqualsMethod) {
+						// For equals(), only throw NPE if the calling object (sym_v2) is null
+						// If only the argument (sym_v1) is null, ignore this choice and let it go to choice 1 (false)
+						if (sym_v2 != null) {
+							// The calling object is symbolic - check if it can be null
 							pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
-						} else {
-							/*
-							 * When a concrete string calls equals() on null:
-							 *   - "Hello World".equals(null) returns FALSE (not NPE)
-							 *   - This is because String.equals() is overridden to handle null
-							 *   - It performs content comparison, not reference comparison
-							 *   - Other methods will still raise NPE, because of their semantics and internal working.
-							 */
-							if (comp == StringComparator.EQUALS) {
+							if (!pc.simplify()) {
+								// Calling object cannot be null, ignore this path
 								th.getVM().getSystemState().setIgnored(true);
-								return;
-							} else { // only sym_v1 is symbolic
+							} else {
+								// Calling object can be null, throw NPE
+								th.createAndThrowException("java.lang.NullPointerException");
+							}
+						} else {
+							// Calling object is concrete (not null), so no NPE for equals()
+							// Ignore this choice and let it fall through to choice 1 (false)
+							th.getVM().getSystemState().setIgnored(true);
+						}
+					} else {
+						if (sym_v1 != null) { // it is symbolic "string1"
+							if (sym_v2 != null) { // it is also symbolic "string0"
+								// Both symbolic
+								pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+							} else {
 								pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
 							}
+						} else { // if sym_v1 is null then sym_v2 is symbolic "string0"
+							pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
 						}
-					} else { // if sym_v1 is null then sym_v2 is symbolic "string0"
-						pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
-					}
-					if (!pc.simplify()) { // not satisfiable
-						th.getVM().getSystemState().setIgnored(true);
-					} else {
-						th.createAndThrowException("java.lang.NullPointerException");
+						if (!pc.simplify()) { // not satisfiable
+							th.getVM().getSystemState().setIgnored(true);
+						} else {
+							th.createAndThrowException("java.lang.NullPointerException");
+						}
 					}
 				}
 			}
