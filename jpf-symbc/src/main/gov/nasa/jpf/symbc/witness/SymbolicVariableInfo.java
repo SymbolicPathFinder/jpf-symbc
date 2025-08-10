@@ -19,6 +19,13 @@ public class SymbolicVariableInfo{
 
         public SymbolicVariableInfo() {};
 
+        public SymbolicVariableInfo(SymbolicVariableInfo copy) {
+                this.lineNumber = copy.lineNumber;
+                this.returnType = copy.returnType;
+                this.varName = copy.varName;
+                this.varValue = copy.varValue;
+        }
+
 }
 
 

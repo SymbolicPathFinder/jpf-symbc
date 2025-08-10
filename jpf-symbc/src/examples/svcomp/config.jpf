@@ -57,7 +57,7 @@
 #had the problem with mod
 #target=svcomp.SatEvenOdd01.Main
 #difficult solver query.
-target=svcomp.StringIndexMethods02.Main
+#target=svcomp.StringIndexMethods02.Main
 #target=svcomp.StringValueOf06.Main
 #target=svcomp.StringCompare01.Main
 #target=svcomp.securibench.Refl2.Main
@@ -68,17 +68,19 @@ target=svcomp.StringIndexMethods02.Main
 #target=svcomp.StringCompare04.Main
 #target=svcomp.StringBuilderConstructors02.Main
 
+target=svcomp.ExSymExe28_false.Main
+
 
 classpath=${jpf-symbc}/build/examples,${jpf-symbc}/lib/com.ibm.wala.util-1.4.4-SNAPSHOT.jar
-symbolic.dp=z3bitvector
-symbolic.min_int=-2147483648
-symbolic.max_int=2147483647
-symbolic.min_double=-10000.0
-symbolic.max_double=10000.0
+symbolic.dp=choco
+symbolic.min_int=-21474836
+symbolic.max_int=21474836
+#symbolic.min_double=-10000.0
+#symbolic.max_double=10000.0
 symbolic.bvlength=64
 search.depth_limit=13
 symbolic.strings=true
-symbolic.string_dp=z3str3
+#symbolic.string_dp=z3str3
 symbolic.lazy=on
 symbolic.jrarrays=true
 veritestingMode = 5
