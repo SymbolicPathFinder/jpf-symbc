@@ -13,7 +13,9 @@ public class SymbolicVariableInfo{
         public int lineNumber;
         public String returnType;
 
-        public String varName;
+        public String varSymName;
+
+        public String varPgmName;
 
         public Object varValue = null;
 
@@ -22,7 +24,8 @@ public class SymbolicVariableInfo{
         public SymbolicVariableInfo(SymbolicVariableInfo copy) {
                 this.lineNumber = copy.lineNumber;
                 this.returnType = copy.returnType;
-                this.varName = copy.varName;
+                this.varSymName = copy.varSymName;
+                this.varPgmName = copy.varPgmName;
                 this.varValue = copy.varValue;
         }
 
