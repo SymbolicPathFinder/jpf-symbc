@@ -61,12 +61,16 @@ public class PathConditionParser{
             }
         }
 
-        for(SymbolicVariableInfo symInfo: symbolicVariableInfoList){
+        for(SymbolicVariableInfo symInfo: symbolicVariableInfoList) {
             if (symInfo.returnType.contains("String")) {
                 symInfo.varValue = pc.spc.solution.get(symInfo.varSymName);
                 break;
             }
 
+            if (symInfo.returnType.equals("boolean")) {
+                symInfo.varValue = Integer.parseInt(pc.spc.solution.get(symInfo.varSymName)) < 0 ? "false" : "true";
+                break;
+            }
         }
 
     }

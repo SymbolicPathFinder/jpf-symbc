@@ -225,8 +225,12 @@ class Manager extends TranslationManager {
 			final Function<StringExpression, String> ValueOfInt = (expr) -> {
 					final DerivedStringExpression dse = (DerivedStringExpression) expr;
 					final String arg = manager.numExpr.collect((IntegerExpression) dse.oprlist[0]);
-					return "(ite ( < " + arg + " 0) (str.++ \"-\" (str.from_int (- " + arg + "))) (str.from_int " +  arg + "))";
-				};
+					if(arg.contains("bool")) {
+						return "(ite ( not (= " + arg + " 0)) \"true\" \"false\")";
+					} else {
+						return "(ite ( < " + arg + " 0) (str.++ \"-\" (str.from_int (- " + arg + "))) (str.from_int " +  arg + "))";
+					}
+			};
 
 			map(StringOrOperation.NONSYM, (expr) -> {
 				return "\"" + ((StringConstant) expr).value + "\"";

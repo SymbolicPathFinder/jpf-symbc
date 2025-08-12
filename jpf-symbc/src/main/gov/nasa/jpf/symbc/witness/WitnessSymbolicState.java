@@ -44,9 +44,11 @@ public class WitnessSymbolicState {
         Object symbolicVar = sf.getOperandAttr();
         if(interceptSymbolic && strIns.contains("nativereturn") && strIns.contains("makeSymbolic")) {
             symbolicVariableInfo.varSymName = symbolicVar.toString();
-            // Copy current symbolic variable details into a new object
-            // so further changes to symbolicVariableInfo won't affect the stored entry
-            symVarInfoList.add(new SymbolicVariableInfo(symbolicVariableInfo));
+            if(!symVarInfoList.contains(symbolicVariableInfo)) {
+                // Copy current symbolic variable details into a new object
+                // so further changes to symbolicVariableInfo won't affect the stored entry
+                symVarInfoList.add(new SymbolicVariableInfo(symbolicVariableInfo));
+            }
             interceptSymbolic = false;
         }
     }

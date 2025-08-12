@@ -9,6 +9,8 @@
 package gov.nasa.jpf.symbc.witness;
 
 
+import choco.cp.solver.constraints.global.geost.geometricPrim.Obj;
+
 public class SymbolicVariableInfo{
         public int lineNumber;
         public String returnType;
@@ -27,6 +29,23 @@ public class SymbolicVariableInfo{
                 this.varSymName = copy.varSymName;
                 this.varPgmName = copy.varPgmName;
                 this.varValue = copy.varValue;
+        }
+
+        @Override
+        public String toString() {
+                return varPgmName + "_" + varSymName + "_" + lineNumber;
+        }
+
+        @Override
+        public int hashCode() {
+                return this.toString().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+                if (o instanceof SymbolicVariableInfo)
+                        return this.toString().equals(o.toString());
+                return false;
         }
 
 }
