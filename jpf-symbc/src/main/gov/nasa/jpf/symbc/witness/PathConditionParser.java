@@ -61,15 +61,26 @@ public class PathConditionParser{
             }
         }
 
-        for(SymbolicVariableInfo symInfo: symbolicVariableInfoList) {
-            if (symInfo.returnType.contains("String")) {
-                symInfo.varValue = pc.spc.solution.get(symInfo.varSymName);
-                break;
-            }
+        /**
+         * Attempting to use the string PathCondition to find the solutions for the symbolic variables.
+         * This should be cleaner if we have a consistent way of have a path condition that is joint
+         * between string and numeric, and also, if we have a uniform way of populating an intermediate
+         * datastructure that hold the model of the sat query.
+         */
 
-            if (symInfo.returnType.equals("boolean")) {
-                symInfo.varValue = Integer.parseInt(pc.spc.solution.get(symInfo.varSymName)) < 0 ? "false" : "true";
-                break;
+        for(SymbolicVariableInfo symInfo: symbolicVariableInfoList) {
+            String solution = pc.spc.solution.get(symInfo.varSymName);
+            if(solution != null) {
+                if (symInfo.returnType.contains("String")) {
+                    symInfo.varValue = solution;
+                    break;
+                } else if (symInfo.returnType.contains("int")) {
+                    symInfo.varValue = solution;
+                    break;
+                } else if (symInfo.returnType.equals("boolean")) {
+                    symInfo.varValue = Integer.parseInt(solution) == 0 ? "false" : "true";
+                    break;
+                }
             }
         }
 
