@@ -44,6 +44,11 @@ public class WitnessSymbolicState {
         Object symbolicVar = sf.getOperandAttr();
         if(interceptSymbolic && strIns.contains("nativereturn") && strIns.contains("makeSymbolic")) {
             symbolicVariableInfo.varSymName = symbolicVar.toString();
+            if(symbolicVariableInfo.varPgmName == null) {
+                // case where we couldn't find the program name of a variable, as in the case where the verifier invocation was within and expression,
+                // for example like an arrayIndex
+                symbolicVariableInfo.varPgmName = symbolicVariableInfo.varSymName;
+            }
             if(!symVarInfoList.contains(symbolicVariableInfo)) {
                 // Copy current symbolic variable details into a new object
                 // so further changes to symbolicVariableInfo won't affect the stored entry
@@ -86,7 +91,11 @@ public class WitnessSymbolicState {
     public static void collectPgmNameForSymVar(Instruction instruction) {
         String strInst = instruction.toString();
         if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
-            int symVarStackSlot = findStackSlot(instruction);
+            Integer symVarStackSlot = findStackSlot(instruction);
+            if (symVarStackSlot == null) {
+                // we failed to find a stackslot, it could just be a temp variable, we just return.
+                return;
+            }
             LocalVarInfo[] methodLocalVars = instruction.getMethodInfo().getLocalVars();
             for (int i = 0; i < methodLocalVars.length; i++) {
                 if(methodLocalVars[i].getSlotIndex() == symVarStackSlot) {
@@ -102,16 +111,20 @@ public class WitnessSymbolicState {
      *
      * @return
      */
-    static int findStackSlot(Instruction instruction) {
+    static Integer findStackSlot(Instruction instruction) {
         Instruction[] instructions = instruction.getMethodInfo().getInstructions();
         int pgmCounter = instruction.getInstructionIndex() + 1;
         Instruction nextInstruction = instructions[pgmCounter];
-        while (!nextInstruction.toString().contains("store")) {
-            pgmCounter++;
-            nextInstruction = instructions[pgmCounter];
-        }
+        // we are assuming here that the next instruction would be the store of the verifier invocation, if this is not the case, then the invocation of the verifier must have occurred as a subexpression,
+        // in which case, we cannot tie it with a slot, or a particular program name. So we return, and give the program name the same name as the symbolic name.
+//        while (!nextInstruction.toString().contains("store")) {
+//            pgmCounter++;
+//            nextInstruction = instructions[pgmCounter];
+//        }
+        if(!nextInstruction.toString().contains("store"))
+            return null;
         int storeStackSlot = Integer.parseInt(
-                nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1)
+                nextInstruction.toString().substring(nextInstruction.toString().indexOf("store") + 6)
         );
         return storeStackSlot;
     }
