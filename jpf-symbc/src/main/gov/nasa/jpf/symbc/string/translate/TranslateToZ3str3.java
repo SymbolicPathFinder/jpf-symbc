@@ -36,7 +36,8 @@ public class TranslateToZ3str3 {
 			System.out.println("Satisfiable: " + o.isSAT());
 			for (String k : o.getModel().keySet()) {
 				System.out.println(k + " => " + o.getModel().get(k));
-				solution.put(k, o.getModel().get(k).replaceAll("^\"|\"$", ""));
+//				solution.put(k, o.getModel().get(k).replaceAll("^\"|\"$", ""));
+				solution.put(k, o.getModel().get(k));
 			}
 			pc.solution = new HashMap<String, String>(solution);
 			System.out.println("*************************************\n");

@@ -80,7 +80,7 @@ public class Edge{
         else if(symbolicVariableInfoList.get(indexOfEdge).returnType.equals("java.lang.String")){
             if(allowMethodInvocation){
                 if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s.equals(%s)</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, "\"\""));
-                else edgeBuilder.append(String.format("         <data key=\"assumption\">%s.equals(\"%s\")</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName,symbolicVariableInfoList.get(indexOfEdge).varValue));
+                else edgeBuilder.append(String.format("         <data key=\"assumption\">%s.equals(%s)</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName,symbolicVariableInfoList.get(indexOfEdge).varValue));
             }
             else{
                 if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s = %s</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, "\"\""));
