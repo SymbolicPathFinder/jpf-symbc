@@ -56,7 +56,7 @@ public class WitnessSymbolicState {
     // catch the invokestatic.Verifier.nondet~~
     // and store the line number and type
     public static void collectVerifierCalls(String className, String methodName, JVMInvokeInstruction md) {
-        if(className.contains("Verifier") && methodName.contains("nondet")) {
+        if (className.contains("Verifier") && methodName.contains("nondet")) {
             extractSymbolicVariableInfo(md);
         }
     }
@@ -76,7 +76,7 @@ public class WitnessSymbolicState {
     // and store the line number and type
     public static void maintainWitnessInterceptionState(Instruction instruction) {
         String strInst = instruction.toString();
-        if(strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
+        if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
             JVMInvokeInstruction md = (JVMInvokeInstruction) instruction;
             extractSymbolicVariableInfo(md);
             interceptSymbolic = true;
@@ -86,19 +86,34 @@ public class WitnessSymbolicState {
     public static void collectPgmNameForSymVar(Instruction instruction) {
         String strInst = instruction.toString();
         if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
-            int currPgmCounter = instruction.getInstructionIndex();
-            Instruction nextInstruction = instruction.getMethodInfo().getInstructions()[currPgmCounter + 1];
-            int symVarStackSlot = Integer.parseInt(
-                    nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1)
-            );
+            int symVarStackSlot = findStackSlot(instruction);
             LocalVarInfo[] methodLocalVars = instruction.getMethodInfo().getLocalVars();
-            for(int i=0; i<methodLocalVars.length; i++) {
-                if(methodLocalVars[i].getSlotIndex()==symVarStackSlot) {
+            for (int i = 0; i < methodLocalVars.length; i++) {
+                if(methodLocalVars[i].getSlotIndex() == symVarStackSlot) {
                     symbolicVariableInfo.varPgmName = methodLocalVars[i].getName();
                     return;
                 }
             }
         }
+    }
+
+    /**
+     * finds the nearest store instruction forward, and return its stack slot.
+     *
+     * @return
+     */
+    static int findStackSlot(Instruction instruction) {
+        Instruction[] instructions = instruction.getMethodInfo().getInstructions();
+        int pgmCounter = instruction.getInstructionIndex() + 1;
+        Instruction nextInstruction = instructions[pgmCounter];
+        while (!nextInstruction.toString().contains("store")) {
+            pgmCounter++;
+            nextInstruction = instructions[pgmCounter];
+        }
+        int storeStackSlot = Integer.parseInt(
+                nextInstruction.toString().substring(nextInstruction.toString().indexOf('_') + 1)
+        );
+        return storeStackSlot;
     }
 
     /**
