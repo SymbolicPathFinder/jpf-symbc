@@ -924,55 +924,46 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else if(currentChocie == 0) {
-				if (sym_v1 != null) { // it is symbolic "string1"
-					if (sym_v2 != null) { // it is also symbolic "string0"
-						pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
-					} else { // it means only the sym_v1 "string0"
-						pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
-					}
-				} else { // if sym_v1 is null then this will be "string0"
-					pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
-				}
-				if (!pc.simplify()) { // not satisfiable
-					th.getVM().getSystemState().setIgnored(true);
-				} else {
-					if(isEqualsMethod) {
-						// For equals(), only throw NPE if the calling object (sym_v2) is null
-						// If only the argument (sym_v1) is null, ignore this choice and let it go to choice 1 (false)
-						if (sym_v2 != null) {
-							// The calling object is symbolic - check if it can be null
-							pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
-							if (!pc.simplify()) {
-								// Calling object cannot be null, ignore this path
-								th.getVM().getSystemState().setIgnored(true);
-							} else {
-								// Calling object can be null, throw NPE
-								th.createAndThrowException("java.lang.NullPointerException");
-							}
-						} else {
-							// Calling object is concrete (not null), so no NPE for equals()
-							// Ignore this choice and let it fall through to choice 1 (false)
-							th.getVM().getSystemState().setIgnored(true);
-						}
-					} else {
-						if (sym_v1 != null) { // it is symbolic "string1"
-							if (sym_v2 != null) { // it is also symbolic "string0"
-								// Both symbolic
-								pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
-							} else {
-								pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
-							}
-						} else { // if sym_v1 is null then sym_v2 is symbolic "string0"
-							pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
-						}
-						if (!pc.simplify()) { // not satisfiable
-							th.getVM().getSystemState().setIgnored(true);
-						} else {
-							th.createAndThrowException("java.lang.NullPointerException");
-						}
-					}
-				}
-			}
+                if(!re_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if(isEqualsMethod) {
+                        // For equals(), only throw NPE if the calling object (sym_v2) is null
+                        // If only the argument (sym_v1) is null, ignore this choice and let it go to choice 1 (false)
+                        if (sym_v2 != null) {
+                            // The calling object is symbolic - check if it can be null
+                            pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+                            if (!pc.simplify()) {
+                                // Calling object cannot be null, ignore this path
+                                th.getVM().getSystemState().setIgnored(true);
+                            } else {
+                                // Calling object can be null, throw NPE
+                                th.createAndThrowException("java.lang.NullPointerException");
+                            }
+                        } else {
+                            // Calling object is concrete (not null), so no NPE for equals()
+                            // Ignore this choice and let it fall through to choice 1 (false)
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
+                    } else {
+                        if (sym_v1 != null) { // it is symbolic "string1"
+                            if (sym_v2 != null) { // it is also symbolic "string0"
+                                // Both symbolic
+                                pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+                            } else {
+                                pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
+                            }
+                        } else { // if sym_v1 is null then sym_v2 is symbolic "string0"
+                            pc.spc._addDet(StringComparator.EQUALS, sym_v2, "null");
+                        }
+                        if (!pc.simplify()) { // not satisfiable
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.NullPointerException");
+                        }
+                    }
+                }
+            }
 
 			if(currentChocie == 1) {
 				sf.push(0, true);
