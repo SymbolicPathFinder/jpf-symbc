@@ -52,7 +52,7 @@ public class WitnessSymbolicState {
             if(!symVarInfoList.contains(symbolicVariableInfo)) {
                 // Copy current symbolic variable details into a new object
                 // so further changes to symbolicVariableInfo won't affect the stored entry
-                symVarInfoList.add(new SymbolicVariableInfo(symbolicVariableInfo));
+                symVarInfoList.add(symbolicVariableInfo);
             }
             interceptSymbolic = false;
         }
@@ -91,6 +91,7 @@ public class WitnessSymbolicState {
     public static void collectPgmNameForSymVar(Instruction instruction) {
         String strInst = instruction.toString();
         if (strInst.contains("invokestatic") && strInst.contains("Verifier.nondet")) {
+            symbolicVariableInfo = new SymbolicVariableInfo();
             Integer symVarStackSlot = findStackSlot(instruction);
             if (symVarStackSlot == null) {
                 // we failed to find a stackslot, it could just be a temp variable, we just return.
