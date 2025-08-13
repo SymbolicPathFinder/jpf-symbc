@@ -78,12 +78,17 @@ public class SymbolicStringHandler {
 
 	public static final int intValueOffset = 5;
 
-    private final boolean re_flag;
+    private final boolean rte_flag;
+    private final boolean npe_flag;
 
 	public SymbolicStringHandler(ThreadInfo th) {
         Config conf = th.getVM().getConfig();
-        String[] re = conf.getStringArray("runtime.exception");
-		this.re_flag = re != null && re[0].equalsIgnoreCase("true");
+
+        String[] rte = conf.getStringArray("runtime.exception");
+        this.rte_flag = rte != null && rte[0].equalsIgnoreCase("true");
+
+        String[] npe = conf.getStringArray("nullPointer.exception");
+		this.npe_flag = npe != null && npe[0].equalsIgnoreCase("true");
 	}
 
 	/* this method checks if a method has as argument any symbolic strings */
@@ -924,7 +929,7 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else if(currentChocie == 0) {
-                if(!re_flag) {
+                if(!npe_flag) {
                     th.getVM().getSystemState().setIgnored(true);
                 } else {
                     if(isEqualsMethod) {
@@ -964,12 +969,6 @@ public class SymbolicStringHandler {
                     }
                 }
             }
-
-			if(currentChocie == 1) {
-				sf.push(0, true);
-			} else if (currentChocie == 2) {
-				sf.push(1, true);
-			}
 		}
 	}
 
@@ -1405,7 +1404,7 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else if(conditionValue == 0) {
-				if(!re_flag) {
+				if(!npe_flag) {
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
 					pc.spc._addDet(StringComparator.EQUALS, sym_v1, "null");
@@ -1415,12 +1414,6 @@ public class SymbolicStringHandler {
 						th.createAndThrowException("java.lang.NullPointerException");
 					}
 				}
-			}
-
-			if(conditionValue == 1) {
-				sf.push(0, true);
-			} else if (conditionValue == 2) {
-				sf.push(1, true);
 			}
 		}
 	}

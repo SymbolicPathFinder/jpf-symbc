@@ -36,6 +36,7 @@
 package gov.nasa.jpf.symbc.bytecode;
 
 
+import gov.nasa.jpf.Config;
 import gov.nasa.jpf.symbc.numeric.Expression;
 import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
@@ -59,61 +60,70 @@ public class IFNONNULL extends gov.nasa.jpf.jvm.bytecode.IFNONNULL {
 		StackFrame sf = ti.getModifiableTopFrame();
 		Expression sym_v = (Expression) sf.getOperandAttr();
 
+        Config conf = ti.getVM().getConfig();
+        String[] npe = conf.getStringArray("nullPointer.exception");
+        final boolean npe_flag = npe != null && npe[0].equalsIgnoreCase("true");
+
 		if (sym_v == null) { // Concrete execution
 			return super.execute(ti);
 		} else { // Symbolic Execution
-			if (sym_v instanceof StringExpression) {
-				ChoiceGenerator<?> cg;
+			if(npe_flag) {
+                if (sym_v instanceof StringExpression) {
+                    ChoiceGenerator<?> cg;
 
-				if (!ti.isFirstStepInsn()) { // This is what really returns results
-					cg = new PCChoiceGenerator(2);
-					ti.getVM().getSystemState().setNextChoiceGenerator(cg);
-					return this;
-				} else {
-					cg = ti.getVM().getSystemState().getChoiceGenerator();
-					assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+                    if (!ti.isFirstStepInsn()) { // This is what really returns results
+                        cg = new PCChoiceGenerator(2);
+                        ti.getVM().getSystemState().setNextChoiceGenerator(cg);
+                        return this;
+                    } else {
+                        cg = ti.getVM().getSystemState().getChoiceGenerator();
+                        assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
 
-					PathCondition pc;
-					ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+                        PathCondition pc;
+                        ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
 
-					while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
-						prev_cg = prev_cg.getPreviousChoiceGenerator();
-					}
+                        while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+                            prev_cg = prev_cg.getPreviousChoiceGenerator();
+                        }
 
-					if (prev_cg == null) {
-						pc = new PathCondition();
-					} else {
-						pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
-					}
+                        if (prev_cg == null) {
+                            pc = new PathCondition();
+                        } else {
+                            pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+                        }
 
-					assert pc != null;
+                        assert pc != null;
 
-					sf.pop(); // remove the operand from the stack
+                        sf.pop(); // remove the operand from the stack
 
-					boolean currentChoice = (Integer) cg.getNextChoice() == 0;
+                        boolean currentChoice = (Integer) cg.getNextChoice() == 0;
 
-					// two choices (EQUALS, "null") | (NOTEQUALS, "null")
-					if (!currentChoice) {
-						pc.spc._addDet(StringComparator.EQUALS, (StringExpression) sym_v, "null");
-						if (!pc.simplify()) {
-							ti.getVM().getSystemState().setIgnored(true);
-						} else {
-							((PCChoiceGenerator) cg).setCurrentPC(pc);
-						}
-						return getNext(ti);
-					} else {
-						pc.spc._addDet(StringComparator.NOTEQUALS, (StringExpression) sym_v, "null");
-						if (!pc.simplify()) {
-							ti.getVM().getSystemState().setIgnored(true);
-						} else {
-							((PCChoiceGenerator) cg).setCurrentPC(pc);
-						}
-						return getTarget();
-					}
-				}
-			} else {
-				return ti.createAndThrowException("java.lang.UnsupportedOperationException", "IFNONNULL for non-string symbolic expressions is not supported.");
-			}
+                        // two choices (EQUALS, "null") | (NOTEQUALS, "null")
+                        if (!currentChoice) {
+                            pc.spc._addDet(StringComparator.EQUALS, (StringExpression) sym_v, "null");
+                            if (!pc.simplify()) {
+                                ti.getVM().getSystemState().setIgnored(true);
+                            } else {
+                                ((PCChoiceGenerator) cg).setCurrentPC(pc);
+                            }
+                            return getNext(ti);
+                        } else {
+                            pc.spc._addDet(StringComparator.NOTEQUALS, (StringExpression) sym_v, "null");
+                            if (!pc.simplify()) {
+                                ti.getVM().getSystemState().setIgnored(true);
+                            } else {
+                                ((PCChoiceGenerator) cg).setCurrentPC(pc);
+                            }
+                            return getTarget();
+                        }
+                    }
+                } else {
+                    return ti.createAndThrowException("java.lang.UnsupportedOperationException", "IFNONNULL for non-string symbolic expressions is not supported.");
+                }
+            } else {
+                sf.pop();
+                return getTarget();
+            }
 		}
 	}
 }
