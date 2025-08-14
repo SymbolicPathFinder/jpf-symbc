@@ -122,7 +122,18 @@ public class WitnessSymbolicState {
 //            pgmCounter++;
 //            nextInstruction = instructions[pgmCounter];
 //        }
-        if(!nextInstruction.toString().contains("store"))
+        String nextInstructionString = nextInstruction.toString();
+        // skip array stores
+        boolean isArrayStore = nextInstructionString.equals("aastore") ||
+                nextInstructionString.equals("iastore") ||
+                nextInstructionString.equals("lastore") ||
+                nextInstructionString.equals("fastore") ||
+                nextInstructionString.equals("dastore") ||
+                nextInstructionString.equals("bastore") ||
+                nextInstructionString.equals("castore") ||
+                nextInstructionString.equals("sastore");
+
+        if(!nextInstructionString.contains("store") || isArrayStore)
             return null;
         int storeStackSlot = Integer.parseInt(
                 nextInstruction.toString().substring(nextInstruction.toString().indexOf("store") + 6)
