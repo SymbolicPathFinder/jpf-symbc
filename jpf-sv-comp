@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# parse arguments
+declare -a BM
+BM=()
+PROP_FILE=""
+WITNESS_FILE=""
+
+TOOL_BINARY=jpf-core/bin/jpf
+FIND_OPTIONS="-name '*.java'"
+
+while [ -n "$1" ] ; do
+  case "$1" in
+    --32|--64) BIT_WIDTH="${1##--}" ; shift 1 ;;
+    --propertyfile) PROP_FILE="$2" ; shift 2 ;;
+    --graphml-witness) WITNESS_FILE="$2" ; shift 2 ;;
+    --version) date -r jpf-symbc/build/jpf-symbc.jar ; exit 0 ;;
+    *) SRC=(`eval "find $1 $FIND_OPTIONS"`) ; BM=("${BM[@]}" "${SRC[@]}") ; shift 1 ;;
+  esac
+done
+
+if [ -z "${BM[0]}" ] || [ -z "$PROP_FILE" ] ; then
+  echo "Missing benchmark or property file"
+  exit 1
+fi
+
+if [ ! -s "${BM[0]}" ] || [ ! -s "$PROP_FILE" ] ; then
+  echo "Empty benchmark or property file"
+  exit 1
+fi
+
+LOG=`mktemp -t jpf-log.XXXXXX`
+DIR=`mktemp -d -t jpf-benchmark.XXXXXX`
+
+trap "rm -rf $DIR" EXIT
+
+mkdir -p $DIR/target/classes
+
+/usr/lib/jvm/java-8-openjdk-amd64/bin/javac -g -cp $CLASSPATH_ADDED:$DIR/target/classes -d $DIR/target/classes "${BM[@]}"
+
+# create configuration file
+echo "target=Main" > $DIR/config.jpf
+echo "classpath=`pwd`/jpf-symbc/build/classes:$DIR/target/classes:$CLASSPATH_ADDED" >> $DIR/config.jpf
+echo "symbolic.dp=z3bitvector" >> $DIR/config.jpf
+echo "symbolic.bvlength=64" >> $DIR/config.jpf
+echo "search.depth_limit=13" >> $DIR/config.jpf
+echo "symbolic.strings=true" >> $DIR/config.jpf
+echo "symbolic.string_dp_timeout_ms=3000" >> $DIR/config.jpf
+echo "symbolic.lazy=on" >> $DIR/config.jpf
+echo "symbolic.arrays=true" >> $DIR/config.jpf
+echo $DIR/config.jpf
+
+# run SPF
+export LD_LIBRARY_PATH=`pwd`/lib:$LD_LIBRARY_PATH
+echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+if test -z "$JVM_FLAGS"; then
+  JVM_FLAGS="-Xmx1024m -ea"
+fi
+/usr/lib/jvm/java-8-openjdk-amd64/bin/java $JVM_FLAGS -jar $(pwd)/jpf-core/build/RunJPF.jar $DIR/config.jpf | tee $LOG
+
+# check the result
+grep "no errors detected" $LOG > /dev/null
+if [ $? -eq 0 ]; then
+  echo "SAFE"
+else
+  grep "^error.*NoUncaughtExceptionsProperty.*AssertionError" $LOG > /dev/null
+  if [ $? -eq 0 ]; then
+    echo "UNSAFE"
+  else
+    echo "UNKNOWN"
+  fi
+fi
