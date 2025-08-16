@@ -179,6 +179,8 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
     public void instructionExecuted(VM vm, ThreadInfo currentThread, Instruction nextInstruction,
             Instruction executedInstruction) {
 
+        collectPgmNameForSymVar(executedInstruction);
+
         if (!vm.getSystemState().isIgnored()) {
             Instruction insn = executedInstruction;
             // SystemState ss = vm.getSystemState();
