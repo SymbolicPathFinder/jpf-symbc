@@ -969,6 +969,11 @@ public class SymbolicStringHandler {
                     }
                 }
             }
+            if(currentChocie == 1) {
+                sf.push(0, true);
+            } else {
+                sf.push(1, true);
+            }
 		}
 	}
 
@@ -1254,10 +1259,9 @@ public class SymbolicStringHandler {
 		StringExpression result = sym_v1._trim();
 
 		ElementInfo  objRef = th.getHeap().newString("", th); /*
-																																     * dummy
-																																	 * String
-																																	 * Object
-																																	 */
+																																 * dummy String
+																																 * Object
+																																 */
 		sf.push(objRef.getObjectRef(), true);
 		sf.setOperandAttr(result);
 	}
@@ -1415,6 +1419,11 @@ public class SymbolicStringHandler {
 					}
 				}
 			}
+            if(conditionValue == 1) {
+                sf.push(0, true);
+            } else {
+                sf.push(1, true);
+            }
 		}
 	}
 
