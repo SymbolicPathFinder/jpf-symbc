@@ -62,14 +62,14 @@ echo "symbolic.bvlength=64" >> $DIR/config.jpf
 echo "search.depth_limit=13" >> $DIR/config.jpf
 echo "symbolic.strings=true" >> $DIR/config.jpf
 echo "symbolic.string_dp=z3str3" >> $DIR/config.jpf
+echo "nullPointer.exception=false" >> $DIR/config.jpf
 echo "symbolic.string_dp_timeout_ms=3000" >> $DIR/config.jpf
 echo "symbolic.lazy=on" >> $DIR/config.jpf
 echo "symbolic.arrays=true" >> $DIR/config.jpf
 if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then
   echo "runtime.exception=true" >> $DIR/config.jpf
-  echo "search.multiple_errors = true" >> $DIR/config.jpf
+  #echo "search.multiple_errors = true" >> $DIR/config.jpf
 fi
-echo "nullPointer.exception=false" >> $DIR/config.jpf
 echo $DIR/config.jpf
 
 # run SPF
@@ -81,28 +81,48 @@ fi
 /usr/lib/jvm/java-8-openjdk-amd64/bin/java $JVM_FLAGS -jar $(pwd)/jpf-core/build/RunJPF.jar $DIR/config.jpf | tee $LOG
 
 # check the result
-grep "no errors detected" $LOG > /dev/null
-if [ $? -eq 0 ]; then
-  echo "SAFE"
-else
-  if [ $ASSERTION_MODE = "TRUE" ]; then
-    echo "inside assertion_mode=true"
-    grep "^error.*NoUncaughtExceptionsProperty.*AssertionError" $LOG > /dev/null
-    if [ $? -eq 0 ]; then
-      echo "UNSAFE"
-    else
-      echo "UNKNOWN"
-    fi
-  elif [ $RUNTIME_EXCEPTION_MODE = "TRUE" ]; then
-    echo "inside runtime_exception_mode=true"
-    grep "java.lang.*Exception" $LOG > /dev/null
-    if [ $? -eq 0 ]; then
-      echo "UNSAFE"
-    else
-      echo "UNKNOWN"
-    fi
+if [ $ASSERTION_MODE = "TRUE" ]; then
+  echo "inside assertion_mode=true"
+
+  grep "no errors detected" $LOG > /dev/null
+  NO_ERRORS=$?
+
+  grep "java.lang.*Exception" $LOG > /dev/null
+  JAVA_EXCEPTION=$?
+
+  grep "^error.*NoUncaughtExceptionsProperty.*AssertionError" $LOG > /dev/null
+  ASSERTION_ERROR=$?
+
+  if [ $NO_ERRORS -eq 0 ] || ([ $JAVA_EXCEPTION -eq 0 ] && [ $ASSERTION_ERROR -ne 0 ]); then
+    echo "SAFE"
+  elif [ $ASSERTION_ERROR -eq 0 ]; then
+    echo "UNSAFE"
   else
-    echo unsupported case. Failing
-    exit 1;
+    echo "UNKNOWN"
   fi
+
+elif [ $RUNTIME_EXCEPTION_MODE = "TRUE" ]; then
+  echo "inside runtime_exception_mode=true"
+
+  # Check for assertion errors AND no java exceptions OR no errors detected
+  grep "^error.*NoUncaughtExceptionsProperty.*AssertionError" $LOG > /dev/null
+  ASSERTION_ERROR=$?
+
+  grep "java.lang.*Exception" $LOG > /dev/null
+  JAVA_EXCEPTION=$?
+
+  grep "no errors detected" $LOG > /dev/null
+  NO_ERRORS=$?
+
+  if ([ $ASSERTION_ERROR -eq 0 ] && [ $JAVA_EXCEPTION -ne 0 ]) || [ $NO_ERRORS -eq 0 ]; then
+    echo "SAFE"
+  elif [ $JAVA_EXCEPTION -eq 0 ]; then
+    echo "UNSAFE"
+  else
+    echo "UNKNOWN"
+  fi
+
+else
+  echo "unsupported case. Failing"
+  exit 1
 fi
