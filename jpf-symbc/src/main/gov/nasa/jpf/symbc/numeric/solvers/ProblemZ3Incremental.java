@@ -75,6 +75,9 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
     Z3Wrapper z3 = Z3Wrapper.getInstance();
     solver = z3.getSolver();
     ctx = z3.getCtx();
+    Params p = ctx.mkParams();
+    p.add("timeout", SymbolicInstructionFactory.dpTimeout);
+    solver.setParameters(p);
     useFpForReals = SymbolicInstructionFactory.fp;
   }
 
@@ -677,12 +680,15 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
   public Boolean solve() {
     try {
       /* find model for the constraints above */
-      Model model = null;                
+      Model model = null;
 
-      if (Status.SATISFIABLE == solver.check()) {   
+      Status s = solver.check();
+      if (s == Status.SATISFIABLE) {
         return true;
-      } else {       
+      } else if (s == Status.UNSATISFIABLE) {
         return false;
+      } else {
+        throw new RuntimeException("Unexpected status: " + s + " reason : " + solver.getReasonUnknown());
       }
     } catch(Exception e){
       e.printStackTrace();

@@ -25,6 +25,7 @@ import choco.kernel.model.Model;
 import choco.kernel.model.constraints.Constraint;
 import choco.kernel.model.variables.integer.IntegerExpressionVariable;
 import choco.kernel.model.variables.integer.IntegerVariable;
+import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 
 /**
  * Integration of the Choco CP library version 2 (2.1.1, specifically).
@@ -39,11 +40,12 @@ import choco.kernel.model.variables.integer.IntegerVariable;
 public class ProblemChoco2 extends ProblemGeneral {
 	private CPSolver solver;
 	private Model model;
-	public static int timeBound = 300;
+	public int timeBound;
 
 	public ProblemChoco2() {
 		model = new CPModel();
 		solver = new CPSolver();
+		timeBound = SymbolicInstructionFactory.dpTimeout;
 	}
 
 	public Object and(long value, Object exp) {	throw new RuntimeException("## Unsupported and "); }
@@ -176,6 +178,11 @@ public class ProblemChoco2 extends ProblemGeneral {
 
 		solver.setTimeLimit(timeBound);
 		Boolean solved = solver.solve();
+		if (solved == null) {
+			throw new RuntimeException("# Error: Choco returned null.\n" +
+					"Time limit: " + timeBound
+			);
+		}
 		boolean feasible = solver.isFeasible();
 
 		System.out.println("Solved: " + solved);

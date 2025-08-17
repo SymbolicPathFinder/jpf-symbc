@@ -97,6 +97,9 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         Z3Wrapper z3 = Z3Wrapper.getInstance();
         solver = z3.getSolver();
         ctx = z3.getCtx();
+        Params p = ctx.mkParams();
+        p.add("timeout", SymbolicInstructionFactory.dpTimeout);
+        solver.setParameters(p);
         solver.push();
 
         // load bitvector length (default = 32 bit), then calculate allowed min-max
@@ -168,13 +171,27 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 System.out.println(solver.toString());
                 long z3time = 0;
                 long t1 = System.nanoTime();
-                result = solver.check() == Status.SATISFIABLE ? true : false;
+                Status s = solver.check();
+                if (s == Status.SATISFIABLE) {
+                    result = true;
+                } else if (s == Status.UNSATISFIABLE) {
+                    result = false;
+                } else {
+                    throw new RuntimeException("Unexpected status: " + s + " reason : " + solver.getReasonUnknown());
+                }
                 z3time += System.nanoTime() - t1;
                 System.out
                         .println("\nSolving time of z3 bitvector is " + TimeUnit.NANOSECONDS.toMillis(z3time) + " ms");
                 System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
             } else {
-                result = solver.check() == Status.SATISFIABLE ? true : false;
+                Status s = solver.check();
+                if (s == Status.SATISFIABLE) {
+                    result = true;
+                } else if (s == Status.UNSATISFIABLE) {
+                    result = false;
+                } else {
+                    throw new RuntimeException("Unexpected status: " + s + " reason : " + solver.getReasonUnknown());
+                }
             }
             return result;
         } catch (Exception e) {

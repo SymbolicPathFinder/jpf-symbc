@@ -38,6 +38,7 @@
 package gov.nasa.jpf.symbc.numeric.solvers;
 
 //import choco.Problem;
+import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.RealProblem;
 import choco.integer.*;
 import choco.integer.var.IntTerm;
@@ -53,10 +54,11 @@ import choco.real.constraint.MixedEqXY;
 // but not for sat, i.e., verification properties, due to its limited integer range.
 public class ProblemChoco extends ProblemGeneral {
 	RealProblem pb;
-	public static int timeBound;// = 30000;
+	public int timeBound;
 	public ProblemChoco() {
 		pb = new RealProblem();
 		//pb.setPrecision(1e-8);// need to check this
+		timeBound = SymbolicInstructionFactory.dpTimeout;
 	}
 
 	public IntDomainVar makeIntVar(String name, long min, long max) {
@@ -333,13 +335,13 @@ public class ProblemChoco extends ProblemGeneral {
 	}
 
 	public Boolean solve() {
-        pb.getSolver().setTimeLimit(ProblemChoco.timeBound);
+        pb.getSolver().setTimeLimit(timeBound);
 
         Boolean result = pb.solve();
 
 		if (result == null) {
-			throw new RuntimeException("# Error: Choco returned null (possibly due to timeout).\n" +
-					"Time limit: " + ProblemChoco.timeBound + "\n" +
+			throw new RuntimeException("# Error: Choco returned null.\n" +
+					"Time limit: " + timeBound + "\n" +
 					"Problem state:\n" + pb.pretty());
 		}
 
