@@ -1,0 +1,15 @@
+target=solvers.z3.Z3TimeoutTest
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+#symbolic.dp=z3
+#symbolic.dp=z3inc
+#symbolic.dp=z3bitvectorinc
+symbolic.dp=z3bitvector
+
+symbolic.dp_timeout_ms=1000
+
+symbolic.arrays=true
+
+
+symbolic.debug=true
