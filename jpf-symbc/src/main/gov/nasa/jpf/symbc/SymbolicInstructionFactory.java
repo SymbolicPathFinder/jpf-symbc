@@ -539,6 +539,7 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	      }
 
 	static public String[] dp;
+	static public int dpTimeout;
 
 	/* Symbolic String configuration */
 	static public String[] string_dp;
@@ -667,6 +668,40 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 			}
 			if (debugMode) System.out.println("symbolic.dp="+dp[0]);
 
+			if (conf.hasValue("symbolic.dp_timeout_ms")) {
+
+				if (dp[0].equalsIgnoreCase("coral") ||
+						dp[0].equalsIgnoreCase("iasolver") ||
+						dp[0].equalsIgnoreCase("cvc3") ||
+						dp[0].equalsIgnoreCase("cvc3bitvec") ||
+						dp[0].equalsIgnoreCase("yices")
+				) {
+					throw new UnsupportedOperationException(
+							"The solver '" + dp[0] + "' does not support the configuration option " +
+									"'symbolic.dp_timeout_ms'. Please disable this option or switch to a solver that " +
+									"supports timeouts."
+					);
+				}
+
+			}
+
+			// If not specified, default is 5000 ms (5 seconds).
+			dpTimeout = conf.getInt("symbolic.dp_timeout_ms", 5000);
+			if(dpTimeout < 1) {
+				throw new IllegalArgumentException("symbolic.dp_timeout_ms must be positive (>0), but was " + dpTimeout);
+			}
+
+			if (debugMode) {
+				if (!(dp[0].equalsIgnoreCase("coral") ||
+						dp[0].equalsIgnoreCase("iasolver") ||
+						dp[0].equalsIgnoreCase("cvc3") ||
+						dp[0].equalsIgnoreCase("cvc3bitvec") ||
+						dp[0].equalsIgnoreCase("yices"))) {
+					// inform only if the dp[0] supports timeout
+					System.out.println("symbolic.dp_timeout_ms=" + dpTimeout);
+				}
+			}
+
 			stringTimeout = conf.getInt("symbolic.string_dp_timeout_ms");
 			if (debugMode) System.out.println("symbolic.string_dp_timeout_ms="+stringTimeout);
 			
@@ -754,10 +789,6 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				heuristicPartitionMode = false;
 			}
 
-			if(dp[0].equalsIgnoreCase("choco") || dp[0].equalsIgnoreCase("debug") || dp[0].equalsIgnoreCase("compare") || dp == null) { // default is choco
-			  ProblemChoco.timeBound = conf.getInt("symbolic.choco_time_bound", 30000);
-			  if (debugMode) System.out.println("symbolic.choco_time_bound="+ProblemChoco.timeBound);
-			}
 			//load CORAL's parameters
 			if (dp[0].equalsIgnoreCase("coral") || dp[0].equalsIgnoreCase("debug") || dp[0].equalsIgnoreCase("compare")) {
 				ProblemCoral.configure(conf);

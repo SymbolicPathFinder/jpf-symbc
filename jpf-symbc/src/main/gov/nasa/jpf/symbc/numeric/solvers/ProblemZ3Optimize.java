@@ -97,6 +97,9 @@ public class ProblemZ3Optimize extends ProblemGeneral {
         Z3Wrapper z3 = Z3Wrapper.getInstance();
         solver = z3.getSolver();
         ctx = z3.getCtx();
+        Params p = ctx.mkParams();
+        p.add("timeout", SymbolicInstructionFactory.dpTimeout);
+        solver.setParameters(p);
         solver.Push();
         scopes++;
         useFpForReals = SymbolicInstructionFactory.fp;
@@ -473,10 +476,13 @@ public class ProblemZ3Optimize extends ProblemGeneral {
 
     public Boolean solve() {
         try {
-            if (Status.SATISFIABLE == solver.Check()) {
+            Status s = solver.Check();
+            if (s == Status.SATISFIABLE) {
                 return true;
-            } else {
+            } else if (s == Status.UNSATISFIABLE) {
                 return false;
+            } else {
+                throw new RuntimeException("Unexpected status: " + s + " reason : " + solver.getReasonUnknown());
             }
         } catch (Exception e) {
             e.printStackTrace();
