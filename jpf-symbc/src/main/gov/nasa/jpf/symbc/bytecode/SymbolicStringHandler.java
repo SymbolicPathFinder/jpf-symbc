@@ -178,7 +178,7 @@ public class SymbolicStringHandler {
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
-					handleEqualsIgnoreCase(invInst, th);
+					handleEqualsIgnoreCase(invInst,  th);
 					return invInst.getNext(th);
 				}
 			} else if (shortName.equals("endsWith")) {
@@ -201,7 +201,7 @@ public class SymbolicStringHandler {
 					handleStartsWith(invInst, th);
 					return invInst.getNext(th);
 				}
-			} else if (shortName.equals("contains")) {
+			} else if (shortName.equals ("contains")) {
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) { // first time around
 					cg = new PCChoiceGenerator(2);
@@ -223,7 +223,7 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals("lastIndexOf")) {
 				handleLastIndexOf(invInst, th);
 			} else if (shortName.equals("charAt")) {
-				handleCharAt(invInst, th); // returns boolean that is ignored
+				handleCharAt (invInst, th); // returns boolean that is ignored
 				//return invInst;
 			} else if (shortName.equals("replace")) {
 				Instruction handled = handleReplace(invInst, th);
@@ -336,7 +336,7 @@ public class SymbolicStringHandler {
 				handlefloatValue(invInst, th);
 			} else if (shortName.equals("isEmpty")) {
 				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) {
+				if (!th.isFirstStepInsn()){
 					cg = new PCChoiceGenerator(2);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
@@ -781,11 +781,11 @@ public class SymbolicStringHandler {
 	/* two possibilities int, or String in parameter */
 	public void handleIndexOf1(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
-		
+
 		//boolean castException = false;
 		StringExpression sym_v1 = null;
 		Expression sym_v2 = null; // could be String or Char
-		sym_v1 = (StringExpression) sf.getOperandAttr(1);
+		sym_v1 = (StringExpression)sf.getOperandAttr(1);
 		sym_v2 = (Expression) sf.getOperandAttr(0);
 		if (sym_v1 == null && sym_v2 == null) {
 			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleIndexOf1");
@@ -794,7 +794,7 @@ public class SymbolicStringHandler {
 			if (sf.isOperandRef()) {
 				s2char = false; //argument is string
 			}
-			
+
 			int s1 = sf.pop();
 			int s2 = sf.pop();
 
@@ -802,26 +802,27 @@ public class SymbolicStringHandler {
 			if (sym_v1 != null) {
 				if (sym_v2 != null) { // both are symbolic values
 					if (s2char)
-						result = sym_v1._indexOf((IntegerExpression) sym_v2);
+						result = sym_v1._indexOf((IntegerExpression)sym_v2);
 					else
-						result = sym_v1._indexOf((StringExpression) sym_v2);
+						result = sym_v1._indexOf((StringExpression)sym_v2);
 				} else { // sym_v2 is null
 					if (s2char) {
 						result = sym_v1._indexOf(new IntegerConstant(s2));
-					} else {
+					}
+					else {
 						ElementInfo e2 = th.getElementInfo(s2);
 						String val = e2.asString();
 						result = sym_v1._indexOf(new StringConstant(val));
 					}
 				}
 			} else { // sym_v1 is null, sym_v2 must be not null
-				assert (sym_v2 != null);
-				ElementInfo e1 = th.getElementInfo(s2);
-				String val = e1.asString();
-				if (s2char)
-					result = new StringConstant(val)._indexOf((IntegerExpression) sym_v2);
-				else
-					result = new StringConstant(val)._indexOf((StringExpression) sym_v2);
+				    assert(sym_v2!=null);
+				    ElementInfo e1 = th.getElementInfo(s2);
+				    String val = e1.asString();
+ 	                if (s2char)
+					   result = new StringConstant(val)._indexOf((IntegerExpression)sym_v2);
+				    else
+					    result = new StringConstant(val)._indexOf((StringExpression)sym_v2);
 			}
 			sf.push(0, false);
 			assert result != null;
@@ -862,13 +863,14 @@ public class SymbolicStringHandler {
 				if (sym_v1 != null) {
 					if (sym_v2 != null) { // both are symbolic values
 						if (s2char)
-							result = sym_v1._indexOf((IntegerExpression) sym_v2, intExp);
+							result = sym_v1._indexOf((IntegerExpression)sym_v2, intExp);
 						else
-							result = sym_v1._indexOf((StringExpression) sym_v2, intExp);
+							result = sym_v1._indexOf((StringExpression)sym_v2, intExp);
 					} else { //sym_v2 is null
 						if (s2char) {
 							result = sym_v1._indexOf(new IntegerConstant(s2), intExp);
-						} else {
+						}
+						else {
 							ElementInfo e2 = th.getElementInfo(s2);
 							String val = e2.asString();
 							result = sym_v1._indexOf(new StringConstant(val), intExp);
@@ -879,31 +881,34 @@ public class SymbolicStringHandler {
 					String val = e1.asString();
 
 					if (sym_v2 != null) {
-						if (s2char)
-							result = new StringConstant(val)._indexOf((IntegerExpression) sym_v2, intExp);
+						if(s2char)
+							result = new StringConstant(val)._indexOf((IntegerExpression)sym_v2, intExp);
 						else
-							result = new StringConstant(val)._indexOf((StringExpression) sym_v2, intExp);
+							result = new StringConstant(val)._indexOf((StringExpression)sym_v2, intExp);
 					} else {
 						if (s2char) {
 							result = new StringConstant(val)._indexOf(new IntegerConstant(s2), intExp);
-						} else {
+						}
+						else {
 							ElementInfo e2 = th.getElementInfo(s2);
 							String val2 = e2.asString();
 							result = new StringConstant(val)._indexOf(new StringConstant(val2), intExp);
 						}
 					}
 				}
-			} else { //intExp is null
+			}
+			else { //intExp is null
 				if (sym_v1 != null) {
 					if (sym_v2 != null) { // both are symbolic values
-						if (s2char)
-							result = sym_v1._indexOf((IntegerExpression) sym_v2, new IntegerConstant(i1));
+						if(s2char)
+							result = sym_v1._indexOf((IntegerExpression)sym_v2, new IntegerConstant(i1));
 						else
-							result = sym_v1._indexOf((StringExpression) sym_v2, new IntegerConstant(i1));
+							result = sym_v1._indexOf((StringExpression)sym_v2, new IntegerConstant(i1));
 					} else { //sym_v1 is null
 						if (s2char) {
 							result = sym_v1._indexOf(new IntegerConstant(s2), new IntegerConstant(i1));
-						} else {
+						}
+						else {
 							ElementInfo e2 = th.getElementInfo(s2);
 							String val = e2.asString();
 							result = sym_v1._indexOf(new StringConstant(val), new IntegerConstant(i1));
@@ -917,14 +922,15 @@ public class SymbolicStringHandler {
 					String val = e1.asString();
 
 					if (sym_v2 != null) {
-						if (s2char)
-							result = new StringConstant(val)._indexOf((IntegerExpression) sym_v2, new IntegerConstant(i1));
+						if(s2char)
+							result = new StringConstant(val)._indexOf((IntegerExpression)sym_v2, new IntegerConstant(i1));
 						else
-							result = new StringConstant(val)._indexOf((StringExpression) sym_v2, new IntegerConstant(i1));
+							result = new StringConstant(val)._indexOf((StringExpression)sym_v2, new IntegerConstant(i1));
 					} else {
 						if (s2char) {
 							result = new StringConstant(val)._indexOf(new IntegerConstant(s2), new IntegerConstant(i1));
-						} else {
+						}
+						else {
 							ElementInfo e2 = th.getElementInfo(s2);
 							String val2 = e2.asString();
 							result = new StringConstant(val)._indexOf(new StringConstant(val2), new IntegerConstant(i1));
@@ -1674,14 +1680,14 @@ public class SymbolicStringHandler {
 		sf.setOperandAttr(result);
 	}
 
-	public Instruction handleValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
+	public Instruction handleValueOf(JVMInvokeInstruction invInst,  ThreadInfo th) {
 		MethodInfo mi = invInst.getInvokedMethod(th);
 		String cname = invInst.getInvokedMethodClassName();
 		String[] argTypes = mi.getArgumentTypeNames();
 		if (cname.equals("java.lang.String")) {
 			// System.out.println(argTypes[0]);
 			if (argTypes[0].equals("int")) {
-				return handleIntValueOf(invInst, th);
+				return handleIntValueOf(invInst,  th);
 			} else if (argTypes[0].equals("float")) {
 				return handleFloatValueOf(invInst, th);
 			} else if (argTypes[0].equals("long")) {
@@ -1711,7 +1717,7 @@ public class SymbolicStringHandler {
 						handleParseIntValueOf(invInst, th);
 					}
 				} else { // converting int to Integer
-					handleParseIntValueOf(invInst, th);
+					handleParseIntValueOf(invInst,  th);
 				}
 			} else if (cname.equals("java.lang.Float")) {
 				if (!(argTypes[0].equals("float"))) { // converting String to Float
@@ -1802,14 +1808,14 @@ public class SymbolicStringHandler {
 
 			assert pc != null;
 
-			if (conditionValue) {
+			if(conditionValue){
 				pc._addDet(Comparator.EQ, sym_v2, (IntegerExpression)(new IntegerConstant(0)));
 				if(!pc.simplify()) {
 					th.getVM().getSystemState().setIgnored(true);
 				} else {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
-			} else {
+			}else{
 				pc._addDet(Comparator.NE, sym_v2, (IntegerExpression)(new IntegerConstant(0)));
 				if(!pc.simplify()) {
 					th.getVM().getSystemState().setIgnored(true);
@@ -1822,7 +1828,7 @@ public class SymbolicStringHandler {
 		}
 	}
 
-	public void handleParseLongValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
+	public void handleParseLongValueOf(JVMInvokeInstruction invInst,  ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
 		Expression sym_v3 = (Expression) sf.getOperandAttr(0);
 

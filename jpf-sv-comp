@@ -41,13 +41,15 @@ mkdir -p $DIR/target/classes
 # create configuration file
 echo "target=Main" > $DIR/config.jpf
 echo "classpath=`pwd`/jpf-symbc/build/classes:$DIR/target/classes:$CLASSPATH_ADDED" >> $DIR/config.jpf
-echo "symbolic.dp=z3bitvector" >> $DIR/config.jpf
+echo "symbolic.dp=z3" >> $DIR/config.jpf
 echo "symbolic.bvlength=64" >> $DIR/config.jpf
 echo "search.depth_limit=13" >> $DIR/config.jpf
 echo "symbolic.strings=true" >> $DIR/config.jpf
+echo "symbolic.string_dp=z3str3" >> $DIR/config.jpf
 echo "symbolic.string_dp_timeout_ms=3000" >> $DIR/config.jpf
 echo "symbolic.lazy=on" >> $DIR/config.jpf
 echo "symbolic.arrays=true" >> $DIR/config.jpf
+echo "listener=.symbc.SymbolicListener" >> $DIR/config.jpf
 echo $DIR/config.jpf
 
 # run SPF
