@@ -99,7 +99,7 @@ public class IFNONNULL extends gov.nasa.jpf.jvm.bytecode.IFNONNULL {
                         boolean currentChoice = (Integer) cg.getNextChoice() == 0;
 
                         // two choices (EQUALS, "null") | (NOTEQUALS, "null")
-                        if (!currentChoice) {
+                        if (currentChoice) {
                             pc.spc._addDet(StringComparator.EQUALS, (StringExpression) sym_v, "null");
                             if (!pc.simplify()) {
                                 ti.getVM().getSystemState().setIgnored(true);

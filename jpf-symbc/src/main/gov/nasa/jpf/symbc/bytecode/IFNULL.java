@@ -99,14 +99,6 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL {
 
                         // two choices (EQUALS, "null") | (NOTEQUALS, "null")
                         if (currentChoice) {
-                            pc.spc._addDet(StringComparator.EQUALS, (StringExpression) sym_v, "null");
-                            if (!pc.simplify()) {
-                                ti.getVM().getSystemState().setIgnored(true);
-                            } else {
-                                ((PCChoiceGenerator) cg).setCurrentPC(pc);
-                            }
-                            return getTarget();
-                        } else {
                             pc.spc._addDet(StringComparator.NOTEQUALS, (StringExpression) sym_v, "null");
                             if (!pc.simplify()) {
                                 ti.getVM().getSystemState().setIgnored(true);
@@ -114,6 +106,14 @@ public class IFNULL extends gov.nasa.jpf.jvm.bytecode.IFNULL {
                                 ((PCChoiceGenerator) cg).setCurrentPC(pc);
                             }
                             return getNext(ti);
+                        } else {
+                            pc.spc._addDet(StringComparator.EQUALS, (StringExpression) sym_v, "null");
+                            if (!pc.simplify()) {
+                                ti.getVM().getSystemState().setIgnored(true);
+                            } else {
+                                ((PCChoiceGenerator) cg).setCurrentPC(pc);
+                            }
+                            return getTarget();
                         }
                     }
                 } else {

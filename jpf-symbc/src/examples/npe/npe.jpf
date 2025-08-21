@@ -3,14 +3,7 @@
 #target=npe.StringStartsWithTest
 #target=npe.StringEndsWithTest
 #target=npe.StringIsEmptyTest
-#target=npe.StringContainsIfNullTest
-#target=npe.StringContainsIfNonNullTest
-#target=npe.StringEqualsIfNullTest
-#target=npe.StringEqualsIfNonNullTest
-#target=npe.StringStartsWithIfNullTest
-#target=npe.StringStartsWithIfNonNullTest
-#target=npe.StringIsEmptyIfNullTest
-#target=npe.StringIsEmptyIfNonNullTest
+target=npe.StringNullAndNonNullTest
 
 classpath=${jpf-symbc}/build/examples
 symbolic.dp=z3bitvector
@@ -22,7 +15,8 @@ symbolic.bvlength=64
 search.depth_limit=13
 symbolic.strings=true
 symbolic.string_dp=z3str3
-runtime.exception=false
+nullPointer.exception=true
+runtime.exception=true
 symbolic.lazy=on
 symbolic.jrarrays=true
 veritestingMode = 5
