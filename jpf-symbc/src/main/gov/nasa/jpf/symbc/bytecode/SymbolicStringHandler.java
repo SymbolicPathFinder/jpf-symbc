@@ -817,12 +817,12 @@ public class SymbolicStringHandler {
 				}
 			} else { // sym_v1 is null, sym_v2 must be not null
 				    assert(sym_v2!=null);
-				    ElementInfo e1 = th.getElementInfo(s2);
-				    String val = e1.asString();
- 	                if (s2char)
-					   result = new StringConstant(val)._indexOf((IntegerExpression)sym_v2);
-				    else
-					    result = new StringConstant(val)._indexOf((StringExpression)sym_v2);
+					ElementInfo e1 = th.getElementInfo(s2);
+					String val = e1.asString();
+                    if (s2char) 
+						result = new StringConstant(val)._indexOf((IntegerExpression)sym_v2);
+					else
+						result = new StringConstant(val)._indexOf((StringExpression)sym_v2);
 			}
 			sf.push(0, false);
 			assert result != null;
@@ -921,7 +921,7 @@ public class SymbolicStringHandler {
 					ElementInfo e1 = th.getElementInfo(s1);
 					String val = e1.asString();
 
-					if (sym_v2 != null) {
+					if (sym_v2 != null) { 
 						if(s2char)
 							result = new StringConstant(val)._indexOf((IntegerExpression)sym_v2, new IntegerConstant(i1));
 						else
