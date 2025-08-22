@@ -781,7 +781,7 @@ public class SymbolicStringHandler {
 	/* two possibilities int, or String in parameter */
 	public void handleIndexOf1(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
-
+		
 		//boolean castException = false;
 		StringExpression sym_v1 = null;
 		Expression sym_v2 = null; // could be String or Char
@@ -794,7 +794,7 @@ public class SymbolicStringHandler {
 			if (sf.isOperandRef()) {
 				s2char = false; //argument is string
 			}
-
+			
 			int s1 = sf.pop();
 			int s2 = sf.pop();
 
@@ -880,7 +880,7 @@ public class SymbolicStringHandler {
 					ElementInfo e1 = th.getElementInfo(s1);
 					String val = e1.asString();
 
-					if (sym_v2 != null) {
+					if (sym_v2 != null) { 
 						if(s2char)
 							result = new StringConstant(val)._indexOf((IntegerExpression)sym_v2, intExp);
 						else
