@@ -891,10 +891,10 @@ public class SymbolicStringHandler {
 				} else {
 					ElementInfo e1 = th.getElementInfo(s1);
 					if(e1 != null) {
-						String val = e1.asString();
+						String val = e1.asString(); // debug here
 						pc.spc._addDet(comp, val, sym_v2);
 					} else {
-						pc.spc._addDet(comp, "null", sym_v2);
+                        System.out.println("Warning: unexpected concrete null arguments are detected");
 					}
 				}
 				if (!pc.simplify()) {// not satisfiable
@@ -920,7 +920,7 @@ public class SymbolicStringHandler {
 						String val = e1.asString();
 						pc.spc._addDet(comp.not(), val, sym_v2);
 					} else {
-						pc.spc._addDet(comp.not(), "null", sym_v2);
+                        System.out.println("Warning: unexpected concrete null arguments are detected");
 					}
 				}
 				if (!pc.simplify()) {// not satisfiable
