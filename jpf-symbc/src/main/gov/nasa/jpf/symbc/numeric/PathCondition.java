@@ -75,7 +75,6 @@ public class PathCondition implements Comparable<PathCondition> {
 
     private Instance instance = null;
 
-    // TODO: to review
     public StringPathCondition spc = new StringPathCondition(this);
 
     private Integer hashCode = null;
@@ -107,7 +106,7 @@ public class PathCondition implements Comparable<PathCondition> {
         PathCondition pc_new = new PathCondition();
         pc_new.header = this.header;
         pc_new.count = this.count;
-        pc_new.spc = this.spc.make_copy(pc_new); // TODO: to review
+        pc_new.spc = this.spc.make_copy(pc_new);
         pc_new.solverCalls = this.solverCalls;
         pc_new.arrayExpressions = this.arrayExpressions;
         return pc_new;
@@ -381,7 +380,7 @@ public class PathCondition implements Comparable<PathCondition> {
         String spsStr = spc.toString().toLowerCase();
         if((spsStr.contains("string") || spsStr.contains("valueof") || (spsStr.contains("charat")))&& (!spc.toString().contains("double")))//only evaluate if no floating theory exists in the string pathCondition
             // modification for string path condition
-            result2 = spc.solve(); // TODO: to review
+            result2 = spc.solve();
         return result1 && result2;
     }
 
@@ -412,7 +411,7 @@ public class PathCondition implements Comparable<PathCondition> {
         String spsStr = spc.toString().toLowerCase();
         //trying to optimize, i.e., skip solving of string constraints
         if ((spsStr.contains("string") || spsStr.contains("valueof") || (spsStr.contains("charat")))&& (!spc.toString().contains("double"))) {
-            boolean result2 = spc.simplify(); // TODO to review: used for strings
+            boolean result2 = spc.simplify();
             return result1 && result2;
         } else return result1;
     }
@@ -426,21 +425,21 @@ public class PathCondition implements Comparable<PathCondition> {
         return "constraint # = " + count + ((header == null) ? "" : "\n" + header.toString());
         // return ((header == null) ? "" : " " + header.toString()); -- for
         // specialization
-        // + "\n" + spc.toString(); // TODO: to review
+        // + "\n" + spc.toString();
     }
 
     public String prefix_notation() {
         return "constraint # = " + count + ((header == null) ? "" : "\n" + header.prefix_notation());
         // return ((header == null) ? "" : " " + header.toString()); -- for
         // specialization
-        // + "\n" + spc.toString(); // TODO: to review
+        // + "\n" + spc.toString();
     }
     
     public String prefix_notationPC4Z3() {
         return header.prefix_notationPC4Z3();
         // return ((header == null) ? "" : " " + header.toString()); -- for
         // specialization
-        // + "\n" + spc.toString(); // TODO: to review
+        // + "\n" + spc.toString();
     }
     
     public static PathCondition getPC(MJIEnv env) {
