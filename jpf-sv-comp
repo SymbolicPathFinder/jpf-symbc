@@ -69,7 +69,10 @@ echo "symbolic.arrays=true" >> $DIR/config.jpf
 echo "listener = .symbc.SymbolicListener" >> $DIR/config.jpf
 if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then
   echo "runtime.exception=true" >> $DIR/config.jpf
-  #echo "search.multiple_errors = true" >> $DIR/config.jpf
+  echo "search.multiple_errors=true" >> $DIR/config.jpf
+else
+  echo "runtime.exception=false" >> $DIR/config.jpf
+  echo "search.multiple_errors=false" >> $DIR/config.jpf
 fi
 echo $DIR/config.jpf
 
@@ -112,11 +115,16 @@ elif [ $RUNTIME_EXCEPTION_MODE = "TRUE" ]; then
   grep "java.lang.*Exception" $LOG > /dev/null
   JAVA_EXCEPTION=$?
 
+  grep "java.lang.ClassNotFoundException" $LOG > /dev/null
+  CLASS_NOT_FOUND=$?
+
   grep "no errors detected" $LOG > /dev/null
   NO_ERRORS=$?
 
   if ([ $ASSERTION_ERROR -eq 0 ] && [ $JAVA_EXCEPTION -ne 0 ]) || [ $NO_ERRORS -eq 0 ]; then
     echo "SAFE"
+  elif [ $CLASS_NOT_FOUND -eq 0 ]; then
+    echo "UNKNOWN"
   elif [ $JAVA_EXCEPTION -eq 0 ]; then
     echo "UNSAFE"
   else
