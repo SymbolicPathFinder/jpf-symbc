@@ -391,8 +391,10 @@ public class PathCondition implements Comparable<PathCondition> {
         if (SymbolicInstructionFactory.concolicMode) {
             PCAnalyzer pa = new PCAnalyzer();
             result1 = pa.isSatisfiable(this, solver);
-        } else
-            result1 = solver.isSatisfiable(this);
+        } else {
+            if(SymbolicInstructionFactory.parallelModeEnabled) result1 = solver.isSatisfiableParallel(this);
+            else result1 = solver.isSatisfiable(this);
+        }
         solverCalls++;
         solver.cleanup();
 

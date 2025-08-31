@@ -547,6 +547,7 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 	 */
 	static public List<String> dp;
 	static public int dpTimeout;
+	static public boolean parallelModeEnabled;
 
 	/* Symbolic String configuration */
 	static public String[] string_dp;
@@ -724,6 +725,9 @@ public class SymbolicInstructionFactory extends gov.nasa.jpf.jvm.bytecode.Instru
 				}
 
 			}
+
+			parallelModeEnabled = conf.getBoolean("symbolic.dp_parallel_mode", false);
+			if(debugMode) System.out.println("symbolic.dp_parallel_mode=" + parallelModeEnabled);
 
 			// If not specified, default is 5000 ms (5 seconds).
 			dpTimeout = conf.getInt("symbolic.dp_timeout_ms", 5000);

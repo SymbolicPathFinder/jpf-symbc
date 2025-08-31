@@ -38,7 +38,6 @@
 package gov.nasa.jpf.symbc.numeric.solvers;
 
 import gov.nasa.jpf.search.Search;
-import gov.nasa.jpf.symbc.numeric.PCParser;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.numeric.SymbolicConstraintsGeneral;
 import gov.nasa.jpf.symbc.numeric.SymbolicReal;
@@ -1417,7 +1416,7 @@ public class ProblemCompare extends ProblemGeneral {
 		} catch(Exception exp) { //reproducing hack to get the value of undefined variables in choco (and possibly others)
 			//if constraint contains real variables, use choco hack to find them
 			if(realVars.size() > 0) {
-				Map<SymbolicReal,Object> realVarsChoco = extractProblemVars(PCParser.symRealVar,pbToCheck);
+				Map<SymbolicReal,Object> realVarsChoco = extractProblemVars(scg.resultParser.symRealVar,pbToCheck);
 				Map<SymbolicReal,Object> reprocessedRealVarsChoco = scg.catchBody(realVarsChoco,pb,p);
 
 				if(reprocessedRealVarsChoco != null) {

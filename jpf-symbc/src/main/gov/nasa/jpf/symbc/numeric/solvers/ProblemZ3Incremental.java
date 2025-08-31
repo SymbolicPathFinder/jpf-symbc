@@ -101,6 +101,11 @@ public class ProblemZ3Incremental extends ProblemGeneral implements IncrementalS
     // nothing to be done here
   }
 
+  public void closeContext() {
+    ctx.close();
+    ctx = null;
+    ProblemZ3Incremental.Z3Wrapper.instance = null;
+  }
 
   public Object makeIntVar(String name, long min, long max) {
     try {

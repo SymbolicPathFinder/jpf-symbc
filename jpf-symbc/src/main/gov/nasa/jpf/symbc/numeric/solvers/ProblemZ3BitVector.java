@@ -122,6 +122,11 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         }
     }
 
+    public void closeContext() {
+        ctx.close();
+        ctx = null;
+        ProblemZ3BitVector.Z3Wrapper.instance = null;
+    }
     // public ProblemZ3BitVector() {
     // HashMap<String, String> cfg = new HashMap<String, String>();
     // cfg.put("model", "true");

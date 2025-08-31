@@ -114,6 +114,11 @@ public class ProblemZ3BitVectorIncremental extends ProblemGeneral implements Inc
     // nothing to be done here
   }
 
+  public void closeContext() {
+    ctx.close();
+    ctx = null;
+    ProblemZ3BitVectorIncremental.Z3Wrapper.instance = null;
+  }
   /*
    * Throws a runtime exception if the given long is outside of the allowed range for the
    * used bit-vector length.

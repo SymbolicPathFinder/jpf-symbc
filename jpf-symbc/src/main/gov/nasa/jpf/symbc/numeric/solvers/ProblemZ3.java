@@ -89,6 +89,11 @@ public class ProblemZ3 extends ProblemGeneral {
 	private Solver solver;
 	private Context ctx;
 
+	public void closeContext() {
+		ctx.close();
+		ctx = null;
+		Z3Wrapper.instance = null;
+	}
 	// Do we use the floating point theory or linear arithmetic over reals
 	private boolean useFpForReals = false;
 
