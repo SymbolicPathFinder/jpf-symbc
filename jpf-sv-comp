@@ -91,13 +91,10 @@ if [ $ASSERTION_MODE = "TRUE" ]; then
   grep "no errors detected" $LOG > /dev/null
   NO_ERRORS=$?
 
-  grep "java.lang.*Exception" $LOG > /dev/null
-  JAVA_EXCEPTION=$?
-
   grep "^error.*NoUncaughtExceptionsProperty.*AssertionError" $LOG > /dev/null
   ASSERTION_ERROR=$?
 
-  if [ $NO_ERRORS -eq 0 ] || ([ $JAVA_EXCEPTION -eq 0 ] && [ $ASSERTION_ERROR -ne 0 ]); then
+  if [ $NO_ERRORS -eq 0 ]; then
     echo "SAFE"
   elif [ $ASSERTION_ERROR -eq 0 ]; then
     echo "UNSAFE"

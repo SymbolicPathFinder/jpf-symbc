@@ -385,29 +385,23 @@ public class SymbolicStringHandler {
             }
 
             assert pc != null;
-
-            if (currentChocie == 2) {
-                IntegerExpression result = null;
-                if (sym_v1 == null) { // operand 0 is concrete
-
-                    int val = s1;
-                    result = sym_v2._charAt(new IntegerConstant(val));
+			
+			if (currentChocie == 0) {
+                if(!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
                 } else {
-
-                    if (sym_v2 == null) {
-                        ElementInfo e1 = th.getElementInfo(s2);
-                        String val2 = e1.asString();
-                        sym_v2 = new StringConstant(val2);
-                        result = sym_v2._charAt(sym_v1);
+                    if(sym_v1 != null) {
+                        pc._addDet(Comparator.LT,  sym_v1, new IntegerConstant(0));
                     } else {
-                        result = sym_v2._charAt(sym_v1);
+                        int val = s1;
+                        pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
                     }
-                    bresult = true;
-				//System.out.println("[handleCharAt] Ignoring: " + result.toString());
-				//th.push(0, false);
+                    if(!pc.simplify()) {
+                        th.getVM().getSystemState().setIgnored(true);
+                    } else {
+                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                    }
                 }
-                sf.push(0, false);
-                sf.setOperandAttr(result);
             } else if (currentChocie == 1) {
                 if(!rte_flag) {
                     th.getVM().getSystemState().setIgnored(true);
@@ -431,22 +425,28 @@ public class SymbolicStringHandler {
                         th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
                     }
                 }
-            } else if (currentChocie == 0) {
-                if(!rte_flag) {
-                    th.getVM().getSystemState().setIgnored(true);
+            } else if (currentChocie == 2) {
+                IntegerExpression result = null;
+                if (sym_v1 == null) { // operand 0 is concrete
+
+                    int val = s1;
+                    result = sym_v2._charAt(new IntegerConstant(val));
                 } else {
-                    if(sym_v1 != null) {
-                        pc._addDet(Comparator.LT,  sym_v1, new IntegerConstant(0));
+
+                    if (sym_v2 == null) {
+                        ElementInfo e1 = th.getElementInfo(s2);
+                        String val2 = e1.asString();
+                        sym_v2 = new StringConstant(val2);
+                        result = sym_v2._charAt(sym_v1);
                     } else {
-                        int val = s1;
-                        pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
+                        result = sym_v2._charAt(sym_v1);
                     }
-                    if(!pc.simplify()) {
-                        th.getVM().getSystemState().setIgnored(true);
-                    } else {
-                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
-                    }
+                    bresult = true;
+				//System.out.println("[handleCharAt] Ignoring: " + result.toString());
+				//th.push(0, false);
                 }
+                sf.push(0, false);
+                sf.setOperandAttr(result);
             }
 		}
 		return bresult; // not used
@@ -1160,7 +1160,7 @@ public class SymbolicStringHandler {
 		} else {
             ChoiceGenerator<?> cg;
             if (!th.isFirstStepInsn()) { // first time around
-                cg = new PCChoiceGenerator(5);
+                cg = new PCChoiceGenerator(6);
                 th.getVM().setNextChoiceGenerator(cg);
                 return invInst;
             } else {
@@ -1202,29 +1202,23 @@ public class SymbolicStringHandler {
 
             assert pc != null;
 
-			if(currentChocie == 2) {
-                StringExpression result = null;
-                if (sym_v1 == null) { // operand 0 is concrete
-                    int val = s1;
-                    result = sym_v2._subString(val);
-                } else {
-                    if (sym_v2 == null) {
-                        ElementInfo e1 = th.getElementInfo(s2);
-                        String val2 = e1.asString();
-                        sym_v2 = new StringConstant(val2);
-                        result = sym_v2._subString(sym_v1);
+			if (currentChocie == 0) {
+                    if (!rte_flag) {
+                        th.getVM().getSystemState().setIgnored(true);
                     } else {
-                        result = sym_v2._subString(sym_v1);
+                        if (sym_v1 != null) {
+                            pc._addDet(Comparator.LT, sym_v1, new IntegerConstant(0));
+                        } else {
+                            int val = s1;
+                            pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
+                        }
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
                     }
-                }
-			ElementInfo objRef = th.getHeap().newString("", th); /*
-																																	 * dummy
-																																	 * String
-																																	 * Object
-																																	 */
-                sf.push(objRef.getObjectRef(), true);
-                sf.setOperandAttr(result);
-            } else if (currentChocie == 1) {
+                } else if (currentChocie == 1) {
                     if (!rte_flag) {
                         th.getVM().getSystemState().setIgnored(true);
                     } else {
@@ -1247,24 +1241,30 @@ public class SymbolicStringHandler {
                             th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
                         }
                     }
-                } else if (currentChocie == 0) {
-                    if (!rte_flag) {
-                        th.getVM().getSystemState().setIgnored(true);
+                } else if(currentChocie == 2) {
+                StringExpression result = null;
+                if (sym_v1 == null) { // operand 0 is concrete
+                    int val = s1;
+                    result = sym_v2._subString(val);
+                } else {
+                    if (sym_v2 == null) {
+                        ElementInfo e1 = th.getElementInfo(s2);
+                        String val2 = e1.asString();
+                        sym_v2 = new StringConstant(val2);
+                        result = sym_v2._subString(sym_v1);
                     } else {
-                        if (sym_v1 != null) {
-                            pc._addDet(Comparator.LT, sym_v1, new IntegerConstant(0));
-                        } else {
-                            int val = s1;
-                            pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
-                        }
-                        if (!pc.simplify()) {
-                            th.getVM().getSystemState().setIgnored(true);
-                        } else {
-                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
-                        }
+                        result = sym_v2._subString(sym_v1);
                     }
                 }
-            }
+			ElementInfo objRef = th.getHeap().newString("", th); /*
+																																	 * dummy
+																																	 * String
+																																	 * Object
+																																	 */
+                sf.push(objRef.getObjectRef(), true);
+                sf.setOperandAttr(result);
+            } 
+        }
 		return null;
 	}
 
