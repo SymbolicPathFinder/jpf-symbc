@@ -1304,7 +1304,7 @@ public class SymbolicStringHandler {
             assert pc != null;
 
 			//System.out.printf("[SymbolicStringHandler] popped %d %d %d\n", s1, s2, s3);
-			if(currentChocie == 5) {
+			if(currentChocie == 5) { // previous code, valid operation
                 StringExpression result = null;
                 if (sym_v1 == null) { // operand 0 is concrete
                     int val = s1;
@@ -1354,7 +1354,7 @@ public class SymbolicStringHandler {
 			sf.push(objRef.getObjectRef(), true);
 			//System.out.println("[SymbolicStringHandler] " + sf.toString());
 			sf.setOperandAttr(result);
-            } else if (currentChocie == 4) {
+            } else if (currentChocie == 4) { // beginIndex > endIndex
                 if (!rte_flag) {
                     th.getVM().getSystemState().setIgnored(true);
                 } else {
@@ -1375,7 +1375,7 @@ public class SymbolicStringHandler {
                         th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
                     }
                 }
-            } else if (currentChocie == 3) {
+            } else if (currentChocie == 3) { // endIndex > str length
                 if (!rte_flag) {
                     th.getVM().getSystemState().setIgnored(true);
                 } else {
@@ -1398,7 +1398,7 @@ public class SymbolicStringHandler {
                         th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
                     }
                 }
-            } else if (currentChocie == 2) {
+            } else if (currentChocie == 2) { // endIndex < 0
                 if (!rte_flag) {
                     th.getVM().getSystemState().setIgnored(true);
                 } else {
@@ -1414,7 +1414,7 @@ public class SymbolicStringHandler {
                         th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
                     }
                 }
-            } else if (currentChocie == 1) {
+            } else if (currentChocie == 1) { // beginIndex > str length
                 if (!rte_flag) {
                     th.getVM().getSystemState().setIgnored(true);
                 } else {
@@ -1437,7 +1437,7 @@ public class SymbolicStringHandler {
                         th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
                     }
                 }
-            } else if (currentChocie == 0) {
+            } else if (currentChocie == 0) { // beginIndex < 0
                 if (!rte_flag) {
                     th.getVM().getSystemState().setIgnored(true);
                 } else {
