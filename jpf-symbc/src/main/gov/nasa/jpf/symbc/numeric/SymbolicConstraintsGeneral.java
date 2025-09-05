@@ -37,12 +37,10 @@
 
 package gov.nasa.jpf.symbc.numeric;
 
-import edu.ucsb.cs.vlab.Z3;
 import gov.nasa.jpf.symbc.Observations;
 import gov.nasa.jpf.symbc.SPFException;
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.solvers.*;
-import javafx.util.Pair;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -108,8 +106,16 @@ public class SymbolicConstraintsGeneral {
             return false;
         }
 
-        // if (SymbolicInstructionFactory.debugMode)
-        // System.out.println("checking: PC "+pc);
+        if(SymbolicInstructionFactory.parallelModeEnabled) {
+            return isSatisfiableParallel(pc);
+        } else {
+            return isSatisfiableSequential(pc);
+        }
+    }
+
+    public boolean isSatisfiableSequential(PathCondition pc) {
+        // cleaning executors to clear z3 contexts
+        cleanExecutors();
         result = null;
         resultSolver = null;
         solvers = new ArrayList<>();
@@ -118,9 +124,10 @@ public class SymbolicConstraintsGeneral {
             solvers.add(createSolverFromDpString(s, pc));
         }
 
-        Pair<Boolean, ProblemGeneral> pair = checkPathConditionSequentially(pc);
-        result = pair.getKey();
-        resultSolver = pair.getValue();
+        PathConditionResultDTO resultDTO = checkPathConditionSequentially(pc);
+        result = resultDTO.result;
+        resultSolver = resultDTO.solver;
+        resultParser = resultDTO.parser;
 
         if (result == null) {
             throw new SPFException("Error: no solver could parse or solve the path condition: " + pc + "\n");
@@ -152,18 +159,21 @@ public class SymbolicConstraintsGeneral {
      * because its limited integer range can give unsound UNSAT results.
      *
      * @param pc the PathCondition to solve
-     * @return a Pair of Boolean result and the solver instance that solved the PC.
+     * @return a PathConditionResultDTO which contains the Boolean result, solver instance that solved the PC,
+     *         parser that parsed the solver and exception if any
      **/
-    public Pair<Boolean, ProblemGeneral> checkPathConditionSequentially(PathCondition pc) {
+    public PathConditionResultDTO checkPathConditionSequentially(PathCondition pc) {
         Boolean res = null;
         ProblemGeneral solver = null;
+        PCParser parser = null;
         for(int i = 0; i < solvers.size() && res == null; i++) {
             solver = solvers.get(i);
             if (SymbolicInstructionFactory.debugMode) {
                 System.out.println("Using solver: " + solver.getClass().getSimpleName());
             }
             try {
-                ProblemGeneral tempPb = PCParser.parse(pc, solver);
+                parser = new PCParser();
+                ProblemGeneral tempPb = parser.parse(pc, solver);
                 if (tempPb == null) {
                     res = Boolean.FALSE;
                 } else {
@@ -171,7 +181,7 @@ public class SymbolicConstraintsGeneral {
                     if (Observations.lastObservedSymbolicExpression != null) {
                         if (solver instanceof ProblemZ3Optimize) {
                             ((ProblemZ3Optimize) solver).maximize(
-                                    PCParser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
+                                    parser.getExpression((IntegerExpression) Observations.lastObservedSymbolicExpression));
                         }
                     }
                     res = solver.solve();
@@ -189,56 +199,76 @@ public class SymbolicConstraintsGeneral {
                 }
             }
         }
-        return new Pair<Boolean, ProblemGeneral>(res, solver);
+        return new PathConditionResultDTO(res, solver, parser);
     }
 
     public boolean isSatisfiableParallel(PathCondition pc) {
-        if (pc == null || pc.count == 0) {
-            if (SymbolicInstructionFactory.debugMode)
-                System.out.println("## Warning: empty path condition");
-            return true;
-        }
-
-        if (pc.count() > SymbolicInstructionFactory.maxPcLength) {
-            System.out.println("## Warning: Path condition exceeds symbolic.max_pc_length="
-                    + SymbolicInstructionFactory.maxPcLength + ".  Pretending it is unsatisfiable.");
-            return false;
-        }
-        if (SymbolicInstructionFactory.maxPcMSec > 0 && System.currentTimeMillis()
-                - SymbolicInstructionFactory.startSystemMillis > SymbolicInstructionFactory.maxPcMSec) {
-            System.out.println("## Warning: Exploration time exceeds symbolic.max_pc_msec="
-                    + SymbolicInstructionFactory.maxPcMSec + ".  Pretending all paths are unsatisfiable.");
-            return false;
-        }
 
         if(executors == null) {
            setupExecutors();
         }
 
-        resultParser = null;
-        result = null;
+        PathConditionResultDTO resultDTO = checkPathConditionParallel(pc);
+        result = resultDTO.result;
+        resultParser = resultDTO.parser;
+        resultSolver = resultDTO.solver;
 
+        if (result == null) {
+            throw new SPFException("Error: no solver could parse or solve the path condition: " + pc + "\n");
+        }
+
+        if (SymbolicInstructionFactory.debugMode) {
+            System.out.println("numeric PC: " + pc + " -> " + result + " solved by " + resultSolver.getClass().getSimpleName() + "\n");
+        }
+
+        if (SymbolicInstructionFactory.regressMode) {
+            String output = "##NUMERIC PC: ";
+            output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
+            output = output + " " + pc;
+            System.out.println(output);
+        }
+
+        if (result == Boolean.TRUE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Try to solve the given PathCondition using the configured solvers in parallel.
+     * It stops as soon as one solver can parse and return a definite SAT/UNSAT result.
+     *
+     * When Choco is used with other solvers, its UNSAT is skipped
+     * because its limited integer range can give unsound UNSAT results.
+     *
+     * @param pc the PathCondition to solve
+     * @return a PathConditionResultDTO which contains the Boolean result, solver instance that solved the PC,
+     *         parser that parsed the solver and exception if any
+     **/
+    public PathConditionResultDTO checkPathConditionParallel(PathCondition pc) {
         List<String> dp = SymbolicInstructionFactory.dp;
-        MultiExecutorCompletionService<ParallelSolverResult> completionService = new MultiExecutorCompletionService<>();
-        List<Future<ParallelSolverResult>> futures = new ArrayList<>();
+        MultiExecutorCompletionService<PathConditionResultDTO> completionService = new MultiExecutorCompletionService<>();
+        List<Future<PathConditionResultDTO>> futures = new ArrayList<>();
 
         // Submit one solver task per DP (decision procedure) in parallel
         for (int i = 0; i < dp.size(); i++) {
             ExecutorService executor = executors.get(dp.get(i));
             // Variable used in lambda expression should be final or effectively final
             final int tempI = i;
-            // Submit a task to the appropriate executor;
+            // Submit a task to the appropriate executor
             // each task parses and solves a PC in a separate thread of the appropriate executor
-            Future<ParallelSolverResult> future = completionService.submit(executor, () -> {
+            Future<PathConditionResultDTO> future = completionService.submit(executor, () -> {
                 ProblemGeneral solver = null;
                 PCParser parser = null;
-                Boolean threadResult = null;
+                Boolean res = null;
                 try {
                     solver = createSolverFromDpString(dp.get(tempI), pc);
                     parser = new PCParser();
                     ProblemGeneral tempPb = parser.parse(pc, solver);
                     if (tempPb == null) {
-                        threadResult = Boolean.FALSE;
+                        res = Boolean.FALSE;
                     } else {
                         // YN: z3 optimize
                         if (Observations.lastObservedSymbolicExpression != null) {
@@ -251,11 +281,11 @@ public class SymbolicConstraintsGeneral {
                         if(Thread.currentThread().isInterrupted()) {
                             return null;
                         }
-                        threadResult = solver.solve();
+                        res = solver.solve();
                     }
-                    return new ParallelSolverResult(threadResult, solver, parser);
+                    return new PathConditionResultDTO(res, solver, parser);
                 } catch (Exception e) {
-                    return new ParallelSolverResult(threadResult, solver, parser, e);
+                    return new PathConditionResultDTO(res, solver, parser, e);
                 } finally {
                     cleanup(solver);
                 }
@@ -263,57 +293,40 @@ public class SymbolicConstraintsGeneral {
             futures.add(future);
         }
 
-        for(int i = 0; i < dp.size(); i++) {
+        PathConditionResultDTO resultDTO = null;
+        for(int i = 0; i < dp.size() && resultDTO == null; i++) {
             try {
-                Future<ParallelSolverResult> future = completionService.take();
-                ParallelSolverResult parallelResult = future.get();
+                Future<PathConditionResultDTO> future = completionService.take();
+                resultDTO = future.get();
 
-                if(parallelResult == null) continue;
-
-                if(parallelResult.exception != null && SymbolicInstructionFactory.debugMode) {
-                    System.out.println("Exception in parsing or solving with solver"
-                            + parallelResult.solver.getClass().getSimpleName() + ":" + parallelResult.exception
-                    );
+                if(resultDTO.exception != null) {
+                    if(SymbolicInstructionFactory.debugMode) {
+                        System.out.println("Exception in parsing or solving with solver"
+                                + resultDTO.solver.getClass().getSimpleName() + ":" + resultDTO.exception
+                        );
+                    }
                     // continue if the future resulted in an exception
-                    continue;
-                }
-                // skip if choco returns an UNSAT/false if more than one solver is used
-                if (dp.size() > 1 && parallelResult.solver instanceof ProblemChoco && parallelResult.result == false) {
-                    continue;
-                }
-                result = parallelResult.result;
-                resultParser = parallelResult.parser;
-                // Cancel all remaining solvers (since we already have an answer)
-                for(Future<ParallelSolverResult> f : futures) {
-                    if(!f.isDone()) {
-                        f.cancel(true);
+                    resultDTO = null;
+                } else if (dp.size() > 1 && resultDTO.solver instanceof ProblemChoco && resultDTO.result == false) {
+                    // Choco uses a reduced integer range [-21474836, 21474836].
+                    // UNSAT results may be unsound for verification. skip when multiple solvers are available.
+                    resultDTO = null;
+                } else {
+                    // Attempt to cancel remaining solver tasks. Cancellation is best-effort only
+                    // if a solver thread is stuck in native code, it may keep running.
+                    for(Future<PathConditionResultDTO> f : futures) {
+                        if(!f.isDone()) {
+                            f.cancel(true);
+                        }
                     }
                 }
-                if (SymbolicInstructionFactory.debugMode) {
-                    System.out.println("numeric PC: " + pc + " -> " + result + " solved by " + parallelResult.solver.getClass().getSimpleName() + "\n");
-                }
-                // stop after first valid result
-                break;
             } catch (Exception e) {
                 if(SymbolicInstructionFactory.debugMode) {
                     e.printStackTrace();
                 }
             }
         }
-
-        if (result == null) {
-            throw new NoSolverSucceededException("Error: no solver could parse or solve the path condition: " + pc + "\n");
-        }
-
-
-        if (SymbolicInstructionFactory.regressMode) {
-            String output = "##NUMERIC PC: ";
-            output = output + (result == Boolean.TRUE ? "(SOLVED)" : "(UNSOLVED)");
-            output = output + " " + pc;
-            System.out.println(output);
-        }
-
-        return result;
+        return resultDTO;
     }
 
     public boolean isSatisfiableGreen(PathCondition pc) {
@@ -381,7 +394,12 @@ public class SymbolicConstraintsGeneral {
         if (dp.contains("no_solver"))
             return true;
 
-        if (isSatisfiable(pc)) {
+        // Do NOT call isSatisfiableParallel() here.
+        // Z3 contexts are not thread-safe, and isSatisfiableParallel() creates separate Z3
+        // contexts in different threads. This method also computes variable solutions,
+        // so both the satisfiability check and solution extraction must happen on the same
+        // thread/context (this method runs in the main thread) to avoid crashes or inconsistent state.
+        if (isSatisfiableSequential(pc)) {
 
             // compute solutions for real variables:
             Set<Entry<SymbolicReal, Object>> sym_realvar_mappings = resultParser.symRealVar.entrySet();
@@ -494,7 +512,12 @@ public class SymbolicConstraintsGeneral {
             return result;
         }
 
-        if (isSatisfiable(pc)) {
+        // Do NOT call isSatisfiableParallel() here.
+        // Z3 contexts are not thread-safe, and isSatisfiableParallel() creates separate Z3
+        // contexts in different threads. This method also computes variable solutions,
+        // so both the satisfiability check and solution extraction must happen on the same
+        // thread/context (this method runs in the main thread) to avoid crashes or inconsistent state.
+        if (isSatisfiableSequential(pc)) {
 
             // compute solutions for real variables:
             Set<Entry<SymbolicReal, Object>> sym_realvar_mappings = resultParser.symRealVar.entrySet();
@@ -608,8 +631,7 @@ public class SymbolicConstraintsGeneral {
     /**
      * Shuts down all executors in an orderly way.
      * For Z3 solvers, submits a cleanup task to close native contexts
-     * before shutting down. Waits up to 20s for tasks to finish, then
-     * forces shutdown if needed.
+     * before shutting down. Waits up to 10s for tasks to finish
      */
     public static void cleanExecutors() {
         List<String> dp = SymbolicInstructionFactory.dp;
@@ -637,9 +659,10 @@ public class SymbolicConstraintsGeneral {
                 executorService.shutdown();
                 executorService.awaitTermination(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-
+                    e.printStackTrace();
             }
         }
+        executors = null;
     }
 
 }

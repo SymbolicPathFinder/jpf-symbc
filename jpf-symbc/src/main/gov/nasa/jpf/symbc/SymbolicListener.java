@@ -124,9 +124,6 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
 
     @Override
     public void propertyViolated(Search search) {
-
-        SymbolicConstraintsGeneral.cleanExecutors();
-
         VM vm = search.getVM();
 
         ChoiceGenerator<?> cg = vm.getChoiceGenerator();
@@ -428,12 +425,6 @@ public class SymbolicListener extends PropertyListenerAdapter implements Publish
             }
         }
     }
-
-    @Override
-    public void searchFinished(Search search) {
-        SymbolicConstraintsGeneral.cleanExecutors();
-    }
-
     /*
      * The way this method works is specific to the format of the methodSummary data structure
      */
