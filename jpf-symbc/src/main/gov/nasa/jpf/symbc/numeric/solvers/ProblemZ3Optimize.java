@@ -112,6 +112,12 @@ public class ProblemZ3Optimize extends ProblemGeneral {
         scopes = 0;
     }
 
+    public void closeContext() {
+        ctx.close();
+        ctx = null;
+        ProblemZ3Optimize.Z3Wrapper.instance = null;
+    }
+
     public Object makeIntVar(String name, long min, long max) {
         try {
             IntExpr intConst = ctx.mkIntConst(name);

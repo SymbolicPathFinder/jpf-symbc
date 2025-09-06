@@ -68,16 +68,16 @@ import java.util.Map.Entry;
 // parses PCs
 
 public class PCParser {
-  static ProblemGeneral pb;
-  static public Map<SymbolicReal, Object>	symRealVar =new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
-  static Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>(); // a map between symbolic variables and DP variables
+  ProblemGeneral pb;
+  public Map<SymbolicReal, Object>	symRealVar =new HashMap<SymbolicReal,Object>(); // a map between symbolic real variables and DP variables
+  Map<SymbolicInteger,Object>	symIntegerVar = new HashMap<SymbolicInteger,Object>(); // a map between symbolic variables and DP variables
   //static Boolean result; // tells whether result is satisfiable or not
-  static int tempVars = 0; //Used to construct "or" clauses
+  int tempVars = 0; //Used to construct "or" clauses
 
 
   
   //	 Converts IntegerExpression's into DP's IntExp's
-  static Object getExpression(IntegerExpression eRef) {
+  Object getExpression(IntegerExpression eRef) {
     assert eRef != null;
     assert !(eRef instanceof IntegerConstant);
 
@@ -233,7 +233,7 @@ public class PCParser {
 
 
   // Converts RealExpression's into DP RealExp's
-  static Object getExpression(RealExpression eRef) {
+  Object getExpression(RealExpression eRef) {
     assert eRef != null;
     assert !(eRef instanceof RealConstant);
 
@@ -358,7 +358,7 @@ public class PCParser {
   //}
 
 
-  static public boolean createDPMixedConstraint(MixedConstraint cRef) { // TODO
+  public boolean createDPMixedConstraint(MixedConstraint cRef) { // TODO
 
     Comparator c_compRef = cRef.getComparator();
     RealExpression c_leftRef = (RealExpression)cRef.getLeft();
@@ -394,7 +394,7 @@ public class PCParser {
     return true;
   }
 
-  static public boolean createDPRealConstraint(RealConstraint cRef) {
+  public boolean createDPRealConstraint(RealConstraint cRef) {
 
     Comparator c_compRef = cRef.getComparator();
     RealExpression c_leftRef = (RealExpression)cRef.getLeft();
@@ -502,7 +502,7 @@ public class PCParser {
   }
 
   //Added by Gideon, to handle CNF style constraints???
-  static public boolean createDPLinearOrIntegerConstraint (LogicalORLinearIntegerConstraints c) {
+  public boolean createDPLinearOrIntegerConstraint (LogicalORLinearIntegerConstraints c) {
     List<Object> orList = new ArrayList<Object>();
 
     for (LinearIntegerConstraint cRef: c.getList()) {
@@ -692,7 +692,7 @@ public class PCParser {
 
   }
 
-  static public boolean createDPLinearIntegerConstraint(LinearIntegerConstraint cRef) {
+  public boolean createDPLinearIntegerConstraint(LinearIntegerConstraint cRef) {
 
     Comparator c_compRef = cRef.getComparator();
 
@@ -800,7 +800,7 @@ public class PCParser {
     return true;
   }
 
-  static public boolean createDPNonLinearIntegerConstraint(NonLinearIntegerConstraint cRef) {
+  public boolean createDPNonLinearIntegerConstraint(NonLinearIntegerConstraint cRef) {
 
     Comparator c_compRef = cRef.getComparator();
 
@@ -910,7 +910,7 @@ public class PCParser {
   //static Map<String,Boolean> dpMap = new HashMap<String,Boolean>();
 
   // Added by Aymeric to support symbolic Arrays
-  public static boolean createArrayConstraint(ArrayConstraint cRef) {
+  public boolean createArrayConstraint(ArrayConstraint cRef) {
     Comparator c_compRef = cRef.getComparator();
 
     SelectExpression selex = null;
@@ -986,7 +986,7 @@ getExpression(stoex.value)), newae));
         return true;
     }
 
-public static boolean createRealArrayConstraint(final RealArrayConstraint cRef) {
+public boolean createRealArrayConstraint(final RealArrayConstraint cRef) {
         final Comparator c_compRef = cRef.getComparator();
 
 
@@ -1062,7 +1062,7 @@ getExpression(stoex.value)), newae));
    * @param pbtosolve ProblemGeneral
    * @return the merged ProblemGener al object; NULL if problem is unsat
    */
-  public static ProblemGeneral parse(PathCondition pc, ProblemGeneral pbtosolve) {
+  public ProblemGeneral parse(PathCondition pc, ProblemGeneral pbtosolve) {
     pb=pbtosolve;
 
 
@@ -1098,7 +1098,7 @@ getExpression(stoex.value)), newae));
     return pb;
   }
 
-  private static boolean addConstraint(Constraint cRef) {
+  private boolean addConstraint(Constraint cRef) {
     boolean constraintResult = true;
 
     if (cRef instanceof RealConstraint)

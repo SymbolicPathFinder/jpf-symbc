@@ -50,6 +50,7 @@ echo "symbolic.string_dp_timeout_ms=3000" >> $DIR/config.jpf
 echo "symbolic.lazy=on" >> $DIR/config.jpf
 echo "symbolic.arrays=true" >> $DIR/config.jpf
 echo "listener=.symbc.SymbolicListener" >> $DIR/config.jpf
+echo "symbolic.dp_parallel_mode=true" >> $DIR/config.jpf
 echo $DIR/config.jpf
 
 # run SPF
