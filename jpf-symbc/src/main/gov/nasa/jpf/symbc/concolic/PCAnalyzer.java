@@ -52,8 +52,7 @@ public class PCAnalyzer {
 		if(concolicPC == null || concolicPC.header == null) return true;
 
 		createSimplifiedPC();
-		if(SymbolicInstructionFactory.parallelModeEnabled) result = solver.isSatisfiableParallel(getSimplifiedPC());
-		else result = solver.isSatisfiable(getSimplifiedPC());
+		result = solver.isSatisfiable(getSimplifiedPC());
 
 		if (SymbolicInstructionFactory.debugMode) {
 			if(result)

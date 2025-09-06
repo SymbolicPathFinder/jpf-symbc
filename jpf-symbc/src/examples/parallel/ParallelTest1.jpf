@@ -1,0 +1,10 @@
+target=parallel.ParallelTest1
+
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.dp=choco,z3
+symbolic.dp_timeout_ms=5000
+symbolic.dp_parallel_mode=true
+
+symbolic.debug=true
