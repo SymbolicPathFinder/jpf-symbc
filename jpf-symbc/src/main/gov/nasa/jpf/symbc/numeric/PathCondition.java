@@ -393,6 +393,7 @@ public class PathCondition implements Comparable<PathCondition> {
             result1 = pa.isSatisfiable(this, solver);
         } else
             result1 = solver.isSatisfiable(this);
+
         solverCalls++;
         solver.cleanup();
 
