@@ -394,14 +394,17 @@ public class SymbolicStringHandler {
                 } else {
                     if (sym_v1 != null) {
                         pc._addDet(Comparator.LT,  sym_v1, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
                     } else {
-                        int val = s1;
-                        pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
-                    }
-                    if (!pc.simplify()) {
-                        th.getVM().getSystemState().setIgnored(true);
-                    } else {
-                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        if (s1 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
                     }
                 }
             } else if (currentChocie == 1) { // index is greater than or equal to the length of string
@@ -1209,14 +1212,17 @@ public class SymbolicStringHandler {
                 } else {
                     if (sym_v1 != null) {
                         pc._addDet(Comparator.LT, sym_v1, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
                     } else {
-                        int val = s1;
-                        pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
-                    }
-                    if (!pc.simplify()) {
-                        th.getVM().getSystemState().setIgnored(true);
-                    } else {
-                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        if (s1 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
                     }
                 }
             } else if (currentChocie == 1) { // beginIndex is greater than length of the string
@@ -1314,14 +1320,17 @@ public class SymbolicStringHandler {
                 } else {
                     if (sym_v2 != null) {
                         pc._addDet(Comparator.LT, sym_v2, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
                     } else {
-                        int val = s2;
-                        pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
-                    }
-                    if (!pc.simplify()) {
-                        th.getVM().getSystemState().setIgnored(true);
-                    } else {
-                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        if (s2 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
                     }
                 }
             } else if (currentChocie == 1) { // beginIndex is greater than the length of string
@@ -1353,14 +1362,17 @@ public class SymbolicStringHandler {
                 } else {
                     if (sym_v1 != null) {
                         pc._addDet(Comparator.LT, sym_v1, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
                     } else {
-                        int val = s1;
-                        pc._addDet(Comparator.LT, new IntegerConstant(val), new IntegerConstant(0));
-                    }
-                    if (!pc.simplify()) {
-                        th.getVM().getSystemState().setIgnored(true);
-                    } else {
-                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        if (s1 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
                     }
                 }
             } else if (currentChocie == 3) { // endIndex is greater than tha length of the string
