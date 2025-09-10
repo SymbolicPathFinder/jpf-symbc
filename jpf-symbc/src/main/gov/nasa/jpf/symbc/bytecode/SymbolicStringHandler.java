@@ -214,8 +214,15 @@ public class SymbolicStringHandler {
 			} else if (shortName.equals("lastIndexOf")) {
 				handleLastIndexOf(invInst, th);
 			} else if (shortName.equals("charAt")) {
-				handleCharAt (invInst, th); // returns boolean that is ignored
-				//return invInst;
+                ChoiceGenerator<?> cg;
+                if (!th.isFirstStepInsn()) { // first time around
+                    cg = new PCChoiceGenerator(3);
+                    th.getVM().setNextChoiceGenerator(cg);
+                    return invInst;
+                } else {
+                    handleCharAt(invInst, th);
+                    return invInst.getNext(th);
+                }
 			} else if (shortName.equals("replace")) {
 				Instruction handled = handleReplace(invInst, th);
 				if (handled != null) {
@@ -338,38 +345,114 @@ public class SymbolicStringHandler {
 	private boolean handleCharAt (JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
 		IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
-		StringExpression sym_v2 = (StringExpression) sf.getOperandAttr(1);
-		boolean bresult = false;
+        StringExpression sym_v2 = null;
+
+        boolean bresult = false;
+
+        Expression operandAttr =  (Expression) sf.getOperandAttr(1);
+        if (operandAttr instanceof StringSymbolic) {
+            sym_v2 = (StringSymbolic) operandAttr;
+        } else if (operandAttr instanceof SymbolicStringBuilder){
+            SymbolicStringBuilder symbolicSB = (SymbolicStringBuilder) operandAttr;
+            sym_v2 = symbolicSB.getstr();
+        } else
+            return bresult;
+
+
 		if ((sym_v1 == null) & (sym_v2 == null)) {
 			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleCharAt");
 		} else {
-			int s1 = sf.pop();
-			int s2 = sf.pop();
 
-			IntegerExpression result = null;
-			if (sym_v1 == null) { // operand 0 is concrete
+            int s1 = sf.pop();
+            int s2 = sf.pop();
 
-				int val = s1;
-				result = sym_v2._charAt(new IntegerConstant(val));
-			} else {
+			ChoiceGenerator<?> cg;
+			int currentChocie = 0;
 
-				if (sym_v2 == null) {
-					ElementInfo e1 = th.getElementInfo(s2);
-					String val2 = e1.asString();
-					sym_v2 = new StringConstant(val2);
-					result = sym_v2._charAt(sym_v1);
-				} else {
-					result = sym_v2._charAt(sym_v1);
-				}
-				bresult = true;
-				//System.out.println("[handleCharAt] Ignoring: " + result.toString());
-				//th.push(0, false);
-			}
-			sf.push(0, false);
-			sf.setOperandAttr(result);
+            cg = th.getVM().getChoiceGenerator();
+            assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+            currentChocie = (Integer) cg.getNextChoice();
+
+            PathCondition pc;
+
+            ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+            while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+                prev_cg = prev_cg.getPreviousChoiceGenerator();
+            }
+
+            if (prev_cg == null) {
+                pc = new PathCondition();
+            } else {
+                pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+            }
+
+            assert pc != null;
+			
+			if (currentChocie == 0) { // index is less than zero
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if (sym_v1 != null) {
+                        pc._addDet(Comparator.LT,  sym_v1, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
+                    } else {
+                        if (s1 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
+                    }
+                }
+            } else if (currentChocie == 1) { // index is greater than or equal to the length of string
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if(sym_v2 != null) {
+                        if(sym_v1 != null) {
+                            pc._addDet(Comparator.GE,  sym_v1, sym_v2._length());
+                        } else {
+                            int val = s1;
+                            pc._addDet(Comparator.GE,  new IntegerConstant(val), sym_v2._length());
+                        }
+                    } else {
+                        ElementInfo e1 = th.getElementInfo(s2);
+                        String val2 = e1.asString();
+                        sym_v2 = new StringConstant(val2);
+                        pc._addDet(Comparator.GE,  sym_v1, sym_v2._length());
+                    }
+                    if (!pc.simplify()) {
+                        th.getVM().getSystemState().setIgnored(true);
+                    } else {
+                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                    }
+                }
+            } else if (currentChocie == 2) { // previous code valid operation
+                IntegerExpression result = null;
+                if (sym_v1 == null) { // operand 0 is concrete
+                    int val = s1;
+                    result = sym_v2._charAt(new IntegerConstant(val));
+                } else {
+                    if (sym_v2 == null) {
+                        ElementInfo e1 = th.getElementInfo(s2);
+                        String val2 = e1.asString();
+                        sym_v2 = new StringConstant(val2);
+                        result = sym_v2._charAt(sym_v1);
+                    } else {
+                        result = sym_v2._charAt(sym_v1);
+                    }
+                    bresult = true;
+                    //System.out.println("[handleCharAt] Ignoring: " + result.toString());
+                    // th.push(0, false);
+                }
+                sf.push(0, false);
+                sf.setOperandAttr(result);
+            }
 		}
-		return bresult; // not used
-
+        return bresult; // not used
 	}
 
 	public void handleLength(JVMInvokeInstruction invInst, ThreadInfo th) {
@@ -1067,9 +1150,25 @@ public class SymbolicStringHandler {
 	public Instruction handleSubString(JVMInvokeInstruction invInst, ThreadInfo th) {
 		int numStackSlots = invInst.getArgSize();
 		if (numStackSlots == 2) {
-			return handleSubString1(invInst, th);
+            ChoiceGenerator<?> cg;
+            if (!th.isFirstStepInsn()) { // first time around
+                cg = new PCChoiceGenerator(3);
+                th.getVM().setNextChoiceGenerator(cg);
+                return invInst;
+            } else {
+                handleSubString1(invInst, th);
+                return invInst.getNext(th);
+            }
 		} else {
-			return handleSubString2(invInst, th);
+            ChoiceGenerator<?> cg;
+            if (!th.isFirstStepInsn()) { // first time around
+                cg = new PCChoiceGenerator(5);
+                th.getVM().setNextChoiceGenerator(cg);
+                return invInst;
+            } else {
+                handleSubString2(invInst, th);
+                return invInst.getNext(th);
+            }
 		}
 	}
 
@@ -1081,31 +1180,98 @@ public class SymbolicStringHandler {
 		if ((sym_v1 == null) & (sym_v2 == null)) {
 			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleSubString1");
 		} else {
-			int s1 = sf.pop();
-			int s2 = sf.pop();
 
-			StringExpression result = null;
-			if (sym_v1 == null) { // operand 0 is concrete
-				int val = s1;
-				result = sym_v2._subString(val);
-			} else {
-				if (sym_v2 == null) {
-					ElementInfo e1 = th.getElementInfo(s2);
-					String val2 = e1.asString();
-					sym_v2 = new StringConstant(val2);
-					result = sym_v2._subString(sym_v1);
-				} else {
-					result = sym_v2._subString(sym_v1);
-				}
-			}
-			ElementInfo objRef = th.getHeap().newString("", th); /*
+            int s1 = sf.pop();
+            int s2 = sf.pop();
+
+			ChoiceGenerator<?> cg;
+			int currentChocie = 0;
+
+            cg = th.getVM().getChoiceGenerator();
+            assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+            currentChocie = (Integer) cg.getNextChoice();
+
+            PathCondition pc;
+
+            ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+            while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+                prev_cg = prev_cg.getPreviousChoiceGenerator();
+            }
+
+            if (prev_cg == null) {
+                pc = new PathCondition();
+            } else {
+                pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+            }
+
+            assert pc != null;
+
+			if (currentChocie == 0) { // beginIndex is less than zero
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if (sym_v1 != null) {
+                        pc._addDet(Comparator.LT, sym_v1, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
+                    } else {
+                        if (s1 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
+                    }
+                }
+            } else if (currentChocie == 1) { // beginIndex is greater than length of the string
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if (sym_v2 != null) {
+                        if (sym_v1 != null) {
+                            pc._addDet(Comparator.GT, sym_v1, sym_v2._length());
+                        } else {
+                            int val = s1;
+                            pc._addDet(Comparator.GT, new IntegerConstant(val), sym_v2._length());
+                        }
+                    } else {
+                        ElementInfo e1 = th.getElementInfo(s2);
+                        String val2 = e1.asString();
+                        sym_v2 = new StringConstant(val2);
+                        pc._addDet(Comparator.GT, sym_v1, sym_v2._length());
+                    }
+                    if (!pc.simplify()) {
+                        th.getVM().getSystemState().setIgnored(true);
+                    } else {
+                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                    }
+                }
+            } else if(currentChocie == 2) { // previous code valid operation
+                StringExpression result = null;
+                if (sym_v1 == null) { // operand 0 is concrete
+                    int val = s1;
+                    result = sym_v2._subString(val);
+                } else {
+                    if (sym_v2 == null) {
+                        ElementInfo e1 = th.getElementInfo(s2);
+                        String val2 = e1.asString();
+                        sym_v2 = new StringConstant(val2);
+                        result = sym_v2._subString(sym_v1);
+                    } else {
+                        result = sym_v2._subString(sym_v1);
+                    }
+                }
+                ElementInfo objRef = th.getHeap().newString("", th); /*
 																																	 * dummy
 																																	 * String
 																																	 * Object
 																																	 */
-			sf.push(objRef.getObjectRef(), true);
-			sf.setOperandAttr(result);
-		}
+                sf.push(objRef.getObjectRef(), true);
+                sf.setOperandAttr(result);
+            } 
+        }
 		return null;
 	}
 
@@ -1119,21 +1285,131 @@ public class SymbolicStringHandler {
 		if ((sym_v1 == null) & (sym_v2 == null) & (sym_v3 == null)) {
 			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleSubString2");
 		} else {
-			int s1 = sf.pop();
-			int s2 = sf.pop();
-			int s3 = sf.pop();
+
+            int s1 = sf.pop();
+            int s2 = sf.pop();
+            int s3 = sf.pop();
+
+            ChoiceGenerator<?> cg;
+            int currentChocie = 0;
+
+            cg = th.getVM().getChoiceGenerator();
+            assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+            currentChocie = (Integer) cg.getNextChoice();
+
+            PathCondition pc;
+
+            ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+            while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+                prev_cg = prev_cg.getPreviousChoiceGenerator();
+            }
+
+            if (prev_cg == null) {
+                pc = new PathCondition();
+            } else {
+                pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+            }
+
+            assert pc != null;
+
 			//System.out.printf("[SymbolicStringHandler] popped %d %d %d\n", s1, s2, s3);
-			StringExpression result = null;
-			if (sym_v1 == null) { // operand 0 is concrete
-				int val = s1;
-				if (sym_v2 == null) { // sym_v3 has to be symbolic
-					int val1 = s2;
-					result = sym_v3._subString(val, val1);
-					//System.out.println("[SymbolicStringHandler] special push");
-					/* Only if both arguments are concrete, something else needs
-					 * to be pushed?
-					 */
-					//sf.push(s3, true); /* symbolic string element */
+
+            if (currentChocie == 0) { // beginIndex is less than zero
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if (sym_v2 != null) {
+                        pc._addDet(Comparator.LT, sym_v2, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
+                    } else {
+                        if (s2 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
+                    }
+                }
+            } else if (currentChocie == 1) { // beginIndex is greater than the length of string
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if (sym_v3 != null) {
+                        if (sym_v2 != null) {
+                            pc._addDet(Comparator.GT, sym_v2, sym_v3._length());
+                        } else {
+                            int val = s2;
+                            pc._addDet(Comparator.GT, new IntegerConstant(val), sym_v3._length());
+                        }
+                    } else {
+                        ElementInfo e1 = th.getElementInfo(s3);
+                        String val2 = e1.asString();
+                        sym_v3 = new StringConstant(val2);
+                        pc._addDet(Comparator.GT, sym_v2, sym_v3._length());
+                    }
+                    if (!pc.simplify()) {
+                        th.getVM().getSystemState().setIgnored(true);
+                    } else {
+                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                    }
+                }
+            } else if (currentChocie == 2) { // endIndex is less than zero
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if (sym_v1 != null) {
+                        pc._addDet(Comparator.LT, sym_v1, new IntegerConstant(0));
+                        if (!pc.simplify()) {
+                            th.getVM().getSystemState().setIgnored(true);
+                        } else {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        }
+                    } else {
+                        if (s1 < 0) {
+                            th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                        } else {
+                            th.getVM().getSystemState().setIgnored(true);
+                        }
+                    }
+                }
+            } else if (currentChocie == 3) { // endIndex is greater than tha length of the string
+                if (!rte_flag) {
+                    th.getVM().getSystemState().setIgnored(true);
+                } else {
+                    if (sym_v3 != null) {
+                        if (sym_v1 != null) {
+                            pc._addDet(Comparator.GT, sym_v1, sym_v3._length());
+                        } else {
+                            int val = s1;
+                            pc._addDet(Comparator.GT, new IntegerConstant(val), sym_v3._length());
+                        }
+                    } else {
+                        ElementInfo e1 = th.getElementInfo(s3);
+                        String val2 = e1.asString();
+                        sym_v3 = new StringConstant(val2);
+                        pc._addDet(Comparator.GT, sym_v1, sym_v3._length());
+                    }
+                    if (!pc.simplify()) {
+                        th.getVM().getSystemState().setIgnored(true);
+                    } else {
+                        th.createAndThrowException("java.lang.StringIndexOutOfBoundsException");
+                    }
+                }
+            } else if (currentChocie == 4) { // previous code, valid operation
+                StringExpression result = null;
+                if (sym_v1 == null) { // operand 0 is concrete
+                    int val = s1;
+                    if (sym_v2 == null) { // sym_v3 has to be symbolic
+                        int val1 = s2;
+                        result = sym_v3._subString(val, val1);
+                        //System.out.println("[SymbolicStringHandler] special push");
+                        // /* Only if both arguments are concrete, something else needs
+                        // * to be pushed?
+                        // */
+                        // sf.push(s3, true); /* symbolic string element */
 				} else {
 					if (sym_v3 == null) { // only sym_v2 is symbolic
 						ElementInfo e3 = th.getElementInfo(s3);
@@ -1167,14 +1443,14 @@ public class SymbolicStringHandler {
 					}
 				}
 			}
-			ElementInfo objRef = th.getHeap().newString("", th);
-			//System.out.println("[SymbolicStringHandler] " + sf.toString());
-			sf.push(objRef.getObjectRef(), true);
-			//System.out.println("[SymbolicStringHandler] " + sf.toString());
-			sf.setOperandAttr(result);
+                ElementInfo objRef = th.getHeap().newString("", th);
+                //System.out.println("[SymbolicStringHandler] " + sf.toString());
+                // sf.push(objRef.getObjectRef(), true);
+                // System.out.println("[SymbolicStringHandler] " + sf.toString());
+                sf.setOperandAttr(result);
+            }
 		}
-
-		return null;
+        return null;
 	}
 
 	public Instruction handleReplaceFirst(JVMInvokeInstruction invInst, ThreadInfo th) {

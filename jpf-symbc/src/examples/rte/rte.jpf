@@ -1,0 +1,23 @@
+#target=rte.StringCharAtTest
+#target=rte.StringSubStringTest
+
+
+classpath=${jpf-symbc}/build/examples
+symbolic.dp=z3bitvector
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+symbolic.bvlength=64
+search.depth_limit=13
+symbolic.strings=true
+symbolic.string_dp=z3str3
+nullPointer.exception=false
+runtime.exception=true
+search.multiple_errors=true
+symbolic.lazy=on
+symbolic.jrarrays=true
+recursiveDepth= 200
+singlePathOptimization=true
+listener = .symbc.SymbolicListener
+symbolic.debug=true
