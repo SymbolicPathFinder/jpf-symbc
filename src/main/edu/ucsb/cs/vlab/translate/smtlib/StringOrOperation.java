@@ -27,6 +27,9 @@ public final class StringOrOperation {
 	public static final StringOrOperation TOLOWERCASE = new StringOrOperation(StringOperator.TOLOWERCASE);
 	public static final StringOrOperation TOUPPERCASE = new StringOrOperation(StringOperator.TOUPPERCASE);
 	public static final StringOrOperation VALUEOF = new StringOrOperation(StringOperator.VALUEOF);
+	public static final StringOrOperation REVERSE = new StringOrOperation(StringOperator.REVERSE);
+	public static final StringOrOperation DELETE = new StringOrOperation(StringOperator.DELETE);
+	public static final StringOrOperation INSERT = new StringOrOperation(StringOperator.INSERT);
 
 	@Override
 	public boolean equals(Object o) {
