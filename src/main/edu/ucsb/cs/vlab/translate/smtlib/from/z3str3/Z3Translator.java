@@ -258,9 +258,9 @@ class Manager extends TranslationManager {
 				}
 			});
 
-			map(StringOrOperation.REPLACE, ReplaceTemplate.apply("(str.replace"));
-			map(StringOrOperation.REPLACEALL, ReplaceTemplate.apply("(replaceAll"));
-			map(StringOrOperation.REPLACEFIRST, ReplaceTemplate.apply("(replaceFirst"));
+			map(StringOrOperation.REPLACE, ReplaceTemplate.apply("(str.replace_all"));
+			map(StringOrOperation.REPLACEALL, ReplaceTemplate.apply("(str.replace_all"));
+			map(StringOrOperation.REPLACEFIRST, ReplaceTemplate.apply("(str.replace"));
 
 			map(StringOrOperation.TRIM, (expr) -> {
 				final DerivedStringExpression dse = (DerivedStringExpression) expr;
