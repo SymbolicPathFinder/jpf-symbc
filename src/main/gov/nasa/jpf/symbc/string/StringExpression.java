@@ -380,6 +380,80 @@ public StringExpression _replaceFirst(StringExpression t, String r) {
 	    return new DerivedStringExpression(StringOperator.REPLACEFIRST, l );
 	  }
 
+	/* delete */
+
+	public StringExpression _delete(Integer int1, Integer int2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = new IntegerConstant(int1);
+		l[2] = new IntegerConstant(int2);
+		return new DerivedStringExpression(StringOperator.DELETE, l);
+	}
+
+	public StringExpression _delete(IntegerExpression intex1, Integer int2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = intex1;
+		l[2] = new IntegerConstant(int2);
+		return new DerivedStringExpression(StringOperator.DELETE, l);
+	}
+
+	public StringExpression _delete(Integer int1, IntegerExpression intex2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = new IntegerConstant(int1);
+		l[2] = intex2;
+		return new DerivedStringExpression(StringOperator.DELETE, l);
+	}
+
+	public StringExpression _delete(IntegerExpression intex1, IntegerExpression intex2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = intex1;
+		l[2] = intex2;
+		return new DerivedStringExpression(StringOperator.DELETE, l);
+	}
+
+	/* insert */
+
+	public StringExpression _insert(String str1, Integer int2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = new StringConstant(str1);
+		l[2] = new IntegerConstant(int2);
+		return new DerivedStringExpression(StringOperator.INSERT, l);
+	}
+
+	public StringExpression _insert(StringExpression str1, Integer int2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = str1;
+		l[2] = new IntegerConstant(int2);
+		return new DerivedStringExpression(StringOperator.INSERT, l);
+	}
+
+	public StringExpression _insert(StringExpression str1, IntegerExpression intex2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = str1;
+		l[2] = intex2;
+		return new DerivedStringExpression(StringOperator.INSERT, l);
+	}
+
+	public StringExpression _insert(String str1, IntegerExpression intex2) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = new StringConstant(str1);
+		l[2] = intex2;
+		return new DerivedStringExpression(StringOperator.INSERT, l);
+	}
+
+	/* reverse */
+
+	public StringExpression _reverse() {
+		return new DerivedStringExpression(StringOperator.REVERSE, this);
+	}
+
 /* valueOf */
 
 public static StringExpression _valueOf(IntegerExpression t) {
