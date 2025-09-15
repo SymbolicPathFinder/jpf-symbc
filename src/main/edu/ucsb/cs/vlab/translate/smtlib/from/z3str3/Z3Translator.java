@@ -366,7 +366,7 @@ class Manager extends TranslationManager {
 			});
 			map(StringOrOperation.REVERSE, (expr) -> {
 				final DerivedStringExpression dse = (DerivedStringExpression) expr;
-				final String in_str = manager.strExpr.collect((StringExpression) dse.oprlist[0]);
+				final String in_str = manager.strExpr.collect(dse.right);
 				String var = "out_str";
 				Results.stringVariables.add("out_str");
 				Results.constraints.add(
