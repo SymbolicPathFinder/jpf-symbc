@@ -152,8 +152,8 @@ class Manager extends TranslationManager {
 			map(StringComparator.NOTEQUALS, "(not (=");
 			map(StringComparator.EQUALSIGNORECASE, "(equalsIgnoreCase");
 			map(StringComparator.NOTEQUALSIGNORECASE, "(not (equalsIgnoreCase");
-			map(StringComparator.EMPTY, "(empty");
-			map(StringComparator.NOTEMPTY, "(not (empty");
+			map(StringComparator.EMPTY, "(= 0 (str.len");
+            map(StringComparator.NOTEMPTY, "(not (= 0 (str.len");
 			map(StringComparator.MATCHES, "(matches");
 			map(StringComparator.NOMATCHES, "(not (matches");
 			map(StringComparator.REGIONMATCHES, "(regionMatches");
@@ -261,9 +261,9 @@ class Manager extends TranslationManager {
 				}
 			});
 
-			map(StringOrOperation.REPLACE, ReplaceTemplate.apply("(str.replace"));
-			map(StringOrOperation.REPLACEALL, ReplaceTemplate.apply("(replaceAll"));
-			map(StringOrOperation.REPLACEFIRST, ReplaceTemplate.apply("(replaceFirst"));
+            map(StringOrOperation.REPLACE, ReplaceTemplate.apply("(str.replace_all"));
+            map(StringOrOperation.REPLACEALL, ReplaceTemplate.apply("(str.replace_all"));
+            map(StringOrOperation.REPLACEFIRST, ReplaceTemplate.apply("(str.replace"));
 
 			map(StringOrOperation.TRIM, (expr) -> {
 				final DerivedStringExpression dse = (DerivedStringExpression) expr;
@@ -277,8 +277,51 @@ class Manager extends TranslationManager {
 				Results.constraints.add("(assert (and (str.in_re " + in_str + " (re.++ ws (str.to_re out_str) ws)) (or (= out_str \"\")(and (str.in_re out_str (re.++ nwc re.all)) (str.in_re out_str (re.++ re.all nwc))))))");
 				return arg;
 			});
-			map(StringOrOperation.TOLOWERCASE, RightTemplate.apply("(toLowerCase"));
-			map(StringOrOperation.TOUPPERCASE, RightTemplate.apply("(toUpperCase"));
+
+			map(StringOrOperation.TOLOWERCASE, (expr) -> {
+                final DerivedStringExpression dse = (DerivedStringExpression) expr;
+                final String in_str = manager.strExpr.collect(dse.right);
+                String arg = "out_str";
+                Results.stringVariables.add("out_str");
+                Results.constraints.add(
+                    "(define-fun-rec toLower ((x String) (y String)) Bool " +
+                      "(or (and (= x \"\") (= y \"\")) " +
+                        "(and (not (= x \"\")) (not (= y \"\")) " +
+                          "(let ((x_head (str.at x 0)) " +
+                                "(y_head (str.at y 0)) " +
+                                "(x_tail (str.substr x 1 (- (str.len x) 1))) " +
+                                "(y_tail (str.substr y 1 (- (str.len y) 1)))) " +
+                            "(and (= (str.to_code y_head) " +
+                                  "(ite (and (<= 65 (str.to_code x_head)) (<= (str.to_code x_head)                 90)) " +
+                                    "(+ (str.to_code x_head) 32) " +
+                                    "(str.to_code x_head))) " +
+                                 "(toLower x_tail y_tail))))))" +
+                    "\n(assert (toLower " + in_str + " out_str))"
+                );
+                return arg;
+            });
+            map(StringOrOperation.TOUPPERCASE, (expr) -> {
+                final DerivedStringExpression dse = (DerivedStringExpression) expr;
+                final String in_str = manager.strExpr.collect(dse.right);
+                String arg = "out_str";
+                Results.stringVariables.add("out_str");
+                Results.constraints.add(
+                    "(define-fun-rec toUpper ((x String) (y String)) Bool " +
+                      "(or (and (= x \"\") (= y \"\")) " +
+                        "(and (not (= x \"\")) (not (= y \"\")) " +
+                          "(let ((x_head (str.at x 0)) " +
+                                "(y_head (str.at y 0)) " +
+                                "(x_tail (str.substr x 1 (- (str.len x) 1))) " +
+                                "(y_tail (str.substr y 1 (- (str.len y) 1)))) " +
+                            "(and (= (str.to_code y_head) " +
+                                  "(ite (and (<= 97 (str.to_code x_head)) (<= (str.to_code x_head) 122)) " +
+                                    "(- (str.to_code x_head) 32) " +
+                                    "(str.to_code x_head))) " +
+                                 "(toUpper x_tail y_tail))))))" +
+                    "\n(assert (toUpper " + in_str + " out_str))"
+                );
+                return arg;
+            });
 
 			map(StringOrOperation.VALUEOF, (expr) -> {
 				String arg = null;
@@ -314,6 +357,42 @@ class Manager extends TranslationManager {
 				} catch (NumberFormatException e) {
 					return arg;
 				}
+			});
+
+			map(StringOrOperation.DELETE, (expr) -> {
+				final DerivedStringExpression dse = (DerivedStringExpression) expr;
+				final String in_str = manager.strExpr.collect((StringExpression) dse.oprlist[0]);
+				final String arg1 = manager.numExpr.collect((IntegerExpression) dse.oprlist[1]);
+				final String arg2 = manager.numExpr.collect((IntegerExpression) dse.oprlist[2]);
+				Results.constraints.add("(assert (<= " + arg2 + " (str.len " + in_str + ")))");
+				return "(str.++ (str.substr " + in_str + " 0 " + arg1 + ") (str.substr " + in_str + " " + arg2 + " (str.len " + in_str + ")))";
+			});
+			map(StringOrOperation.INSERT, (expr) -> {
+				final DerivedStringExpression dse = (DerivedStringExpression) expr;
+				final String in_str = manager.strExpr.collect((StringExpression) dse.oprlist[0]);
+				final String insert_str = manager.strExpr.collect((StringExpression) dse.oprlist[1]);
+				final String arg1 = manager.numExpr.collect((IntegerExpression) dse.oprlist[2]);
+				Results.constraints.add("(assert (<= " + arg1 + " (str.len " + in_str + ")))");
+				return "(str.++ (str.substr " + in_str + " 0 " + arg1 + ") " + insert_str + " (str.substr " + in_str + " " + arg1 + " (str.len " + in_str + ")))";
+			});
+			map(StringOrOperation.REVERSE, (expr) -> {
+				final DerivedStringExpression dse = (DerivedStringExpression) expr;
+				final String in_str = manager.strExpr.collect(dse.right);
+				String var = "out_str";
+				Results.stringVariables.add("out_str");
+				Results.constraints.add(
+						"(define-fun-rec reverse ((x String) (y String)) Bool " +
+								"(or (and (= x \"\") (= y \"\")) " +
+								"(and (not (= x \"\")) (not (= y \"\")) " +
+								"(let ((x_head (str.at x 0)) " +
+								"(y_head (str.at y (- (str.len y) 1))) " +
+								"(x_tail (str.substr x 1 (- (str.len x) 1))) " +
+								"(y_tail (str.substr y 0 (- (str.len y) 1)))) " +
+								"(and (= x_head y_head) " +
+								"(reverse x_tail y_tail))))))" +
+								"\n(assert (reverse " + in_str + " out_str))"
+				);
+				return var;
 			});
 		}
 	}
