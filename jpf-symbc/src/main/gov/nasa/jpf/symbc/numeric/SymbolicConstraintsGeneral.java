@@ -74,16 +74,28 @@ public class SymbolicConstraintsGeneral {
             return false;
         }
 
-        // if (SymbolicInstructionFactory.debugMode)
-        // System.out.println("checking: PC "+pc);
-
         String[] dp = SymbolicInstructionFactory.dp;
+
+        // --- Two‑pass detection for Z3 ---
+        boolean useBitvectorForZ3 = false;
+        if (dp != null && dp.length > 0 && dp[0].equalsIgnoreCase("z3")) {
+            BitwiseDetector detector = new BitwiseDetector();
+            Constraint c = pc.header;
+            while (c != null) {
+                c.accept(detector);
+                if (detector.hasBitwise()) {
+                    useBitvectorForZ3 = true;
+                    break;
+                }
+                c = c.getTail();
+            }
+        }
+
+        // --- Solver selection ---
         if (dp == null) { // default: use choco
             pb = new ProblemChoco();
         } else if (dp[0].equalsIgnoreCase("choco")) {
             pb = new ProblemChoco();
-            // } else if(dp[0].equalsIgnoreCase("choco2")){
-            // pb = new ProblemChoco2();
         } else if (dp[0].equalsIgnoreCase("coral")) {
             pb = new ProblemCoral();
         } else if (dp[0].equalsIgnoreCase("iasolver")) {
@@ -95,7 +107,11 @@ public class SymbolicConstraintsGeneral {
         } else if (dp[0].equalsIgnoreCase("yices")) {
             pb = new ProblemYices();
         } else if (dp[0].equalsIgnoreCase("z3")) {
-            pb = new ProblemZ3();
+            if (useBitvectorForZ3) {
+                pb = new ProblemZ3BitVector();   // bitvector version for bitwise ops
+            } else {
+                pb = new ProblemZ3();             // plain arithmetic Z3
+            }
         } else if (dp[0].equalsIgnoreCase("z3inc")) {
             pb = new ProblemZ3Incremental();
         } else if (dp[0].equalsIgnoreCase("z3bitvectorinc")) {
@@ -161,7 +177,6 @@ public class SymbolicConstraintsGeneral {
         } else {
             return false;
         }
-
     }
 
     public boolean isSatisfiableGreen(PathCondition pc) {
