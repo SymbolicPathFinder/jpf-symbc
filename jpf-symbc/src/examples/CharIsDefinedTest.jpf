@@ -1,0 +1,10 @@
+target=CharIsDefinedTest
+classpath=${jpf-symbc}/build/examples
+
+listener = gov.nasa.jpf.symbc.SymbolicListener
+symbolic.dp=choco
+symbolic.strings=false
+symbolic.debug=true
+
+# prefer symbc peers over core peers
+peer_packages = gov.nasa.jpf.symbc,gov.nasa.jpf.vm
