@@ -211,6 +211,8 @@ public class SymbolicStringHandler {
 					handleContains(invInst, th);
 					return invInst.getNext(th);
 				}
+			} else if (shortName.equals("matches")) {
+				return handleMatches(invInst, th);
 			} else if (shortName.equals("append")) {
 				Instruction handled = handleAppend(invInst, th);
 				if (handled != null) {
@@ -1088,9 +1090,69 @@ public class SymbolicStringHandler {
 		}
 	}
 
+	private Instruction handleMatches(JVMInvokeInstruction invInst, ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+		
+		StringExpression sym_this = (StringExpression) sf.getOperandAttr(0);
+		StringExpression sym_regex = (StringExpression) sf.getOperandAttr(1);
 
+		if (sym_this == null && sym_regex == null) {
+			return null;
+		}
+
+		if (!th.isFirstStepInsn()) {
+			ChoiceGenerator<?> cg = new PCChoiceGenerator(2);
+			th.getVM().setNextChoiceGenerator(cg);
+			return invInst;
+		} else {
+			PCChoiceGenerator cg = th.getVM().getSystemState().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+			boolean choice = cg.getNextChoice() == 1;
+
+			// Pop the arguments
+			int regexRef = sf.pop();
+			int thisRef = sf.pop();
+
+			PathCondition pc = PathCondition.getPC(th.getVM());
+
+			// Get actual values for concrete parts
+			String regexVal = (sym_regex == null) ? th.getElementInfo(regexRef).asString() : null;
+			String thisVal = (sym_this == null) ? th.getElementInfo(thisRef).asString() : null;
+
+			if (choice) {
+				// Path: Matches
+				if (sym_this != null) {
+					if (sym_regex != null) {
+						pc.spc._addDet(StringComparator.MATCHES, sym_this, sym_regex);
+					} else {
+						pc.spc._addDet(StringComparator.MATCHES, sym_this, regexVal);
+					}
+				} else {
+					pc.spc._addDet(StringComparator.MATCHES, thisVal, sym_regex);
+				}
+			} else {
+				// Path: Does Not Match
+				if (sym_this != null) {
+					if (sym_regex != null) {
+						pc.spc._addDet(StringComparator.NOMATCHES, sym_this, sym_regex);
+					} else {
+						pc.spc._addDet(StringComparator.NOMATCHES, sym_this, regexVal);
+					}
+				} else {
+					pc.spc._addDet(StringComparator.NOMATCHES, thisVal, sym_regex);
+				}
+			}
+
+			if (!pc.simplify()) {
+				th.getVM().getSystemState().setIgnored(true);
+			} else {
+				cg.setCurrentPC(pc);
+			}
+
+			sf.push(choice ? 1 : 0, true);
+			return invInst.getNext(th);
+		}
+	}
 	
-
 	public void handlebooleanValue(JVMInvokeInstruction invInst, SystemState ss, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
 		Expression sym_v3 = (Expression) sf.getOperandAttr(0);

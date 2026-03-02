@@ -1,0 +1,17 @@
+target=TestStringMatches
+
+classpath=${jpf-symbc}/build/examples
+
+# Enable Symbolic String Handling
+symbolic.strings = true
+symbolic.string_dp = choco
+
+# Tell JPF where your new SymbolicStringHandler is
+peer_packages = gov.nasa.jpf.symbc,gov.nasa.jpf.vm,org.sosy_lab.sv_benchmarks
+
+# Listeners to see the results in the console
+listener = gov.nasa.jpf.symbc.SymbolicListener
+symbolic.debug = true
+
+# Solver limits to keep it fast
+symbolic.string_dp_timeout_ms = 5000
