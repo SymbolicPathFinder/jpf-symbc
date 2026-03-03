@@ -75,6 +75,8 @@ import gov.nasa.jpf.symbc.numeric.RealExpression;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
+import gov.nasa.jpf.vm.Heap;
+import gov.nasa.jpf.Config;
 
 
 public class SymbolicStringHandler {
@@ -373,8 +375,13 @@ public class SymbolicStringHandler {
                 } else {
                     handleToLowerCase(invInst, th);
                     return invInst.getNext(th);
-                }
-            } else {
+					}
+			} else if (shortName.equals("split")){
+				Instruction handled = handleSplit(invInst, th);
+				if (handled != null) {
+					return handled;
+				}
+			} else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
 			}
@@ -3383,6 +3390,68 @@ public class SymbolicStringHandler {
 			th.getHeap().newString("", th); //Corina this code is so broken
 			//th.push(objRef, true);
 			//sf.setOperandAttr(sym_v1);
+		}
+	}
+
+	private Instruction handleSplit(JVMInvokeInstruction invInst, ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+		
+		// 1. Get the subject string (sentence)
+		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(1);
+		if (sym_v1 == null) return null; // Fallback to concrete split
+
+		// 2. We need a ChoiceGenerator to handle the symbolic state
+		if (!th.isFirstStepInsn()) {
+			// Create a CG with 1 choice just to anchor the PathCondition
+			PCChoiceGenerator cg = new PCChoiceGenerator(1); 
+			th.getVM().setNextChoiceGenerator(cg);
+			return invInst;
+		} else {
+			// Retrieve the CG we just created
+			PCChoiceGenerator cg = th.getVM().getSystemState().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+			
+			// Pop operands now that we are in the second step
+			int regexRef = sf.pop();
+			int thisRef = sf.pop(); 
+
+			Config conf = th.getVM().getConfig();
+    		int numTokens = conf.getInt("symbolic.string.split_limit", 3);
+
+			Heap heap = th.getHeap();
+			ElementInfo eiArray = heap.newArray("[Ljava/lang/String;", numTokens, th);
+			eiArray = eiArray.getModifiableInstance();
+
+			PathCondition pc = PathCondition.getPC(th.getVM());
+			if (pc == null) pc = new PathCondition(); // Safety check
+
+			StringExpression totalConcat = null;
+			StringConstant space = new StringConstant(" ");
+
+			for (int i = 0; i < numTokens; i++) {
+				StringExpression token = new StringSymbolic("token_" + i);
+				ElementInfo eiToken = heap.newString("token" + i, th);
+				eiToken.setObjectAttr(token);
+				eiArray.setReferenceElement(i, eiToken.getObjectRef());
+
+				if (totalConcat == null) {
+					totalConcat = token;
+				} else {
+					totalConcat = totalConcat._concat(space)._concat(token);
+				}
+			}
+
+			// Add the constraint: string0 == token0 + " " + token1 + ...
+			pc.spc._addDet(StringComparator.EQUALS, sym_v1, totalConcat);
+			
+			if (!pc.simplify()) {
+				th.getVM().getSystemState().setIgnored(true);
+			} else {
+				cg.setCurrentPC(pc); // This should no longer NPE
+			}
+
+			// Push the array reference back to the stack
+			sf.push(eiArray.getObjectRef(), true);
+			return invInst.getNext(th);
 		}
 	}
 }

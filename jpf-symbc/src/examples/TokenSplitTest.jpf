@@ -1,0 +1,22 @@
+target=TokenSplitTest
+
+classpath=${jpf-symbc}/build/examples
+
+symbolic.dp=choco
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+symbolic.bvlength=64
+search.depth_limit=13
+symbolic.strings=true
+symbolic.string_dp=choco
+symbolic.string.split_limit = 4
+symbolic.lazy=on
+symbolic.jrarrays=true
+
+peer_packages = org.sosy_lab.sv_benchmarks,gov.nasa.jpf.symbc,gov.nasa.jpf.vm
+listener = .symbc.SymbolicListener
+
+symbolic.optimizechoices=true
+symbolic.debug=true
