@@ -52,7 +52,6 @@ package gov.nasa.jpf.symbc.bytecode;
 
 
 import com.microsoft.z3.Expr;
-
 import gov.nasa.jpf.symbc.numeric.*;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
