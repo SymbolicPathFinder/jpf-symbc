@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit;
 import com.microsoft.z3.*;
 
 import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
+import gov.nasa.jpf.symbc.numeric.RealExpression;
 
 public class ProblemZ3BitVector extends ProblemGeneral {
 
@@ -696,7 +697,12 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVMul((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkMul((IntExpr) exp1, (IntExpr) exp2);
-            } else {
+            }
+            else if(exp1 instanceof RealExpr && exp2 instanceof RealExpr)
+            {
+                return ctx.mkMul((RealExpr) exp1,(RealExpr) exp2);
+            } 
+            else {
                 throw new RuntimeException();
             }
         } catch (Exception e) {
