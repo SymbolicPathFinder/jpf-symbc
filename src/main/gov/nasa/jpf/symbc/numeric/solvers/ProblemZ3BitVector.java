@@ -1545,4 +1545,246 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         // TODO Auto-generated method stub
         throw new RuntimeException("## Error Z3 \n");
     }
+
+    // ========== Nonlinear Math Functions Support ==========
+    // Implementations for sin, cos, exp, log, sqrt, pow, atan, atan2, asin, acos, tan
+
+    @Override
+    public Object constant(double d) {
+        return makeRealConst(d);
+    }
+
+    @Override
+    public Object sin(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl sinFunc = ctx.mkFuncDecl("sin", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(sinFunc, (Expr) exp);
+            } else {
+                FuncDecl sinFunc = ctx.mkFuncDecl("sin", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(sinFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: sin(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object cos(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl cosFunc = ctx.mkFuncDecl("cos", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(cosFunc, (Expr) exp);
+            } else {
+                FuncDecl cosFunc = ctx.mkFuncDecl("cos", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(cosFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: cos(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object tan(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl tanFunc = ctx.mkFuncDecl("tan", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(tanFunc, (Expr) exp);
+            } else {
+                FuncDecl tanFunc = ctx.mkFuncDecl("tan", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(tanFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: tan(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object asin(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl asinFunc = ctx.mkFuncDecl("asin", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(asinFunc, (Expr) exp);
+            } else {
+                FuncDecl asinFunc = ctx.mkFuncDecl("asin", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(asinFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: asin(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object acos(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl acosFunc = ctx.mkFuncDecl("acos", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(acosFunc, (Expr) exp);
+            } else {
+                FuncDecl acosFunc = ctx.mkFuncDecl("acos", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(acosFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: acos(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object atan(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl atanFunc = ctx.mkFuncDecl("atan", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(atanFunc, (Expr) exp);
+            } else {
+                FuncDecl atanFunc = ctx.mkFuncDecl("atan", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(atanFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: atan(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object atan2(Object lhs, Object rhs) {
+        try {
+            if (useFpForReals) {
+                FPSort fpSort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                FuncDecl atan2Func = ctx.mkFuncDecl("atan2", new Sort[] { fpSort, fpSort }, fpSort);
+                return ctx.mkApp(atan2Func, (Expr) lhs, (Expr) rhs);
+            } else {
+                FuncDecl atan2Func = ctx.mkFuncDecl("atan2", 
+                    new Sort[] { ctx.mkRealSort(), ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(atan2Func, (Expr) lhs, (Expr) rhs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: atan2(Object, Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object atan2(Object lhs, double rhs) {
+        return atan2(lhs, makeRealConst(rhs));
+    }
+
+    @Override
+    public Object atan2(double lhs, Object rhs) {
+        return atan2(makeRealConst(lhs), rhs);
+    }
+
+    @Override
+    public Object exp(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl expFunc = ctx.mkFuncDecl("exp", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(expFunc, (Expr) exp);
+            } else {
+                FuncDecl expFunc = ctx.mkFuncDecl("exp", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(expFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: exp(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object log(Object exp) {
+        try {
+            if (useFpForReals) {
+                FuncDecl logFunc = ctx.mkFuncDecl("log", 
+                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
+                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
+                return ctx.mkApp(logFunc, (Expr) exp);
+            } else {
+                FuncDecl logFunc = ctx.mkFuncDecl("log", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(logFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: log(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object sqrt(Object exp) {
+        try {
+            if (useFpForReals) {
+                return ctx.mkFPSqrt(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp);
+            } else {
+                FuncDecl sqrtFunc = ctx.mkFuncDecl("sqrt", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(sqrtFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: sqrt(Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object power(Object lhs, Object rhs) {
+        try {
+            if (useFpForReals) {
+                FPSort fpSort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                FuncDecl powFunc = ctx.mkFuncDecl("pow", new Sort[] { fpSort, fpSort }, fpSort);
+                return ctx.mkApp(powFunc, (Expr) lhs, (Expr) rhs);
+            } else {
+                if (rhs instanceof RatNum || rhs instanceof IntNum) {
+                    return ctx.mkPower((ArithExpr) lhs, (ArithExpr) rhs);
+                } else {
+                    FuncDecl powFunc = ctx.mkFuncDecl("pow", 
+                        new Sort[] { ctx.mkRealSort(), ctx.mkRealSort() }, ctx.mkRealSort());
+                    return ctx.mkApp(powFunc, (Expr) lhs, (Expr) rhs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: power(Object, Object) failed.\n" + e);
+        }
+    }
+
+    @Override
+    public Object power(Object lhs, double rhs) {
+        return power(lhs, makeRealConst(rhs));
+    }
+
+    @Override
+    public Object power(double lhs, Object rhs) {
+        return power(makeRealConst(lhs), rhs);
+    }
+
+    @Override
+    public Object round(Object exp) {
+        try {
+            if (useFpForReals) {
+                return ctx.mkFPRoundToIntegral(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp);
+            } else {
+                FuncDecl roundFunc = ctx.mkFuncDecl("round", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                return ctx.mkApp(roundFunc, (Expr) exp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: round(Object) failed.\n" + e);
+        }
+    }
 }
