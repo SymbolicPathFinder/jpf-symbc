@@ -664,7 +664,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVMul(ctx.mkBV(value, this.bitVectorLength), (BitVecExpr) exp);
             } else if (exp instanceof IntExpr) {
                 return ctx.mkMul(ctx.mkInt(value), (IntExpr) exp);
-            } else {
+            } 
+            else {
                 throw new RuntimeException();
             }
         } catch (Exception e) {
@@ -752,7 +753,10 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSDiv((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkDiv((IntExpr) exp1, (IntExpr) exp2);
-            } else {
+            } else if (exp1 instanceof RealExpr && exp2 instanceof RealExpr) {
+                return ctx.mkDiv((RealExpr) exp1, (RealExpr) exp2);
+            } 
+            else {
                 throw new RuntimeException();
             }
         } catch (Exception e) {
