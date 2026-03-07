@@ -1,0 +1,22 @@
+target=gov.nasa.jpf.symbc.TestRealMultiplication
+classpath=${jpf-symbc}/build/tests
+
+listener=.symbc.SymbolicListener
+
+symbolic.method=gov.nasa.jpf.symbc.TestRealMultiplication.test(sym#sym)
+
+symbolic.dp=z3bitvector
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+symbolic.bvlength=64
+search.depth_limit=13
+symbolic.strings=true
+symbolic.string_dp=z3str3
+symbolic.lazy=on
+symbolic.jrarrays=true
+listener = .symbc.SymbolicListener
+
+symbolic.optimizechoices=true
+symbolic.debug=true
