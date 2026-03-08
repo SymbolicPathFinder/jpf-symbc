@@ -1,0 +1,10 @@
+target=CharacterPeerTest
+classpath=${jpf-symbc}/build/examples
+
+listener=gov.nasa.jpf.symbc.SymbolicListener
+
+symbolic.dp=z3bitvector
+symbolic.bvlength=32
+
+search.depth_limit=10
+search.max_states=20
