@@ -24,34 +24,6 @@
             env.setObjectAttr(objRef, attr);
         }
     }
-        /**
-         * capacity()
-         * Java rule: capacity = length + 16
-         */
-    // @MJI
-    // public int capacity____I(MJIEnv env, int objRef) {
-
-    //     Object attr = env.getObjectAttr(objRef);
-
-    //     if (attr instanceof gov.nasa.jpf.symbc.string.StringSymbolic) {
-
-    //         gov.nasa.jpf.symbc.string.StringSymbolic sym =
-    //             (gov.nasa.jpf.symbc.string.StringSymbolic) attr;
-
-    //         gov.nasa.jpf.symbc.numeric.IntegerExpression cap =
-    //             sym._length._plus(16);
-
-    //         env.setReturnAttribute(cap);
-
-    //         return 0; // concrete placeholder
-    //     }
-
-    //     return 16;
-    // }
-
-        /**
-         * length()
-         */
         @MJI
         public int length____I(MJIEnv env, int objRef) {
 
