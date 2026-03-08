@@ -1,0 +1,10 @@
+target = FloatParserFloatPeerTest
+
+classpath = ${jpf-symbc}/build/examples
+sourcepath = ${jpf-symbc}/src/examples
+
+symbolic.method = FloatParseFloatPeerTest.main(sym)
+
+symbolic.dp = z3bitvector
+symbolic.string_dp = z3str3
+symbolic.string_dp_timeout_ms = 0
