@@ -5,6 +5,7 @@ import gov.nasa.jpf.symbc.string.StringSymbolic;
 import gov.nasa.jpf.vm.MJIEnv;
 import gov.nasa.jpf.vm.NativePeer;
 
+// Peer for SV-Benchmarks Verifier.nondetString() to create symbolic strings
 public class JPF_org_sosy_lab_sv_benchmarks_Verifier extends NativePeer {
 
     @MJI

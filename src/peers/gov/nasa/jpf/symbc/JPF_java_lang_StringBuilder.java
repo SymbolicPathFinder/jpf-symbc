@@ -4,7 +4,7 @@
     import gov.nasa.jpf.vm.MJIEnv;
     import gov.nasa.jpf.vm.NativePeer;
     import gov.nasa.jpf.vm.ElementInfo;
-
+// Peer implementations for basic StringBuilder operations used in symbolic execution
     public class JPF_java_lang_StringBuilder extends NativePeer {
 
         /**
