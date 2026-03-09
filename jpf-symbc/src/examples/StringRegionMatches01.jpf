@@ -1,0 +1,19 @@
+target=StringRegionMatches01
+
+classpath=${jpf-symbc}/build/examples
+
+symbolic.dp=z3bitvector
+symbolic.strings=true
+symbolic.string_dp=z3str3
+symbolic.bvlength=64
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+
+listener = .symbc.SymbolicListener
+
+symbolic.debug=true
+symbolic.lazy=on
+symbolic.jrarrays=true
+symbolic.optimizechoices=true
