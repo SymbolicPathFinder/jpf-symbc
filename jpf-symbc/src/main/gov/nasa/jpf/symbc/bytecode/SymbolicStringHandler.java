@@ -374,6 +374,16 @@ public class SymbolicStringHandler {
                     handleToLowerCase(invInst, th);
                     return invInst.getNext(th);
                 }
+			} else if (shortName.equals("regionMatches")) {
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) { // first time around
+					cg = new PCChoiceGenerator(2);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleRegionMatches(invInst, th);
+					return invInst.getNext(th);
+				}
             } else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
@@ -1825,6 +1835,84 @@ public class SymbolicStringHandler {
 			}
 
 			sf.push(conditionValue ? 1 : 0, true);
+		}
+
+	}
+
+	public void handleRegionMatches(JVMInvokeInstruction invInst, ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+
+		ChoiceGenerator<?> cg = th.getVM().getChoiceGenerator();
+		if (!(cg instanceof PCChoiceGenerator)) {
+			throw new RuntimeException("Expected PCChoiceGenerator, got: " + cg);
+		}
+		
+		boolean conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+
+		IntegerExpression sym_len      = (IntegerExpression) sf.getOperandAttr(0);
+		IntegerExpression sym_ooffset  = (IntegerExpression) sf.getOperandAttr(1);
+		StringExpression  sym_other    = (StringExpression)  sf.getOperandAttr(2);
+		IntegerExpression sym_toffset  = (IntegerExpression) sf.getOperandAttr(3);
+		StringExpression  sym_receiver = (StringExpression)  sf.getOperandAttr(4);
+
+		int v_len      = sf.pop();
+		int v_ooffset  = sf.pop();
+		int v_otherRef = sf.pop();
+		int v_toffset  = sf.pop();
+		int v_thisRef  = sf.pop();
+
+		PathCondition pc;
+		ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+		while (prev_cg != null && !(prev_cg instanceof PCChoiceGenerator)) {
+			prev_cg = prev_cg.getPreviousChoiceGenerator();
+		}
+		pc = (prev_cg == null) ? new PathCondition() : ((PCChoiceGenerator) prev_cg).getCurrentPC();
+
+		try {
+			if (v_len < 0 || v_toffset < 0 || v_ooffset < 0) {
+				if (conditionValue) {
+					th.getVM().getSystemState().setIgnored(true);
+					return;
+				}
+				sf.push(0, true);
+				return;
+			}
+
+			int toEnd = v_toffset + v_len;
+			int oEnd = v_ooffset + v_len;
+
+			StringExpression leftSub;
+			if (sym_receiver != null) {
+				leftSub = sym_receiver._subString(toEnd, v_toffset);
+			} else {
+				String valR = th.getElementInfo(v_thisRef).asString();
+				leftSub = new StringConstant(valR)._subString(toEnd, v_toffset);
+			}
+
+			StringExpression rightSub;
+			if (sym_other != null) {
+				rightSub = sym_other._subString(oEnd, v_ooffset);
+			} else {
+				String valO = th.getElementInfo(v_otherRef).asString();
+				rightSub = new StringConstant(valO)._subString(oEnd, v_ooffset);
+			}
+
+			if (conditionValue) {
+				pc.spc._addDet(StringComparator.EQUALS, leftSub, rightSub);
+			} else {
+				pc.spc._addDet(StringComparator.NOTEQUALS, leftSub, rightSub);
+			}
+
+			if (!pc.simplify()) {
+				th.getVM().getSystemState().setIgnored(true);
+			} else {
+				((PCChoiceGenerator) cg).setCurrentPC(pc);
+			}
+
+			sf.push(conditionValue ? 1 : 0, true);
+
+		} catch (Exception e) {
+			throw new RuntimeException("ERROR: regionMatches handling failed: " + e.getMessage(), e);
 		}
 	}
 
