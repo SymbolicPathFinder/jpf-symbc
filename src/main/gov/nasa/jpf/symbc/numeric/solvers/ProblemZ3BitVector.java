@@ -93,6 +93,20 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     private long minAllowed;
     private long maxAllowed;
 
+    // Cached function declarations for nonlinear math functions (to avoid name collisions and improve performance)
+    private FuncDecl sinFunc;
+    private FuncDecl cosFunc;
+    private FuncDecl tanFunc;
+    private FuncDecl asinFunc;
+    private FuncDecl acosFunc;
+    private FuncDecl atanFunc;
+    private FuncDecl atan2Func;
+    private FuncDecl expFunc;
+    private FuncDecl logFunc;
+    private FuncDecl sqrtFunc;
+    private FuncDecl powFunc;
+    private FuncDecl roundFunc;
+
     public ProblemZ3BitVector() {
         Z3Wrapper z3 = Z3Wrapper.getInstance();
         solver = z3.getSolver();
@@ -109,6 +123,52 @@ public class ProblemZ3BitVector extends ProblemGeneral {
             System.out.println("Z3bitvector using " + bitVectorLength + "-bit bitvectors.");
             System.out.println("Allowed [min,max] values: [" + minAllowed + "," + maxAllowed + "].");
             System.out.println("Using floating point for reals: " + (useFpForReals ? "yes" : "no"));
+        }
+        
+        // Initialize cached function declarations with namespaced names to avoid collisions
+        initializeNonlinearFunctions();
+    }
+
+    /**
+     * Initialize cached function declarations for nonlinear math functions.
+     * Uses namespaced names (e.g., "_jpf_symbc_sin_fp32") to avoid collisions with user variables.
+     */
+    private void initializeNonlinearFunctions() {
+        try {
+            String suffix = useFpForReals ? ("_fp" + bitVectorLength) : "_real";
+            
+            if (useFpForReals) {
+                Sort fpSort = bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
+                sinFunc = ctx.mkFuncDecl("_jpf_symbc_sin" + suffix, new Sort[] { fpSort }, fpSort);
+                cosFunc = ctx.mkFuncDecl("_jpf_symbc_cos" + suffix, new Sort[] { fpSort }, fpSort);
+                tanFunc = ctx.mkFuncDecl("_jpf_symbc_tan" + suffix, new Sort[] { fpSort }, fpSort);
+                asinFunc = ctx.mkFuncDecl("_jpf_symbc_asin" + suffix, new Sort[] { fpSort }, fpSort);
+                acosFunc = ctx.mkFuncDecl("_jpf_symbc_acos" + suffix, new Sort[] { fpSort }, fpSort);
+                atanFunc = ctx.mkFuncDecl("_jpf_symbc_atan" + suffix, new Sort[] { fpSort }, fpSort);
+                atan2Func = ctx.mkFuncDecl("_jpf_symbc_atan2" + suffix, new Sort[] { fpSort, fpSort }, fpSort);
+                expFunc = ctx.mkFuncDecl("_jpf_symbc_exp" + suffix, new Sort[] { fpSort }, fpSort);
+                logFunc = ctx.mkFuncDecl("_jpf_symbc_log" + suffix, new Sort[] { fpSort }, fpSort);
+                powFunc = ctx.mkFuncDecl("_jpf_symbc_pow" + suffix, new Sort[] { fpSort, fpSort }, fpSort);
+                roundFunc = null; // FP uses native mkFPRoundToIntegral, not uninterpreted function
+                sqrtFunc = null;  // FP uses native mkFPSqrt, not uninterpreted function
+            } else {
+                Sort realSort = ctx.mkRealSort();
+                sinFunc = ctx.mkFuncDecl("_jpf_symbc_sin" + suffix, new Sort[] { realSort }, realSort);
+                cosFunc = ctx.mkFuncDecl("_jpf_symbc_cos" + suffix, new Sort[] { realSort }, realSort);
+                tanFunc = ctx.mkFuncDecl("_jpf_symbc_tan" + suffix, new Sort[] { realSort }, realSort);
+                asinFunc = ctx.mkFuncDecl("_jpf_symbc_asin" + suffix, new Sort[] { realSort }, realSort);
+                acosFunc = ctx.mkFuncDecl("_jpf_symbc_acos" + suffix, new Sort[] { realSort }, realSort);
+                atanFunc = ctx.mkFuncDecl("_jpf_symbc_atan" + suffix, new Sort[] { realSort }, realSort);
+                atan2Func = ctx.mkFuncDecl("_jpf_symbc_atan2" + suffix, new Sort[] { realSort, realSort }, realSort);
+                expFunc = ctx.mkFuncDecl("_jpf_symbc_exp" + suffix, new Sort[] { realSort }, realSort);
+                logFunc = ctx.mkFuncDecl("_jpf_symbc_log" + suffix, new Sort[] { realSort }, realSort);
+                sqrtFunc = ctx.mkFuncDecl("_jpf_symbc_sqrt" + suffix, new Sort[] { realSort }, realSort);
+                powFunc = ctx.mkFuncDecl("_jpf_symbc_pow" + suffix, new Sort[] { realSort, realSort }, realSort);
+                roundFunc = ctx.mkFuncDecl("_jpf_symbc_round" + suffix, new Sort[] { realSort }, realSort);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("## Error Z3: Failed to initialize nonlinear function declarations.\n" + e);
         }
     }
 
@@ -1557,15 +1617,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object sin(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl sinFunc = ctx.mkFuncDecl("sin", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(sinFunc, (Expr) exp);
-            } else {
-                FuncDecl sinFunc = ctx.mkFuncDecl("sin", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(sinFunc, (Expr) exp);
-            }
+            return ctx.mkApp(sinFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: sin(Object) failed.\n" + e);
@@ -1575,15 +1627,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object cos(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl cosFunc = ctx.mkFuncDecl("cos", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(cosFunc, (Expr) exp);
-            } else {
-                FuncDecl cosFunc = ctx.mkFuncDecl("cos", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(cosFunc, (Expr) exp);
-            }
+            return ctx.mkApp(cosFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: cos(Object) failed.\n" + e);
@@ -1593,15 +1637,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object tan(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl tanFunc = ctx.mkFuncDecl("tan", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(tanFunc, (Expr) exp);
-            } else {
-                FuncDecl tanFunc = ctx.mkFuncDecl("tan", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(tanFunc, (Expr) exp);
-            }
+            return ctx.mkApp(tanFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: tan(Object) failed.\n" + e);
@@ -1611,15 +1647,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object asin(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl asinFunc = ctx.mkFuncDecl("asin", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(asinFunc, (Expr) exp);
-            } else {
-                FuncDecl asinFunc = ctx.mkFuncDecl("asin", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(asinFunc, (Expr) exp);
-            }
+            return ctx.mkApp(asinFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: asin(Object) failed.\n" + e);
@@ -1629,15 +1657,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object acos(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl acosFunc = ctx.mkFuncDecl("acos", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(acosFunc, (Expr) exp);
-            } else {
-                FuncDecl acosFunc = ctx.mkFuncDecl("acos", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(acosFunc, (Expr) exp);
-            }
+            return ctx.mkApp(acosFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: acos(Object) failed.\n" + e);
@@ -1647,15 +1667,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object atan(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl atanFunc = ctx.mkFuncDecl("atan", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(atanFunc, (Expr) exp);
-            } else {
-                FuncDecl atanFunc = ctx.mkFuncDecl("atan", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(atanFunc, (Expr) exp);
-            }
+            return ctx.mkApp(atanFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: atan(Object) failed.\n" + e);
@@ -1665,15 +1677,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object atan2(Object lhs, Object rhs) {
         try {
-            if (useFpForReals) {
-                FPSort fpSort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
-                FuncDecl atan2Func = ctx.mkFuncDecl("atan2", new Sort[] { fpSort, fpSort }, fpSort);
-                return ctx.mkApp(atan2Func, (Expr) lhs, (Expr) rhs);
-            } else {
-                FuncDecl atan2Func = ctx.mkFuncDecl("atan2", 
-                    new Sort[] { ctx.mkRealSort(), ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(atan2Func, (Expr) lhs, (Expr) rhs);
-            }
+            return ctx.mkApp(atan2Func, (Expr) lhs, (Expr) rhs);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: atan2(Object, Object) failed.\n" + e);
@@ -1693,15 +1697,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object exp(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl expFunc = ctx.mkFuncDecl("exp", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(expFunc, (Expr) exp);
-            } else {
-                FuncDecl expFunc = ctx.mkFuncDecl("exp", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(expFunc, (Expr) exp);
-            }
+            return ctx.mkApp(expFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: exp(Object) failed.\n" + e);
@@ -1711,15 +1707,7 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object log(Object exp) {
         try {
-            if (useFpForReals) {
-                FuncDecl logFunc = ctx.mkFuncDecl("log", 
-                    new Sort[] { this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64() },
-                    this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64());
-                return ctx.mkApp(logFunc, (Expr) exp);
-            } else {
-                FuncDecl logFunc = ctx.mkFuncDecl("log", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
-                return ctx.mkApp(logFunc, (Expr) exp);
-            }
+            return ctx.mkApp(logFunc, (Expr) exp);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: log(Object) failed.\n" + e);
@@ -1730,9 +1718,10 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     public Object sqrt(Object exp) {
         try {
             if (useFpForReals) {
+                // FP mode uses native Z3 sqrt
                 return ctx.mkFPSqrt(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp);
             } else {
-                FuncDecl sqrtFunc = ctx.mkFuncDecl("sqrt", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                // Real mode uses uninterpreted function
                 return ctx.mkApp(sqrtFunc, (Expr) exp);
             }
         } catch (Exception e) {
@@ -1745,15 +1734,13 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     public Object power(Object lhs, Object rhs) {
         try {
             if (useFpForReals) {
-                FPSort fpSort = this.bitVectorLength == 32 ? ctx.mkFPSort32() : ctx.mkFPSort64();
-                FuncDecl powFunc = ctx.mkFuncDecl("pow", new Sort[] { fpSort, fpSort }, fpSort);
                 return ctx.mkApp(powFunc, (Expr) lhs, (Expr) rhs);
             } else {
                 if (rhs instanceof RatNum || rhs instanceof IntNum) {
+                    // Use native Z3 power for integer/rational exponents
                     return ctx.mkPower((ArithExpr) lhs, (ArithExpr) rhs);
                 } else {
-                    FuncDecl powFunc = ctx.mkFuncDecl("pow", 
-                        new Sort[] { ctx.mkRealSort(), ctx.mkRealSort() }, ctx.mkRealSort());
+                    // Use uninterpreted function for symbolic exponents
                     return ctx.mkApp(powFunc, (Expr) lhs, (Expr) rhs);
                 }
             }
@@ -1777,9 +1764,10 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     public Object round(Object exp) {
         try {
             if (useFpForReals) {
+                // FP mode uses native Z3 rounding
                 return ctx.mkFPRoundToIntegral(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp);
             } else {
-                FuncDecl roundFunc = ctx.mkFuncDecl("round", new Sort[] { ctx.mkRealSort() }, ctx.mkRealSort());
+                // Real mode uses uninterpreted function
                 return ctx.mkApp(roundFunc, (Expr) exp);
             }
         } catch (Exception e) {

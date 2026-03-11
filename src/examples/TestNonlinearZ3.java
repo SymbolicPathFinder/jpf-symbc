@@ -23,12 +23,15 @@ public class TestNonlinearZ3 {
             System.out.println("Path 3: exp(x) > 2.0");
         }
         
-        if (Math.log(y) < 1.0) {
+        // Note: log requires y > 0 to avoid NaN
+        // Without explicit domain constraints, uninterpreted functions may find infeasible paths
+        if (y > 0.0 && Math.log(y) < 1.0) {
             System.out.println("Path 4: log(y) < 1.0");
         }
         
-        // Test square root
-        if (Math.sqrt(x) > 1.5) {
+        // Note: sqrt requires x >= 0 to avoid NaN
+        // Without explicit domain constraints, uninterpreted functions may find infeasible paths
+        if (x >= 0.0 && Math.sqrt(x) > 1.5) {
             System.out.println("Path 5: sqrt(x) > 1.5");
         }
         
