@@ -354,6 +354,16 @@ public class SymbolicStringHandler {
                     handleIsLetter(invInst, th);
                     return invInst.getNext(th);
                 }
+			} else if (shortName.equals("isDefined")) {
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) {
+					cg = new PCChoiceGenerator(2);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleIsDefined(invInst, th);
+					return invInst.getNext(th);
+				}
             } else if(shortName.equals("toUpperCase")){
                 ChoiceGenerator<?> cg;
                 if (!th.isFirstStepInsn()) { // first time around
@@ -713,6 +723,47 @@ public class SymbolicStringHandler {
       }
     }
 	}
+
+	private Instruction handleIsDefined(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
+    IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
+
+    if (sym_v1 == null) return null; // Fallback to concrete
+
+    if (!th.isFirstStepInsn()) {
+        // STEP 1: Create the CG
+        PCChoiceGenerator cg = new PCChoiceGenerator(2);
+        th.getVM().getSystemState().setNextChoiceGenerator(cg);
+        return invInst;
+    } else {
+        // STEP 2: Execute the choices
+        PCChoiceGenerator cg = th.getVM().getSystemState().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+        int choice = cg.getNextChoice();
+        
+        PathCondition pc = PathCondition.getPC(th.getVM());
+        if (pc == null) pc = new PathCondition();
+
+        sf.pop(); // Pop the symbolic char operand
+
+        // Use a unique name for the result
+        SymbolicInteger res = new SymbolicInteger("isDefined_res_" + sym_v1.hashCode());
+		
+        if (choice == 0) { // Defined path
+            pc._addDet(Comparator.EQ, res, new IntegerConstant(1));
+            sf.push(1, true); 
+        } else { // Undefined path
+            pc._addDet(Comparator.EQ, res, new IntegerConstant(0));
+            sf.push(0, true);
+        }
+
+        if (!pc.simplify()) {
+            th.getVM().getSystemState().setIgnored(true);
+        } else {
+            cg.setCurrentPC(pc);
+        }
+        return invInst.getNext(th);
+    }
+}
 
 	private boolean handleCharAt (JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();

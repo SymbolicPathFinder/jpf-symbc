@@ -1,10 +1,21 @@
 target=CharIsDefinedTest
+
 classpath=${jpf-symbc}/build/examples
 
-listener = gov.nasa.jpf.symbc.SymbolicListener
-symbolic.dp=choco
-symbolic.strings=false
-symbolic.debug=true
+vm.peer_packages = gov.nasa.jpf.symbc
 
-# prefer symbc peers over core peers
-peer_packages = gov.nasa.jpf.symbc,gov.nasa.jpf.vm
+symbolic.dp=z3bitvector
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+symbolic.bvlength=64
+search.depth_limit=13
+symbolic.strings=true
+symbolic.string_dp=z3str3
+symbolic.lazy=on
+symbolic.jrarrays=true
+listener = .symbc.SymbolicListener
+
+symbolic.optimizechoices=true
+symbolic.debug=true
