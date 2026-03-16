@@ -66,13 +66,6 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
-import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.symbc.numeric.Expression;
-import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.RealExpression;
-import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
 
@@ -374,7 +367,18 @@ public class SymbolicStringHandler {
                     handleToLowerCase(invInst, th);
                     return invInst.getNext(th);
                 }
-            } else {
+            } else if (shortName.equals("compareTo")) { //compareTo added 
+					ChoiceGenerator<?> cg;
+					if (!th.isFirstStepInsn()) {
+						cg = new PCChoiceGenerator(3); //3 choices begin given <0 , =0, >0
+						th.getVM().setNextChoiceGenerator(cg);
+						return invInst;
+					} else {
+						handleCompareTo(invInst, th);
+						return invInst.getNext(th);
+					}
+				}
+				else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
 			}
@@ -385,7 +389,43 @@ public class SymbolicStringHandler {
 
 	}
 
+	private void handleCompareTo(JVMInvokeInstruction invInst, ThreadInfo th) {
 
+		StackFrame sf = th.getModifiableTopFrame();
+		Expression sym_v1 = (Expression) sf.getOperandAttr(1);
+		Expression sym_v2 = (Expression) sf.getOperandAttr(0);
+
+		// retrieving choice generated in 1st step
+		PCChoiceGenerator cg =
+			th.getVM().getSystemState().getLastChoiceGeneratorOfType(PCChoiceGenerator.class);
+		int choice = cg.getNextChoice();
+		PathCondition pc = PathCondition.getPC(th.getVM());
+		if (pc == null) pc = new PathCondition();
+
+		sf.pop(); // arg
+		sf.pop(); // receiver
+
+		// symbolic integer representing result of compareTo
+		SymbolicInteger res = new SymbolicInteger("compareTo_res");
+
+		// Possible paths exploration
+		if (choice == 0) {
+			pc._addDet(Comparator.LT, res, new IntegerConstant(0)); // result < 0
+			sf.push(-1, true);
+		} else if (choice == 1) {
+			pc._addDet(Comparator.EQ, res, new IntegerConstant(0)); // result == 0
+			sf.push(0, true);
+		} else {
+			pc._addDet(Comparator.GT, res, new IntegerConstant(0)); // result > 0
+			sf.push(1, true);
+		}
+
+		if (!pc.simplify()) {
+			th.getVM().getSystemState().setIgnored(true);
+		} else {
+			cg.setCurrentPC(pc);
+		}
+	}
   public void handleToUpperCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
 
     StackFrame sf = th.getModifiableTopFrame();
