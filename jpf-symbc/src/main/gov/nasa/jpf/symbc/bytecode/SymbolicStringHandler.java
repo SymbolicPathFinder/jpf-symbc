@@ -218,6 +218,8 @@ public class SymbolicStringHandler {
 				}
 			} else if (shortName.equals("length")) {
 				handleLength(invInst, th);
+			} else if (shortName.equals("capacity")) {
+				handleCapacity(invInst, th);
 			} else if (shortName.equals("indexOf")) {
 				handleIndexOf(invInst, th);
 			} else if (shortName.equals("lastIndexOf")) {
@@ -385,6 +387,29 @@ public class SymbolicStringHandler {
 
 	}
 
+	public void handleCapacity(JVMInvokeInstruction invInst, ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+		Object sym_v1 = sf.getOperandAttr(0);
+		if (sym_v1 == null) {
+			return;
+		}
+
+		IntegerExpression lengthExpr = null;
+		if (sym_v1 instanceof SymbolicStringBuilder) {
+			lengthExpr = ((SymbolicStringBuilder) sym_v1)._length();
+			IntegerExpression capExpr = new gov.nasa.jpf.symbc.numeric.BinaryLinearIntegerExpression(lengthExpr, gov.nasa.jpf.symbc.numeric.Operator.PLUS, new IntegerConstant(16));
+			sf.pop();
+			sf.push(0, false);
+			sf.setOperandAttr(capExpr);
+		} else if (sym_v1 instanceof StringSymbolic) {
+			lengthExpr = ((StringExpression) sym_v1)._length();
+			sf.pop();
+			sf.push(0, false);
+			sf.setOperandAttr(lengthExpr);
+		} else {
+			return;
+		}
+	}
 
   public void handleToUpperCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
 
