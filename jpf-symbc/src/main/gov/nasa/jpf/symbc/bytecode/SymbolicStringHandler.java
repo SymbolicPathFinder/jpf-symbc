@@ -367,7 +367,17 @@ public class SymbolicStringHandler {
                     handleToLowerCase(invInst, th);
                     return invInst.getNext(th);
                 }
-            } else {
+            } else if(shortName.equals("setCharAt")) { //***
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) {
+					cg = new PCChoiceGenerator(1);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleSetCharAt(invInst, th); //***
+					return invInst.getNext(th);
+					}
+			} else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
 			}
@@ -378,6 +388,65 @@ public class SymbolicStringHandler {
 
 	}
 
+
+	private void handleSetCharAt(JVMInvokeInstruction invInst, ThreadInfo th) {
+	StackFrame sf = th.getModifiableTopFrame();
+	Object attr = sf.getOperandAttr(2);
+	int ch = sf.pop();     // pop char value to set
+	int idx = sf.pop();    // pop index position
+	int objRef = sf.pop(); // pop StringBuilder reference
+
+	SymbolicStringBuilder sym_v2 = (SymbolicStringBuilder) attr; // cast to symbolic builder
+	if (sym_v2 == null)
+		sym_v2 = new SymbolicStringBuilder(); // initialize if builder not symbolic yet
+	if (sym_v2.getstr() == null) { // convert concrete builder content to symbolic
+		ElementInfo ei = th.getElementInfo(objRef);
+		String val = getStringEquiv(ei);
+		sym_v2.putstr(new StringConstant(val));
+	}
+
+	StringExpression base = sym_v2.getstr();
+	ChoiceGenerator<?> cg = th.getVM().getSystemState().getChoiceGenerator(); // get current choice generator
+	if (cg instanceof PCChoiceGenerator) {
+		PCChoiceGenerator pcg = (PCChoiceGenerator) cg;
+		PathCondition pc = pcg.getCurrentPC();
+
+		if (pc == null) pc = new PathCondition();
+		IntegerExpression len = base._length();
+		IntegerExpression idxExpr = new IntegerConstant(idx);
+		pc._addDet(Comparator.GE, idxExpr, new IntegerConstant(0)); // enforce idx >= 0
+		pc._addDet(Comparator.LT, idxExpr, len); // enforce idx < length
+
+		if (!pc.simplify()) {
+			th.getVM().getSystemState().setIgnored(true);
+			return;
+		} else {
+			pcg.setCurrentPC(pc);
+		}
+	}
+	StringExpression prefix = createSymbolicSubstring(
+			base,
+			new IntegerConstant(0),
+			new IntegerConstant(idx),
+			objRef,
+			objRef
+	); // substring from start to idx (exclusive)
+
+	StringExpression charStr =
+			new StringConstant(Character.toString((char) ch)); // convert char to string
+
+	StringExpression suffix = createSymbolicSubstring(
+			base,
+			new IntegerConstant(idx + 1),
+			null,
+			objRef,
+			objRef
+	);
+
+	StringExpression result =
+			prefix._concat(charStr)._concat(suffix);
+	sym_v2.putstr(result); // update builder with new symbolic string
+	}
 
   public void handleToUpperCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
 
