@@ -66,13 +66,6 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
-import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.symbc.numeric.Expression;
-import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.RealExpression;
-import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
 
@@ -717,7 +710,7 @@ public class SymbolicStringHandler {
 	private boolean handleCharAt (JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
 		IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
-		StringExpression sym_v2 = (StringExpression) sf.getOperandAttr(1);
+		Object sym_v2 = sf.getOperandAttr( 1 ); // string (can be multiple types)
 		boolean bresult = false;
 		if ((sym_v1 == null) & (sym_v2 == null)) {
 			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleCharAt");
@@ -726,23 +719,31 @@ public class SymbolicStringHandler {
 			int s2 = sf.pop();
 
 			IntegerExpression result = null;
-			if (sym_v1 == null) { // operand 0 is concrete
+			// handle concrete string → wrap as symbolic
+			if (sym_v2 == null) {
+				ElementInfo e1 = th.getElementInfo(s2);
+				String val2 = e1.asString();
+				sym_v2 = new StringConstant(val2);
+			}
 
-				int val = s1;
-				result = sym_v2._charAt(new IntegerConstant(val));
+			// normalize to StringExpression
+			StringExpression strExpr = null;
+			if (sym_v2 instanceof StringExpression) {
+				strExpr = (StringExpression) sym_v2;
+			} else if (sym_v2 instanceof SymbolicStringBuilder) {
+				strExpr = ((SymbolicStringBuilder) sym_v2).getstr();
+			}
+			if (strExpr == null) {
+				throw new RuntimeException("Unsupported symbolic string type in handleCharAt: " + sym_v2);
+			}
+
+			// handle index
+			if (sym_v1 == null) {
+				int val = s1; // concrete index
+				result = strExpr._charAt(new IntegerConstant(val));
 			} else {
-
-				if (sym_v2 == null) {
-					ElementInfo e1 = th.getElementInfo(s2);
-					String val2 = e1.asString();
-					sym_v2 = new StringConstant(val2);
-					result = sym_v2._charAt(sym_v1);
-				} else {
-					result = sym_v2._charAt(sym_v1);
-				}
+				result = strExpr._charAt(sym_v1); // symbolic index
 				bresult = true;
-				//System.out.println("[handleCharAt] Ignoring: " + result.toString());
-				//th.push(0, false);
 			}
 			sf.push(0, false);
 			sf.setOperandAttr(result);
