@@ -367,7 +367,27 @@ public class SymbolicStringHandler {
                     handleToLowerCase(invInst, th);
                     return invInst.getNext(th);
                 }
-            } else {
+            } else if (shortName.equals("forDigit")) { // handles Character.forDigit symbolic execution
+				ChoiceGenerator<?>cg;
+				if (!th.isFirstStepInsn()) {
+					cg =new PCChoiceGenerator(1);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleForDigit(invInst, th );//symbolic handling logic
+					return invInst.getNext(th );
+				}
+			} else if (shortName.equals("digit")) { //handles Character.digit symbolic execution
+					ChoiceGenerator<?> cg;
+					if (!th.isFirstStepInsn()) {
+						cg = new PCChoiceGenerator(1);
+						th.getVM().setNextChoiceGenerator(cg);
+						return invInst;
+					} else {
+						handleDigit(invInst , th); //digit handling logic
+						return invInst.getNext(th);
+					}
+				} else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
 			}
@@ -378,6 +398,81 @@ public class SymbolicStringHandler {
 
 	}
 
+	private void handleForDigit(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
+    IntegerExpression sym_radix =(IntegerExpression) sf.getOperandAttr(0);
+    IntegerExpression sym_digit= (IntegerExpression) sf.getOperandAttr(1);
+    sf.pop(2);
+
+    ChoiceGenerator<?> cg=th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator);
+
+    PathCondition pc;
+    ChoiceGenerator<?> prev= cg.getPreviousChoiceGenerator();
+    while (prev != null && !(prev instanceof PCChoiceGenerator)) {
+        prev = prev.getPreviousChoiceGenerator();
+    }
+
+    pc = (prev == null) ?new PathCondition() : ((PCChoiceGenerator) prev).getCurrentPC();
+    assert pc != null;// sanity check
+
+    // Constraints: valid digit + radix
+    pc._addDet(Comparator.GE,sym_digit, new IntegerConstant(0)); // digit >= 0
+    pc._addDet(Comparator.GE,sym_radix, new IntegerConstant(2));// radix >= 2
+    pc._addDet(Comparator.LE, sym_radix,new IntegerConstant(36)); //radix<=36 
+    pc._addDet(Comparator.LT, sym_digit,sym_radix);
+
+    if (!pc.simplify()) {
+        th.getVM().getSystemState().setIgnored(true);
+        return;
+    }
+
+    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+
+    // symbolic result
+    IntegerExpression result=new SymbolicInteger("forDigit_res");
+
+    sf.push(0, false);
+    sf.setOperandAttr(result);
+}
+
+private void handleDigit(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
+
+    IntegerExpression sym_radix= (IntegerExpression) sf.getOperandAttr(0);// symbolic radix
+    IntegerExpression sym_char =(IntegerExpression) sf.getOperandAttr(1);
+
+    sf.pop(2);
+
+    ChoiceGenerator<?> cg =th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator);
+
+    PathCondition pc;
+    ChoiceGenerator<?> prev = cg.getPreviousChoiceGenerator();
+    while (prev != null && !(prev instanceof PCChoiceGenerator)) {
+        prev = prev.getPreviousChoiceGenerator();
+    }
+
+    pc = (prev == null) ? new PathCondition(): ((PCChoiceGenerator) prev).getCurrentPC();
+    assert pc != null;
+
+    // radix constraints
+    pc._addDet(Comparator.GE, sym_radix, new IntegerConstant(2));// radix >= 2
+    pc._addDet(Comparator.LE, sym_radix, new IntegerConstant(36)); // radix <= 36
+
+    if (!pc.simplify()) {
+        th.getVM().getSystemState().setIgnored(true);
+        return;
+    }
+
+    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+
+    // symbolic result (digit or -1)
+    IntegerExpression result = new SymbolicInteger("digit_res");
+
+    sf.push(0, false);
+    sf.setOperandAttr(result);
+}
 
   public void handleToUpperCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
 
