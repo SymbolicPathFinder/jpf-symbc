@@ -66,13 +66,6 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
-import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.symbc.numeric.Expression;
-import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.RealExpression;
-import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
 
@@ -2495,8 +2488,13 @@ public class SymbolicStringHandler {
 		StackFrame sf = th.getModifiableTopFrame();
 		IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
 
-		if (sym_v1 == null) {
-			throw new RuntimeException("ERROR: symbolic string method must have symbolic operand: handleLongValueOf");
+		if (sym_v1 == null) { //added fixes string
+			long val =sf.popLong();
+			StringExpression sym_v2=new StringConstant(String.valueOf(val));
+
+			int objRef = th.getHeap().newString("", th ).getObjectRef();
+			sf.push(objRef, true );
+			sf.setOperandAttr(sym_v2 );
 		} else {
 			sf.popLong();
 			StringExpression sym_v2 = StringExpression._valueOf(sym_v1);
@@ -2508,7 +2506,7 @@ public class SymbolicStringHandler {
 			sf.push(objRef, true);
 			sf.setOperandAttr(sym_v2);
 		}
-		return null;
+		return invInst.getNext(th);
 	}
 
 	public Instruction handleDoubleValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
