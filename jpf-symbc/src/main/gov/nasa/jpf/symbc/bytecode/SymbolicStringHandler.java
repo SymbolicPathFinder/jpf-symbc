@@ -284,9 +284,9 @@ public class SymbolicStringHandler {
 				if (!th.isFirstStepInsn()) { // first time around
 					cg = new PCChoiceGenerator(2);
 					th.getVM().setNextChoiceGenerator(cg);
-          			throw new RuntimeException("ERROR: Unsupported string operation.");
+          			// throw new RuntimeException("ERROR: Unsupported string operation.");
           //SH: commented this for now as this is not correctly working with Z3Str3.
-//					return invInst;
+					return invInst;
 				} else {
 					handleParseDouble(invInst, th);
 					return invInst.getNext(th);
@@ -2261,7 +2261,8 @@ public class SymbolicStringHandler {
 				cg = th.getVM().getChoiceGenerator();
 
 				assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
-				conditionValue = (Integer) cg.getNextChoice() == 0 ? false : true;
+				conditionValue = ((PCChoiceGenerator) cg).getNextChoice() == 1; //added
+
 				sf.pop();
 				PathCondition pc;
 
@@ -2284,8 +2285,8 @@ public class SymbolicStringHandler {
 					} else {
 						((PCChoiceGenerator) cg).setCurrentPC(pc);
 						RealExpression sym_v2 = new SpecialRealExpression(sym_v1);
-						sf.pushLong((long) 0); /* Result is don't care and 0 */
-						//sf = th.getModifiableTopFrame(); ??
+						// sf.pushLong((long) 0); /* Result is don't care and 0 */
+						 sf.pushDouble(0.0); //added
 						sf.setLongOperandAttr(sym_v2);
 					}
 				} else {
@@ -2293,8 +2294,8 @@ public class SymbolicStringHandler {
 					if (!pc.simplify()) {// not satisfiable
 						th.getVM().getSystemState().setIgnored(true);
 					} else {
-						throw new RuntimeException("ERROR: Double Format Type Exception");
-						//th.getVM().getSystemState().setIgnored(true);TODO: needs revision
+						th.getVM().getSystemState().setIgnored(true); //added
+
 					}
 				}
 			}
@@ -2514,8 +2515,13 @@ public class SymbolicStringHandler {
 		RealExpression sym_v1 = (RealExpression) sf.getOperandAttr(0);
 
 		if (sym_v1 == null) {
-			throw new RuntimeException("ERROR: symbolic string method must have symbolic operand: handleDoubleValueOf");
-		} else {
+        double val = Types.longToDouble(sf.peekLong());
+        sf.popLong();
+
+        int objRef = th.getHeap().newString(Double.toString(val), th).getObjectRef();
+        sf.push(objRef, true);
+        sf.setOperandAttr(null);
+    }  else {
 			sf.popLong();
 			StringExpression sym_v2 = StringExpression._valueOf(sym_v1);
 			int objRef = th.getHeap().newString("", th).getObjectRef(); /*
