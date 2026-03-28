@@ -66,13 +66,6 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
-import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.symbc.numeric.Expression;
-import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.RealExpression;
-import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
 
@@ -2672,27 +2665,73 @@ public class SymbolicStringHandler {
 		return null;
 	}
 
-	public void handleObjectEquals(JVMInvokeInstruction invInst,  ThreadInfo th) {
-		StackFrame sf = th.getModifiableTopFrame();
-		Expression sym_v1 = (Expression) sf.getOperandAttr(0);
-		Expression sym_v2 = (Expression) sf.getOperandAttr(1);
+	public void handleObjectEquals(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
 
-		if (sym_v1 != null) {
-			// System.out.println("*" + sym_v1.toString());
-			if (!(sym_v1 instanceof StringExpression)) {
-				throw new RuntimeException("ERROR: expressiontype not handled: ObjectEquals");
-			}
-		}
+    int objRef1 = sf.peek(1);
+    int objRef2 = sf.peek(0);
+    Object attr1=sf.getOperandAttr(1);
+    Object attr2=sf.getOperandAttr(0);
 
-		if (sym_v2 != null) {
-			// System.out.println("***" + sym_v2.toString());
-			if (!(sym_v2 instanceof StringExpression)) {
-				throw new RuntimeException("ERROR: expressiontype not handled: ObjectEquals");
-			}
-		}
+    //NULL handling
+    if (objRef1 == -1 || objRef2 == -1) {
+        sf.pop(2);
+        boolean result = (objRef1 == objRef2);
+        sf.push(result ? 1 : 0, false);
+        sf.setOperandAttr(null);
+        return;
+    }
 
-		handleEquals(invInst, th);
-	}
+    // concrete
+    if (attr1 == null && attr2 == null) {
+        sf.pop(2);
+        boolean result = (objRef1 == objRef2);
+        sf.push(result ? 1 : 0, false);
+        sf.setOperandAttr(null);
+        return;
+    }
+
+    //symbolic branching
+    ChoiceGenerator<?> cg;
+    if (!th.isFirstStepInsn()) {
+        cg = new PCChoiceGenerator(2);
+        th.getVM().setNextChoiceGenerator(cg);
+        return;
+    } else {
+        sf.pop(2);
+
+        cg = th.getVM().getChoiceGenerator();
+        PathCondition pc;
+
+        ChoiceGenerator<?> prev = cg.getPreviousChoiceGenerator();
+        while (prev != null && !(prev instanceof PCChoiceGenerator)) {
+            prev = prev.getPreviousChoiceGenerator();
+        }
+        pc = (prev == null) ? new PathCondition()
+                           : ((PCChoiceGenerator) prev).getCurrentPC();
+
+        int choice = ((PCChoiceGenerator) cg).getNextChoice();
+
+        if (choice == 0) {
+            pc._addDet(Comparator.EQ,
+                new IntegerConstant(objRef1),
+                new IntegerConstant(objRef2));
+            sf.push(1, false);
+            sf.setOperandAttr(null);
+        } else {
+            pc._addDet(Comparator.NE,
+                new IntegerConstant(objRef1),
+                new IntegerConstant(objRef2));
+            sf.push(0, false);
+            sf.setOperandAttr(null);
+        }
+        if (!pc.simplify()) {
+            th.getVM().getSystemState().setIgnored(true);
+        } else {
+            ((PCChoiceGenerator) cg).setCurrentPC(pc);
+        }
+    }
+}
 
 	public void handleEquals(JVMInvokeInstruction invInst,  ThreadInfo th) {
 		handleBooleanStringInstructions(invInst,  th, StringComparator.EQUALS);
