@@ -1,0 +1,27 @@
+target=TestStringValueOf07
+
+classpath=${jpf-symbc}/build/examples
+
+symbolic.method=TestStringValueOf07.check(sym)
+
+symbolic.dp=z3bitvector
+symbolic.string_dp=z3str3
+
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+
+symbolic.min_double=-10000.0
+symbolic.max_double=10000.0
+
+symbolic.bvlength=64
+
+symbolic.strings=true
+symbolic.lazy=on
+symbolic.jrarrays=true
+
+search.depth_limit=13
+
+listener = .symbc.SymbolicListener
+
+symbolic.optimizechoices=true
+symbolic.debug=true

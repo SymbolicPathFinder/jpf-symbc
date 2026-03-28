@@ -1,0 +1,19 @@
+target=TestStringValueOf09
+
+classpath=${jpf-symbc}/build/examples
+sourcepath=${jpf-symbc}/src/examples
+
+symbolic.dp=z3bitvector
+symbolic.min_int=-2147483648
+symbolic.max_int=2147483647
+
+symbolic.strings=true
+symbolic.string_dp=z3str3
+
+symbolic.lazy=on
+symbolic.jrarrays=true
+
+listener = .symbc.SymbolicListener
+
+symbolic.optimizechoices=true
+symbolic.debug=true
