@@ -367,16 +367,26 @@ public class SymbolicStringHandler {
                     handleToLowerCase(invInst, th);
                     return invInst.getNext(th);
                 }
-            } else if(shortName.equals("setCharAt")) { //***
+            } else if(shortName.equals("setCharAt")) { //adding support for setCharAt
 				ChoiceGenerator<?> cg;
 				if (!th.isFirstStepInsn()) {
 					cg = new PCChoiceGenerator(1);
 					th.getVM().setNextChoiceGenerator(cg);
 					return invInst;
 				} else {
-					handleSetCharAt(invInst, th); //***
+					handleSetCharAt(invInst, th); //symbolic handling
 					return invInst.getNext(th);
 					}
+			} else if (shortName.equals("reverse")) { //adding support for reverse
+				ChoiceGenerator<?> cg;
+				if (!th.isFirstStepInsn()) {
+					cg = new PCChoiceGenerator(1);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleReverse(invInst, th); //symbolic handling
+					return invInst.getNext(th);
+				}
 			} else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
@@ -447,6 +457,75 @@ public class SymbolicStringHandler {
 			prefix._concat(charStr)._concat(suffix);
 	sym_v2.putstr(result); // update builder with new symbolic string
 	}
+
+	private void handleReverse(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
+    Object attr = sf.getOperandAttr(0);
+    int objRef = sf.pop(); // builder ref
+
+    SymbolicStringBuilder sym_v = (SymbolicStringBuilder) attr;
+    if (sym_v == null)
+        sym_v = new SymbolicStringBuilder();
+
+    // concrete → symbolic
+    if (sym_v.getstr() == null) {
+        ElementInfo ei = th.getElementInfo(objRef);
+        String val = getStringEquiv(ei);
+        sym_v.putstr(new StringConstant(val));
+    }
+    StringExpression base = sym_v.getstr();
+    // GET PC
+    ChoiceGenerator<?> cg = th.getVM().getChoiceGenerator();
+    PathCondition pc;
+
+    ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+    while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+        prev_cg = prev_cg.getPreviousChoiceGenerator();
+    }
+
+    if (prev_cg == null) {
+        pc = new PathCondition();
+    } else {
+        pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+    }
+
+    IntegerExpression len = base._length();
+    StringExpression result = new StringConstant("");
+    int MAX = 10; // safe bound
+    for (int i = 0; i < MAX; i++) {
+        // condition: i < length
+        pc._addDet(Comparator.GT, len, new IntegerConstant(i));
+
+        if (!pc.simplify()) {
+            th.getVM().getSystemState().setIgnored(true);
+            return;
+        }
+        // substring for single char: [len-i-1, len-i)
+        IntegerExpression start =
+                new BinaryLinearIntegerExpression(
+                        len, Operator.MINUS, new IntegerConstant(i + 1)
+                );
+        IntegerExpression end =
+                new BinaryLinearIntegerExpression(
+                        len, Operator.MINUS, new IntegerConstant(i)
+                );
+        StringExpression ch = createSymbolicSubstring(
+                base,
+                start,
+                end,
+                objRef,
+                objRef
+        );
+        result = result._concat(ch);
+    }
+
+    sym_v.putstr(result);
+
+    // reverse returns builder
+    sf.push(objRef, true);
+    sf.setOperandAttr(sym_v);
+	}
+
 
   public void handleToUpperCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
 
