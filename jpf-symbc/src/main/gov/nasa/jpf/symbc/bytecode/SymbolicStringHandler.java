@@ -66,13 +66,6 @@ import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
-import gov.nasa.jpf.symbc.mixednumstrg.SpecialRealExpression;
-import gov.nasa.jpf.symbc.numeric.IntegerConstant;
-import gov.nasa.jpf.symbc.numeric.PCChoiceGenerator;
-import gov.nasa.jpf.symbc.numeric.Expression;
-import gov.nasa.jpf.symbc.numeric.IntegerExpression;
-import gov.nasa.jpf.symbc.numeric.RealExpression;
-import gov.nasa.jpf.symbc.numeric.PathCondition;
 import gov.nasa.jpf.symbc.string.*;
 import gov.nasa.jpf.symbc.mixednumstrg.*;
 
@@ -374,7 +367,27 @@ public class SymbolicStringHandler {
                     handleToLowerCase(invInst, th);
                     return invInst.getNext(th);
                 }
-            } else {
+            } else if (shortName.equals("forDigit")) { // handles Character.forDigit symbolic execution
+				ChoiceGenerator<?>cg;
+				if (!th.isFirstStepInsn()) {
+					cg =new PCChoiceGenerator(1);
+					th.getVM().setNextChoiceGenerator(cg);
+					return invInst;
+				} else {
+					handleForDigit(invInst, th );//symbolic handling logic
+					return invInst.getNext(th );
+				}
+			} else if (shortName.equals("digit")) { //handles Character.digit symbolic execution
+					ChoiceGenerator<?> cg;
+					if (!th.isFirstStepInsn()) {
+						cg = new PCChoiceGenerator(1);
+						th.getVM().setNextChoiceGenerator(cg);
+						return invInst;
+					} else {
+						handleDigit(invInst , th); //digit handling logic
+						return invInst.getNext(th);
+					}
+				} else {
 				throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
 				//return null;
 			}
@@ -385,6 +398,81 @@ public class SymbolicStringHandler {
 
 	}
 
+	private void handleForDigit(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
+    IntegerExpression sym_radix =(IntegerExpression) sf.getOperandAttr(0);
+    IntegerExpression sym_digit= (IntegerExpression) sf.getOperandAttr(1);
+    sf.pop(2);
+
+    ChoiceGenerator<?> cg=th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator);
+
+    PathCondition pc;
+    ChoiceGenerator<?> prev= cg.getPreviousChoiceGenerator();
+    while (prev != null && !(prev instanceof PCChoiceGenerator)) {
+        prev = prev.getPreviousChoiceGenerator();
+    }
+
+    pc = (prev == null) ?new PathCondition() : ((PCChoiceGenerator) prev).getCurrentPC();
+    assert pc != null;// sanity check
+
+    // Constraints: valid digit + radix
+    pc._addDet(Comparator.GE,sym_digit, new IntegerConstant(0)); // digit >= 0
+    pc._addDet(Comparator.GE,sym_radix, new IntegerConstant(2));// radix >= 2
+    pc._addDet(Comparator.LE, sym_radix,new IntegerConstant(36)); //radix<=36 
+    pc._addDet(Comparator.LT, sym_digit,sym_radix);
+
+    if (!pc.simplify()) {
+        th.getVM().getSystemState().setIgnored(true);
+        return;
+    }
+
+    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+
+    // symbolic result
+    IntegerExpression result=new SymbolicInteger("forDigit_res");
+
+    sf.push(0, false);
+    sf.setOperandAttr(result);
+}
+
+private void handleDigit(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
+
+    IntegerExpression sym_radix= (IntegerExpression) sf.getOperandAttr(0);// symbolic radix
+    IntegerExpression sym_char =(IntegerExpression) sf.getOperandAttr(1);
+
+    sf.pop(2);
+
+    ChoiceGenerator<?> cg =th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator);
+
+    PathCondition pc;
+    ChoiceGenerator<?> prev = cg.getPreviousChoiceGenerator();
+    while (prev != null && !(prev instanceof PCChoiceGenerator)) {
+        prev = prev.getPreviousChoiceGenerator();
+    }
+
+    pc = (prev == null) ? new PathCondition(): ((PCChoiceGenerator) prev).getCurrentPC();
+    assert pc != null;
+
+    // radix constraints
+    pc._addDet(Comparator.GE, sym_radix, new IntegerConstant(2));// radix >= 2
+    pc._addDet(Comparator.LE, sym_radix, new IntegerConstant(36)); // radix <= 36
+
+    if (!pc.simplify()) {
+        th.getVM().getSystemState().setIgnored(true);
+        return;
+    }
+
+    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+
+    // symbolic result (digit or -1)
+    IntegerExpression result = new SymbolicInteger("digit_res");
+
+    sf.push(0, false);
+    sf.setOperandAttr(result);
+}
 
   public void handleToUpperCase(JVMInvokeInstruction invInst,  ThreadInfo th) {
 
@@ -1771,7 +1859,20 @@ public class SymbolicStringHandler {
 				} else { // converting int to Integer
 					handleParseBooleanValueOf(invInst, th);
 				}
-			} else {
+			} else if (cname.equals("java.lang.Character")) { //added missing Character support here
+				if (!(argTypes[0].equals("char"))){ // converting String → Character
+					ChoiceGenerator<?>cg;
+					if (!th.isFirstStepInsn()) {
+						cg =new PCChoiceGenerator(2);
+						th.getVM().setNextChoiceGenerator(cg );
+						return invInst;
+					} else {
+						handleParseCharValueOf(invInst,th );
+					}
+				} else { // converting char → Character
+					return handleCharValueOf(invInst, th);
+					}
+				} else {
 				throw new RuntimeException("ERROR: Type not handled in Symbolic Type ValueOf: " + cname);
 			}
 		}
@@ -1828,6 +1929,29 @@ public class SymbolicStringHandler {
 		}
 	}
 
+	private void handleParseCharValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
+		StackFrame sf = th.getModifiableTopFrame();
+		Expression sym_v1 = (Expression) sf.getOperandAttr(0); // get symbolic attribute of argument
+
+		if (sym_v1 == null) {
+			throw new RuntimeException("ERROR: symbolic method must have symbolic string operand");
+		} else {
+			if (sym_v1 instanceof IntegerExpression) {
+				IntegerExpression sym=(IntegerExpression) sym_v1; // cast to integer symbolic
+				sf.pop();
+				int objRef =getNewObjRef(invInst, th);
+				sf.push(objRef , true);
+
+				sf.setOperandAttr(sym);
+			} else {
+				sf.pop();
+				int objRef = getNewObjRef(invInst, th);
+				sf.push(objRef, true); 
+			}
+		}
+	}
+
+	
 	public void handleParseLongValueOf(JVMInvokeInstruction invInst,  ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
 		Expression sym_v3 = (Expression) sf.getOperandAttr(0);
