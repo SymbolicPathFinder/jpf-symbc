@@ -92,7 +92,8 @@ public class Edge{
         else{ //TODO: be conservative and not generate a witness if we cannot find a solution for the symbolic variable, i.e., do not print default value.
             // Here, the type of symbolic variable should be integer or char.
             assert(symbolicVariableInfoList.get(indexOfEdge).returnType.equals("int") ||
-                    symbolicVariableInfoList.get(indexOfEdge).returnType.equals("char"));
+                    symbolicVariableInfoList.get(indexOfEdge).returnType.equals("char")||
+                symbolicVariableInfoList.get(indexOfEdge).returnType.equals("long"));
             if(symbolicVariableInfoList.get(indexOfEdge).varValue == null) edgeBuilder.append(String.format("         <data key=\"assumption\">%s = %d</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, 4));
             else edgeBuilder.append(String.format("         <data key=\"assumption\">%s = %s</data>\n", symbolicVariableInfoList.get(indexOfEdge).varPgmName, symbolicVariableInfoList.get(indexOfEdge).varValue));
         }
