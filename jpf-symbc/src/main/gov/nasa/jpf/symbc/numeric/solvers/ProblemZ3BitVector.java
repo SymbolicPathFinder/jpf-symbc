@@ -39,8 +39,10 @@ package gov.nasa.jpf.symbc.numeric.solvers;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.microsoft.z3.*;
@@ -1595,7 +1597,21 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     private double getFPValue(FPExpr fpExpr) {
         Model model = solver.getModel();
         String rawValue = model.getConstInterp(fpExpr.getFuncDecl()).toString();
-        String[] pieces = rawValue.split(" ");
+        String[] rawPieces = rawValue.split(" ");
+        // Z3 prints a negative numeral as two tokens, "(-" followed by its magnitude
+        // (e.g. "(- 8160)" for -8160), instead of a single "-8160" token. Collapse any
+        // such pair into one signed token, wherever it appears in the split value
+        // (the whole value, a numerator, a denominator, ...), before parsing below.
+        List<String> mergedPieces = new ArrayList<>();
+        for (int i = 0; i < rawPieces.length; i++) {
+            if (rawPieces[i].equals("(-") && i + 1 < rawPieces.length) {
+                mergedPieces.add("-" + rawPieces[i + 1].replaceAll("[()]", ""));
+                i++;
+            } else {
+                mergedPieces.add(rawPieces[i]);
+            }
+        }
+        String[] pieces = mergedPieces.toArray(new String[0]);
 
         if (pieces.length < 1) {
             throw new RuntimeException("Error extracting value of FPExpr!");
