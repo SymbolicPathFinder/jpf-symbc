@@ -70,4 +70,9 @@ public final class Verifier {
   public static String nondetString() {
     return Debug.makeSymbolicString("string"+counter++);
   }
+
+  public static <T> T nondetObject(Class<T> classType, ObjectFactory<T> factory) {
+    T obj = factory.createObject();
+    return classType.cast(Debug.makeSymbolicRef("object" + counter++, obj));
+  }
 }

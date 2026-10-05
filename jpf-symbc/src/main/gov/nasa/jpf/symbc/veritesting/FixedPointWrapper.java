@@ -127,6 +127,7 @@ public class FixedPointWrapper {
         changedTransformation = null;
         firstException = null;
         iterationNumber = 0;
+        multiPathRegSymbolValueTable = null;
     }
 
     public static DynamicRegion executeFixedPointTransformations(ThreadInfo ti, DynamicRegion dynRegion) throws StaticRegionException, CloneNotSupportedException {

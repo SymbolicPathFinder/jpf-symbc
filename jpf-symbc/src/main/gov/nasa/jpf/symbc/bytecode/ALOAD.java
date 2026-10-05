@@ -77,7 +77,7 @@ public class ALOAD extends gov.nasa.jpf.jvm.bytecode.ALOAD {
 		String typeOfLocalVar = super.getLocalVariableType();
 
 
-		if(attr == null || typeOfLocalVar.equals("?") || attr instanceof SymbolicStringBuilder || attr instanceof StringExpression || attr instanceof ArrayExpression) {
+		if(attr == null || typeOfLocalVar.equals("?") || attr instanceof SymbolicStringBuilder || attr instanceof StringExpression || attr instanceof ArrayExpression || attr instanceof SymbolicInteger) {
 			return super.execute(th);
 		}
 		

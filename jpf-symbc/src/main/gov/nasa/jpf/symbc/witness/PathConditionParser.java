@@ -45,7 +45,7 @@ public class PathConditionParser {
       }
       // Other types
       else {
-        int value = Integer.parseInt(pcVariableValue);
+        long value = Long.parseLong(pcVariableValue);
         for (int i = 0; i < symbolicVariableInfoList.size(); i++) {
           if (symbolicVariableInfoList.get(i).varSymName.equals(pcVariableName)) {
             // special case for boolean type
@@ -54,9 +54,11 @@ public class PathConditionParser {
                 symbolicVariableInfoList.get(i).varValue = true;
               else if (value == 0)
                 symbolicVariableInfoList.get(i).varValue = false;
-              break;
-            } else
+            } else if (symbolicVariableInfoList.get(i).returnType.equals("long")) {
               symbolicVariableInfoList.get(i).varValue = value;
+            } else {
+              symbolicVariableInfoList.get(i).varValue = (int) value;
+            }
             break;
           }
         }

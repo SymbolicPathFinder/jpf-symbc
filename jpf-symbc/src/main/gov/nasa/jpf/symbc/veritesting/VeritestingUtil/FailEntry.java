@@ -21,6 +21,6 @@ public class FailEntry {
 
     @Override
     public String toString() {
-        return super.toString() + (this.failMsg == "" ? "" : " - FailInstruction = " + this.failMsg.toString());
+        return super.toString() + (this.failMsg!=null && this.failMsg.equals("") ? "" : " - FailInstruction = " + this.failMsg);
     }
 }

@@ -38,7 +38,7 @@ public class RegionStatistics {
 
         table += "\nFail Reasons\n";
         for (FailEntry fail : failReasonList) {
-            table += fail.toString();
+            table += fail.toString()+"\n";
         }
 
         return table;

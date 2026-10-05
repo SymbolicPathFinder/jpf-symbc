@@ -337,7 +337,7 @@ public class SymbolicStringHandler {
       } else if (shortName.equals("doubleValue")) {
         handledoubleValue(invInst, th);
       } else if (shortName.equals("booleanValue")) {
-        handlefloatValue(invInst, th);
+        handlebooleanValue(invInst, th);
       } else if (shortName.equals("isEmpty")) {
         ChoiceGenerator<?> cg;
         if (!th.isFirstStepInsn()) {
@@ -757,18 +757,19 @@ public class SymbolicStringHandler {
 
 	}
 
-	public void handleLength(JVMInvokeInstruction invInst, ThreadInfo th) {
+	public void handleLength(JVMInvokeInstruction invInst, ThreadInfo th) throws RuntimeException {
 		StackFrame sf = th.getModifiableTopFrame();
 		Expression sym_v1 = (Expression) sf.getOperandAttr(0);
 		if (sym_v1 == null)
 			return;
 
 		IntegerExpression sym_v2;
-		if (sym_v1 instanceof StringSymbolic)
-			sym_v2 = ((StringSymbolic) sym_v1)._length();
+		if (sym_v1 instanceof StringExpression)
+			sym_v2 = ((StringExpression) sym_v1)._length();
 		else if (sym_v1 instanceof SymbolicStringBuilder)
 			sym_v2 = ((SymbolicStringBuilder) sym_v1)._length();
-		else return;
+    else
+      throw new RuntimeException("ERROR: operand type not tackled - length: " + sym_v1.getClass());
 		sf.pop();
 		sf.push(0, false); /* dont care value for length */
 		sf.setOperandAttr(sym_v2);
@@ -1092,7 +1093,7 @@ public class SymbolicStringHandler {
 
 
 
-	public void handlebooleanValue(JVMInvokeInstruction invInst, SystemState ss, ThreadInfo th) {
+	public void handlebooleanValue(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
 		Expression sym_v3 = (Expression) sf.getOperandAttr(0);
 

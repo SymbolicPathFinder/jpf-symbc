@@ -9,6 +9,8 @@ import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
 import gov.nasa.jpf.vm.StackFrame;
 import gov.nasa.jpf.vm.ThreadInfo;
+import gov.nasa.jpf.vm.bytecode.LocalVariableInstruction;
+import gov.nasa.jpf.vm.bytecode.StoreInstruction;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -128,11 +130,16 @@ public class WitnessSymbolicState {
 //      pgmCounter++;
 //      nextInstruction = instructions[pgmCounter];
 //    }
-    if(!nextInstruction.toString().contains("store"))
+//    if(!nextInstruction.toString().contains("store"))
+//      return null;
+//    int storeStackSlot = Integer.parseInt(
+//        nextInstruction.toString().substring(nextInstruction.toString().indexOf("store") + 6));
+//    return storeStackSlot;
+    if (!(nextInstruction instanceof StoreInstruction &&
+        nextInstruction instanceof LocalVariableInstruction))
       return null;
-    int storeStackSlot = Integer.parseInt(
-        nextInstruction.toString().substring(nextInstruction.toString().indexOf("store") + 6));
-    return storeStackSlot;
+    return ((LocalVariableInstruction)
+        nextInstruction).getLocalVariableSlot();
   }
 
   /**

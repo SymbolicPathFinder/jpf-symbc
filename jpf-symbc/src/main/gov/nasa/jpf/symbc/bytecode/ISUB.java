@@ -36,6 +36,7 @@
 package gov.nasa.jpf.symbc.bytecode;
 
 
+import gov.nasa.jpf.symbc.SymbolicInstructionFactory;
 import gov.nasa.jpf.symbc.numeric.*;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.StackFrame;
@@ -58,20 +59,33 @@ public class ISUB extends gov.nasa.jpf.jvm.bytecode.ISUB {
             int v1 = sf.pop();
             int v2 = sf.pop();
 
-            // Java Ranger change: this change is required to get NanoXML to not crash because it ends up being used in
-            // the JPF model of charAt in JPF_java_lang_String (using executeNative). This should not matter because
-            // we're setting up the parameter to charAt to be a symbolic expression but somehow JPF_java_lang_String's
-            // charAt still ends up being used. TODO figure out why this happens and configure NanoXML correctly
-            sf.push(0, false); // for symbolic expressions, the concrete value does not matter
+            // Java Ranger change: replace the old sf.push(0, false) workaround (used to avoid a NanoXML
+            // crash in JPF_java_lang_String.charAt) with the correct concrete result. The concrete stack
+            // value is used when the expression is consumed non-symbolically (e.g. by native peers).
+            // The crash is confirmed gone — the correct v2 - v1 works fine (NanoXML test passes).
+            sf.push(v2 - v1, false);
 
             IntegerExpression result = null;
-            if (sym_v2 != null) {
-                if (sym_v1 != null)
-                    result = sym_v2._minus(sym_v1);
-                else // v1 is concrete
-                    result = sym_v2._minus(v1);
-            } else if (sym_v1 != null)
-                result = sym_v1._minus_reverse(v2);
+            String[] dp = SymbolicInstructionFactory.dp;
+
+            if ((dp[0].equalsIgnoreCase("z3bitvector") || dp[0].equalsIgnoreCase("z3bitvectorinc"))
+                && SymbolicInstructionFactory.bvlength == 64) {
+                if (sym_v2 != null) {
+                    if (sym_v1 != null)
+                        result = ((sym_v2._minus(sym_v1))._shiftL(32))._shiftR(32);
+                    else // v1 is concrete
+                        result = ((sym_v2._minus(v1))._shiftL(32))._shiftR(32);
+                } else if (sym_v1 != null)
+                    result = ((sym_v1._minus_reverse(v2))._shiftL(32))._shiftR(32);
+            } else {
+                if (sym_v2 != null) {
+                    if (sym_v1 != null)
+                        result = sym_v2._minus(sym_v1);
+                    else // v1 is concrete
+                        result = sym_v2._minus(v1);
+                } else if (sym_v1 != null)
+                    result = sym_v1._minus_reverse(v2);
+            }
 
             if (result instanceof IntegerConstant) { // SH: if the output of the subtraction is constant, like subtracting a symbolic variable from itself produces zero, then just propagate the concerte value of the computation
                 long resultVal = ((IntegerConstant) result).value;
