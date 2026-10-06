@@ -2497,7 +2497,7 @@ public class SymbolicStringHandler {
 
 	public Instruction handleLongValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
-		IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
+		IntegerExpression sym_v1 = (IntegerExpression) sf.getLongOperandAttr();
 
 		if (sym_v1 == null) {
 			throw new RuntimeException("ERROR: symbolic string method must have symbolic operand: handleLongValueOf");
@@ -2517,7 +2517,7 @@ public class SymbolicStringHandler {
 
 	public Instruction handleDoubleValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
 		StackFrame sf = th.getModifiableTopFrame();
-		RealExpression sym_v1 = (RealExpression) sf.getOperandAttr(0);
+		RealExpression sym_v1 = (RealExpression) sf.getLongOperandAttr();
 
 		if (sym_v1 == null) {
 			throw new RuntimeException("ERROR: symbolic string method must have symbolic operand: handleDoubleValueOf");

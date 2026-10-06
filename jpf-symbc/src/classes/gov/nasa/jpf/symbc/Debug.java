@@ -102,15 +102,16 @@ public class Debug {
     
     // makes v a symbolic object
     public static Object makeSymbolicRef(String name, Object v) {
-    	assert (v!=null); // needed for type info
-    	if (Verify.randomBool()) {
-
-    		makeFieldsSymbolic(name, v);
-    	}
-    	else {
-
-    		v = makeSymbolicNull(name);
-    	}
+//    	assert (v!=null); // needed for type info
+      if(v == null)
+        v = makeSymbolicNull(name);
+      else
+//          if (Verify.randomBool()) {
+      makeFieldsSymbolic(name, v);
+//    	}
+//    	else {
+//        v = makeSymbolicNull(name);
+//    	}
     	return v;
     }
 
