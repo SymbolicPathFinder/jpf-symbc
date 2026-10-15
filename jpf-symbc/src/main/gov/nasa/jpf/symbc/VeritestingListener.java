@@ -13,6 +13,7 @@ import gov.nasa.jpf.symbc.veritesting.Heuristics.HeuristicManager;
 import gov.nasa.jpf.symbc.veritesting.Heuristics.PathStatus;
 import gov.nasa.jpf.symbc.veritesting.StaticRegionException;
 import gov.nasa.jpf.Config;
+import gov.nasa.jpf.ConfigChangeListener;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.PropertyListenerAdapter;
 import gov.nasa.jpf.jvm.JVMDirectCallStackFrame;
@@ -84,7 +85,10 @@ import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.oneTimeFillAssumpt
 import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.populateWitnessGraph;
 import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.witnessHasStringVar;
 
-public class VeritestingListener extends PropertyListenerAdapter implements PublisherExtension {
+public class VeritestingListener extends PropertyListenerAdapter implements PublisherExtension, ConfigChangeListener {
+
+    // set once publishFinished() ran, either from the reporter or from jpfRunTerminated()
+    private boolean reportPublished = false;
 
 
     // veritestingMode ranges from 1 to 5 which is the same as runMode ranging from VANILLASPF, VERITESTING, HIGHORDER,
@@ -269,6 +273,8 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
 
             StatisticManager.veritestingRunning = true;
             jpf.addPublisherExtension(ConsolePublisher.class, this);
+            // get notified at the end of the run even if it ended with an exception, see jpfRunTerminated()
+            conf.addChangeListener(this);
             if (System.getenv("TIMEOUT_MINS") != null) {
                 timeout_mins = Integer.parseInt(System.getenv("TIMEOUT_MINS"));
             }
@@ -1097,7 +1103,31 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
     }
 
 
+    @Override
+    public void propertyChanged(Config conf, String key, String oldValue, String newValue) {
+    }
+
+    // called from the finally block of JPF.run(), also when the run was aborted by an exception,
+    // in which case the reporter never called publishFinished()
+    @Override
+    public void jpfRunTerminated(Config conf) {
+        conf.removeChangeListener(this);
+        if (reportPublished)
+            return;
+        // never throw from here: it would replace the exception that aborted the run
+        try {
+            for (Publisher p : VM.getVM().getJPF().getReporter().getPublishers())
+                if (p instanceof ConsolePublisher) {
+                    publishFinished(p);
+                    p.getOut().flush();
+                }
+        } catch (Throwable t) {
+            System.err.println("VeritestingListener: failed to publish report after aborted run: " + t);
+        }
+    }
+
     public void publishFinished(Publisher publisher) {
+        reportPublished = true;
         long runEndTime = System.nanoTime();
         PrintWriter pw = publisher.getOut();
         publisher.publishTopicStart("VeritestingListener report:");

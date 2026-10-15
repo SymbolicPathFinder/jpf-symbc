@@ -382,6 +382,7 @@ public class SymbolicStringHandler {
       }
 			else {
         throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
+//        assert false: "ERROR: symbolic method not handled: "+shortName;
         //return null;
       }
       return invInst.getNext(th);
