@@ -303,6 +303,39 @@ public abstract class StringExpression extends Expression {
 	    return new DerivedStringExpression(StringOperator.REPLACE, l );
 	  }
 
+		/* replaceall */
+		public StringExpression _replaceAll(StringExpression t, StringExpression r) {
+			Expression l[] = new Expression[3];
+			l[0] = this;
+			l[1] = t;
+			l[2] = r;
+			return new DerivedStringExpression(StringOperator.REPLACEALL, l );
+		}
+
+	public StringExpression _replaceAll(String t, StringExpression r) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = new StringConstant(t);
+		l[2] = r;
+		return new DerivedStringExpression(StringOperator.REPLACEALL, l );
+	}
+
+	public StringExpression _replaceAll(String t, String r) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = new StringConstant(t);
+		l[2] = new StringConstant(r);
+		return new DerivedStringExpression(StringOperator.REPLACEALL, l );
+	}
+
+	public StringExpression _replaceAll(StringExpression t, String r) {
+		Expression l[] = new Expression[3];
+		l[0] = this;
+		l[1] = t;
+		l[2] = new StringConstant(r);
+		return new DerivedStringExpression(StringOperator.REPLACEALL, l );
+	}
+
   /* subString */
 
   public StringExpression _subString(IntegerExpression t, int r) {

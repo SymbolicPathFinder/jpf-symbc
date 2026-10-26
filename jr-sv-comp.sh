@@ -126,6 +126,9 @@ do
   export LD_LIBRARY_PATH=$PWD/java-ranger/lib:$LD_LIBRARY_PATH
   echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
   export TARGET_CLASSPATH_WALA=$DIR/target/classes/
+  # VeritestingListener prints a "Metrics Vector:" every 10 seconds in the last 2 minutes before TIMEOUT_MINS,
+  # so that we still have its statistics if ulimit kills it before it prints its report
+  export TIMEOUT_MINS=$(( DURATION / 60 ))
   echo $TARGET_CLASSPATH_WALA
   #jpf-core/bin/jpf $DIR/config.jpf
   if test -z "$JVM_FLAGS"; then
@@ -177,8 +180,18 @@ do
 
   ####end of old script
 
-  # Claude: keep only the tail of this iteration's log instead of the whole thing
-  tail -n 120 "$LOG" > "$LOG.tail" && mv "$LOG.tail" "$LOG"  # Claude
+  # if the VeritestingListener report was printed, keep it all, it is usually longer than 120 lines
+  if grep -q "VeritestingListener report:" "$LOG"; then
+    sed -n '/VeritestingListener report:/,$p' "$LOG" > "$LOG.tail"
+  else
+    tail -n 120 "$LOG" > "$LOG.tail"
+    # no report (e.g. killed on timeout): the last printed metrics vector is the closest we have
+    LAST_METRICS=$(grep -A1 "^Metrics Vector:" "$LOG" | tail -n 1)
+    if [ -n "$LAST_METRICS" ]; then
+      echo "Last Metrics Vector (no report printed):" >> "$LOG.tail"
+      echo "$LAST_METRICS" >> "$LOG.tail"
+    fi
+  fi && mv "$LOG.tail" "$LOG"
   cat "$LOG"
 
   if [ $TIMEOUT_EXIT_CODE -gt 0  ]; then #TIMEOUT happened

@@ -242,7 +242,20 @@ class Manager extends TranslationManager {
 			});
 
 			map(StringOrOperation.REPLACE, ReplaceTemplate.apply("(str.replace"));
-			map(StringOrOperation.REPLACEALL, ReplaceTemplate.apply("(replaceAll"));
+			map(StringOrOperation.REPLACEALL, (expr) -> {
+				final DerivedStringExpression dse = (DerivedStringExpression) expr;
+				final String s = manager.strExpr.collect((StringExpression) dse.oprlist[0]);
+				final String t = manager.strExpr.collect((StringExpression) dse.oprlist[1]);
+				final String r = manager.strExpr.collect((StringExpression) dse.oprlist[2]);
+				// char-for-char replace (str.replace_all is incomplete in z3): same length, every position mapped independently
+				final String res = "rep_" + Integer.toHexString((s + " " + t + " " + r).hashCode());
+				Results.stringVariables.add(res);
+				Results.constraints.add("(assert (= (str.len " + res + ") (str.len " + s + ")))");
+				Results.constraints.add("(assert (forall ((i Int)) (=> (and (<= 0 i) (< i (str.len " + s + ")))"
+						+ " (= (str.at " + res + " i) (ite (= (str.at " + s + " i) " + t + ") " + r
+						+ " (str.at " + s + " i))))))");
+				return res;
+			});
 			map(StringOrOperation.REPLACEFIRST, ReplaceTemplate.apply("(replaceFirst"));
 
 			map(StringOrOperation.TRIM, (expr) -> {

@@ -1345,6 +1345,9 @@ public class SymbolicStringHandler {
 
 	//Only supports character for character
 	public Instruction handleReplace(JVMInvokeInstruction invInst, ThreadInfo th) {
+//    - s1 / operand 0 is newChar
+//    - s2 / operand 1 is oldChar
+//    - s3 / operand 2 is the receiver string
 		StackFrame sf = th.getModifiableTopFrame();
 		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
 		StringExpression sym_v2 = (StringExpression) sf.getOperandAttr(1);
@@ -1364,15 +1367,15 @@ public class SymbolicStringHandler {
 				if (sym_v2 == null) { // sym_v3 has to be symbolic
 					//ElementInfo e2 = th.getElementInfo(s2);
 					//String val1 = e2.asString();
-					result = sym_v3._replace(val, String.valueOf((char)s2));
+					result = sym_v3._replaceAll(String.valueOf((char)s2),val);
 				} else {
 					if (sym_v3 == null) { // only sym_v2 is symbolic
 						ElementInfo e3 = th.getElementInfo(s3);
 						String val2 = e3.asString();
 						sym_v3 = new StringConstant(val2);
-						result = sym_v3._replace(val, sym_v2);
+						result = sym_v3._replaceAll(sym_v2, val);
 					} else {
-						result = sym_v3._replace(val, sym_v2);
+						result = sym_v3._replaceAll(sym_v2, val);
 					}
 				}
 			} else { // sym_v1 is symbolic
@@ -1383,20 +1386,20 @@ public class SymbolicStringHandler {
 						//ElementInfo e3 = th.getElementInfo(s3);
 						String val2 = String.valueOf((char) s3);
 						sym_v3 = new StringConstant(val2);
-						result = sym_v3._replace(sym_v1, val1);
+						result = sym_v3._replaceAll(val1, sym_v1);
 					} else {
 						//ElementInfo e2 = th.getElementInfo(s2);
 						String val1 = String.valueOf((char) s2);
-						result = sym_v3._replace(sym_v1, val1);
+						result = sym_v3._replaceAll(val1, sym_v1);
 					}
 				} else {
 					if (sym_v3 == null) {
 						ElementInfo e3 = th.getElementInfo(s3);
 						String val2 = e3.asString();
 						sym_v3 = new StringConstant(val2);
-						result = sym_v3._replace(sym_v1, sym_v2);
+						result = sym_v3._replaceAll(sym_v2, sym_v1);
 					} else {
-						result = sym_v3._replace(sym_v1, sym_v2);
+						result = sym_v3._replaceAll(sym_v2, sym_v1);
 					}
 				}
 			}
@@ -1595,6 +1598,9 @@ public class SymbolicStringHandler {
 	}
 
 	public Instruction handleReplaceFirst(JVMInvokeInstruction invInst, ThreadInfo th) {
+//    - s1 / operand 0 is newChar
+//    - s2 / operand 1 is oldChar
+//    - s3 / operand 2 is the receiver string
 		StackFrame sf = th.getModifiableTopFrame();
 		StringExpression sym_v1 = (StringExpression) sf.getOperandAttr(0);
 		StringExpression sym_v2 = (StringExpression) sf.getOperandAttr(1);
@@ -1614,16 +1620,16 @@ public class SymbolicStringHandler {
 				if (sym_v2 == null) { // sym_v3 has to be symbolic
 					ElementInfo e2 = th.getElementInfo(s2);
 					String val1 = e2.asString();
-					result = sym_v3._replaceFirst(val, val1);
+					result = sym_v3._replaceFirst(val1, val);
 
 				} else {
 					if (sym_v3 == null) { // only sym_v2 is symbolic
 						ElementInfo e3 = th.getElementInfo(s3);
 						String val2 = e3.asString();
 						sym_v3 = new StringConstant(val2);
-						result = sym_v3._replaceFirst(val, sym_v2);
+						result = sym_v3._replaceFirst(sym_v2, val);
 					} else {
-						result = sym_v3._replaceFirst(val, sym_v2);
+						result = sym_v3._replaceFirst(sym_v2, val);
 					}
 				}
 			} else { // sym_v1 is symbolic
@@ -1634,20 +1640,20 @@ public class SymbolicStringHandler {
 						ElementInfo e3 = th.getElementInfo(s3);
 						String val2 = e3.asString();
 						sym_v3 = new StringConstant(val2);
-						result = sym_v3._replaceFirst(sym_v1, val1);
+						result = sym_v3._replaceFirst(val1, sym_v1);
 					} else {
 						ElementInfo e2 = th.getElementInfo(s2);
 						String val1 = e2.asString();
-						result = sym_v3._replaceFirst(sym_v1, val1);
+						result = sym_v3._replaceFirst(val1, sym_v1);
 					}
 				} else {
 					if (sym_v3 == null) {
 						ElementInfo e3 = th.getElementInfo(s3);
 						String val2 = e3.asString();
 						sym_v3 = new StringConstant(val2);
-						result = sym_v3._replaceFirst(sym_v1, sym_v2);
+						result = sym_v3._replaceFirst(sym_v2, sym_v1);
 					} else {
-						result = sym_v3._replaceFirst(sym_v1, sym_v2);
+						result = sym_v3._replaceFirst(sym_v2, sym_v1);
 					}
 				}
 			}

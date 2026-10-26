@@ -299,8 +299,8 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
         if (timeout_mins != -1) {
             long runningTimeNsecs = System.nanoTime() - runStartTime;
             if (TimeUnit.NANOSECONDS.toSeconds(runningTimeNsecs) > ((timeout_mins * 60) - (10 * timeoutReportingCounter))) {
-                System.out.println("Metrics Vector:");
-                System.out.println(getMetricsVector(runningTimeNsecs));
+                System.err.println("Metrics Vector:");
+                System.err.println(getMetricsVector(runningTimeNsecs));
                 timeoutReportingCounter--;
             }
         }
