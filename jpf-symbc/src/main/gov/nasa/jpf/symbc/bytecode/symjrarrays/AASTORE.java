@@ -153,7 +153,7 @@ public class AASTORE extends gov.nasa.jpf.jvm.bytecode.AASTORE {
             int concreteIndex = ti.getTopFrame().peek(1);
             if (concreteIndex < 0 || concreteIndex >= arrayLen)
                 return ti.createAndThrowException("java.lang.ArrayIndexOutOfBoundsException", "index less/greater than array bounds");
-
+            arrayInfo.setReferenceElement(concreteIndex, frame.peek());
             arrayInfo.setElementAttr(concreteIndex, symStoreVal);
             frame.pop(3);
             return getNext(ti);
