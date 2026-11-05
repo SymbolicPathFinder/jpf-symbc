@@ -27,7 +27,6 @@ package gov.nasa.jpf.symbc.bytecode.symjrarrays;
 
 
 import gov.nasa.jpf.symbc.numeric.*;
-import gov.nasa.jpf.symbc.string.SymbolicLengthInteger;
 import gov.nasa.jpf.vm.*;
 
 import java.util.ArrayList;
@@ -57,13 +56,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
         if (attr == null)
             return super.execute(ti);
 
-        if (attr instanceof SymbolicLengthInteger) {
-            long l = ((SymbolicLengthInteger) attr).solution;
-            if (!(l >= 0 && l <= Integer.MAX_VALUE))
-                return ti.createAndThrowException("java.lang.NegativeArraySizeException");
-            arrayLength = (int) l;
-            sf.pop();
-        } else if (attr instanceof IntegerExpression) {
+        if (attr instanceof IntegerExpression) {
             ChoiceGenerator<?> cg = ti.getVM().getSystemState().getChoiceGenerator();
             if (!ti.isFirstStepInsn()) {
                 while (!((cg == null) || (cg instanceof PCChoiceGenerator))) {

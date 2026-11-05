@@ -108,6 +108,7 @@ do
   echo "singlePathOptimization=true" >> $DIR/config.jpf
   #echo "symbolic.optimizechoices=false" >> $DIR/config.jpf
   echo "symbolic.fp = true" >> $DIR/config.jpf
+  echo "vm.sysprop.keys=path.separator,line.separator,file.separator,user.name,user.dir,user.timezone,user.country,java.home,java.version,java.io.tmpdir,java.class.path,os.name,java.awt.headless/true" >> $DIR/config.jpf
   if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then
     echo "search.multiple_errors = true" >> $DIR/config.jpf
     # assert statements are not part of the runtime-exception property: disable them, but only in the
@@ -126,9 +127,9 @@ do
   export LD_LIBRARY_PATH=$PWD/java-ranger/lib:$LD_LIBRARY_PATH
   echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
   export TARGET_CLASSPATH_WALA=$DIR/target/classes/
-  # VeritestingListener prints a "Metrics Vector:" every 10 seconds in the last 2 minutes before TIMEOUT_MINS,
+  # VeritestingListener prints a "Metrics Vector:" every 10 seconds after 2 minutes TIMEOUT_MINS,
   # so that we still have its statistics if ulimit kills it before it prints its report
-  export TIMEOUT_MINS=$(( DURATION / 60 ))
+  export TIMEOUT_MINS=2
   echo $TARGET_CLASSPATH_WALA
   #jpf-core/bin/jpf $DIR/config.jpf
   if test -z "$JVM_FLAGS"; then
@@ -164,7 +165,7 @@ do
       fi
     elif [ $RUNTIME_EXCEPTION_MODE = "TRUE" ]; then
       echo "inside runtime=true"
-      grep "java.lang.*Exception" $LOG > /dev/null
+      grep -E "^error.*NoUncaughtExceptionsProperty \"[A-Za-z0-9_.$]*Exception" $LOG > /dev/null
       if [ $? -eq 0 ]; then
         echo " state3 = UNSAFE"
         RESULT="UNSAFE"

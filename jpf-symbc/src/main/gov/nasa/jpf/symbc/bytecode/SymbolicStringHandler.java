@@ -223,8 +223,14 @@ public class SymbolicStringHandler {
       } else if (shortName.equals("lastIndexOf")) {
         handleLastIndexOf(invInst, th);
       } else if (shortName.equals("charAt")) {
-        handleCharAt(invInst, th); // returns boolean that is ignored
-        //return invInst;
+        ChoiceGenerator<?> cg;
+        if (!th.isFirstStepInsn()) { // first time around
+          cg = new PCChoiceGenerator(3);
+          th.getVM().setNextChoiceGenerator(cg);
+          return invInst;
+        } else {
+          return handleCharAt(invInst, th);
+        }
       } else if (shortName.equals("replace")) {
         Instruction handled = handleReplace(invInst, th);
         if (handled != null) {
@@ -721,42 +727,77 @@ public class SymbolicStringHandler {
     }
 	}
 
-	private boolean handleCharAt (JVMInvokeInstruction invInst, ThreadInfo th) {
-		StackFrame sf = th.getModifiableTopFrame();
-		IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
-		StringExpression sym_v2 = (StringExpression) sf.getOperandAttr(1);
-		boolean bresult = false;
-		if ((sym_v1 == null) & (sym_v2 == null)) {
-			throw new RuntimeException("ERROR: symbolic string method must have one symbolic operand: HandleCharAt");
-		} else {
-			int s1 = sf.pop();
-			int s2 = sf.pop();
+  private Instruction handleCharAt(JVMInvokeInstruction invInst, ThreadInfo th) {
+    StackFrame sf = th.getModifiableTopFrame();
 
-			IntegerExpression result = null;
-			if (sym_v1 == null) { // operand 0 is concrete
+    // the receiver is a SymbolicStringBuilder for StringBuilder/StringBuffer, and a StringExpression for String
+    IntegerExpression sym_v1 = (IntegerExpression) sf.getOperandAttr(0);
+    Object receiverAttr = sf.getOperandAttr(1);
+    StringExpression sym_v2;
+    if (receiverAttr instanceof SymbolicStringBuilder) {
+      sym_v2 = ((SymbolicStringBuilder) receiverAttr).getstr();
+    } else {
+      sym_v2 = (StringExpression) receiverAttr;
+    }
 
-				int val = s1;
-				result = sym_v2._charAt(new IntegerConstant(val));
-			} else {
+    if ((sym_v1 == null) && (sym_v2 == null)) {
+      throw new RuntimeException(
+          "ERROR: symbolic string method must have one symbolic operand: HandleCharAt");
+    }
 
-				if (sym_v2 == null) {
-					ElementInfo e1 = th.getElementInfo(s2);
-					String val2 = e1.asString();
-					sym_v2 = new StringConstant(val2);
-					result = sym_v2._charAt(sym_v1);
-				} else {
-					result = sym_v2._charAt(sym_v1);
-				}
-				bresult = true;
-				//System.out.println("[handleCharAt] Ignoring: " + result.toString());
-				//th.push(0, false);
-			}
-			sf.push(0, false);
-			sf.setOperandAttr(result);
-		}
-		return bresult; // not used
+    // peek rather than pop: the operands are only removed on the in-bounds path
+    int s1 = sf.peek(0);
+    int s2 = sf.peek(1);
 
-	}
+    if (sym_v2 == null) { // concrete receiver, symbolic index
+      ElementInfo e1 = th.getElementInfo(s2);
+      sym_v2 = new StringConstant(e1.asString());
+    }
+    IntegerExpression index = (sym_v1 != null) ? sym_v1 : new IntegerConstant(s1);
+    IntegerExpression length = sym_v2._length();
+
+    ChoiceGenerator<?> cg = th.getVM().getChoiceGenerator();
+    assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
+    PathCondition pc;
+    ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+    while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
+      prev_cg = prev_cg.getPreviousChoiceGenerator();
+    }
+
+    if (prev_cg == null) {
+      pc = new PathCondition();
+    } else {
+      pc = ((PCChoiceGenerator) prev_cg).getCurrentPC();
+    }
+    assert pc != null;
+
+    int choice = (Integer) cg.getNextChoice();
+    if (choice == 0) { // in bounds: 0 <= index < length
+      pc._addDet(Comparator.LT, index, length);
+      pc._addDet(Comparator.GE, index, new IntegerConstant(0));
+    } else if (choice == 1) { // out of bounds: index >= length
+      pc._addDet(Comparator.GE, index, length);
+    } else { // out of bounds: index < 0
+      pc._addDet(Comparator.LT, index, new IntegerConstant(0));
+    }
+
+    if (!pc.simplify()) { // this path is not feasible
+      th.getVM().getSystemState().setIgnored(true);
+      return invInst.getNext(th);
+    }
+    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+
+    if (choice != 0) {
+      return th.createAndThrowException("java.lang.StringIndexOutOfBoundsException",
+          "String index out of range: " + index);
+    }
+
+    sf.pop();
+    sf.pop();
+    sf.push(0, false); // don't-care concrete value
+    sf.setOperandAttr(sym_v2._charAt(index));
+    return invInst.getNext(th);
+  }
 
 	public void handleLength(JVMInvokeInstruction invInst, ThreadInfo th) throws RuntimeException {
 		StackFrame sf = th.getModifiableTopFrame();
