@@ -223,14 +223,7 @@ public class SymbolicStringHandler {
       } else if (shortName.equals("lastIndexOf")) {
         handleLastIndexOf(invInst, th);
       } else if (shortName.equals("charAt")) {
-        ChoiceGenerator<?> cg;
-        if (!th.isFirstStepInsn()) { // first time around
-          cg = new PCChoiceGenerator(3);
-          th.getVM().setNextChoiceGenerator(cg);
-          return invInst;
-        } else {
-          return handleCharAt(invInst, th);
-        }
+        return handleCharAt(invInst, th);
       } else if (shortName.equals("replace")) {
         Instruction handled = handleReplace(invInst, th);
         if (handled != null) {
@@ -756,6 +749,20 @@ public class SymbolicStringHandler {
     IntegerExpression index = (sym_v1 != null) ? sym_v1 : new IntegerConstant(s1);
     IntegerExpression length = sym_v2._length();
 
+    if (!th.isFirstStepInsn()) { // first time around
+      if (canBeOutOfBounds(th, index, length)) {
+        th.getVM().setNextChoiceGenerator(new PCChoiceGenerator(3));
+        return invInst;
+      }
+      // in bounds on every path (e.g. inside "for (i = 0; i < s.length(); i++)"): skip the
+      // choice generator, each one costs a level of search depth
+      sf.pop();
+      sf.pop();
+      sf.push(0, false); // don't-care concrete value
+      sf.setOperandAttr(sym_v2._charAt(index));
+      return invInst.getNext(th);
+    }
+
     ChoiceGenerator<?> cg = th.getVM().getChoiceGenerator();
     assert (cg instanceof PCChoiceGenerator) : "expected PCChoiceGenerator, got: " + cg;
     PathCondition pc;
@@ -797,6 +804,19 @@ public class SymbolicStringHandler {
     sf.push(0, false); // don't-care concrete value
     sf.setOperandAttr(sym_v2._charAt(index));
     return invInst.getNext(th);
+  }
+
+  // is "index >= length" or "index < 0" satisfiable on the current path?
+  private boolean canBeOutOfBounds(ThreadInfo th, IntegerExpression index, IntegerExpression length) {
+    PathCondition pc = PathCondition.getPC(th.getVM());
+    if (pc == null) {
+      pc = new PathCondition();
+    }
+    PathCondition tooBig = pc.make_copy();
+    tooBig._addDet(Comparator.GE, index, length);
+    PathCondition negative = pc.make_copy();
+    negative._addDet(Comparator.LT, index, new IntegerConstant(0));
+    return tooBig.simplify() || negative.simplify();
   }
 
 	public void handleLength(JVMInvokeInstruction invInst, ThreadInfo th) throws RuntimeException {
