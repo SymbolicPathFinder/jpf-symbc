@@ -1599,15 +1599,15 @@ public class SymbolicStringHandler {
 				int val = s1;
 				if (sym_v2 == null) { // sym_v3 has to be symbolic
 					int val1 = s2;
-					result = sym_v3._subString(val + 1, val1);
+					result = sym_v3._subString(val, val1);
 				} else {
 					if (sym_v3 == null) { // only sym_v2 is symbolic
 						ElementInfo e3 = th.getElementInfo(s3);
 						String val2 = e3.asString();
 						sym_v3 = new StringConstant(val2);
-						result = sym_v3._subString(val + 1, sym_v2);
+						result = sym_v3._subString(val, sym_v2);
 					} else {
-						result = sym_v3._subString(val + 1, sym_v2);
+						result = sym_v3._subString(val, sym_v2);
 					}
 				}
 				IntegerExpression strLengthExp = sym_v3._length();
@@ -1618,7 +1618,7 @@ public class SymbolicStringHandler {
 					((PCChoiceGenerator) cg).setCurrentPC(pc);
 				}
 			} else { // sym_v1 is symbolic
-				IntegerExpression endBound = new BinaryLinearIntegerExpression(sym_v1, Operator.PLUS, new IntegerConstant(1));
+				IntegerExpression endBound = sym_v1;
 				if (sym_v2 == null) {
 					if (sym_v3 == null) {
 						int val1 = s2;
