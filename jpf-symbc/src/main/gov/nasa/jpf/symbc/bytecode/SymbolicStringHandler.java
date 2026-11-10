@@ -51,6 +51,9 @@ TERMINATION OF THIS AGREEMENT. */
 package gov.nasa.jpf.symbc.bytecode;
 
 
+import static gov.nasa.jpf.symbc.VeritestingListener.targetProperty;
+
+import gov.nasa.jpf.symbc.VeritestingListener.TargetProperty;
 import gov.nasa.jpf.symbc.numeric.*;
 import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ClassInfo;
@@ -59,7 +62,6 @@ import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.MethodInfo;
-import gov.nasa.jpf.vm.SystemState;
 import gov.nasa.jpf.vm.Types;
 import gov.nasa.jpf.vm.VM;
 import gov.nasa.jpf.vm.StackFrame;
@@ -750,12 +752,17 @@ public class SymbolicStringHandler {
     IntegerExpression length = sym_v2._length();
 
     if (!th.isFirstStepInsn()) { // first time around
-      if (canBeOutOfBounds(th, index, length)) {
+      if (targetProperty == TargetProperty.RUNTIME_EXCEPTION && canBeOutOfBounds(th, index, length)) {
         th.getVM().setNextChoiceGenerator(new PCChoiceGenerator(3));
         return invInst;
       }
       // in bounds on every path (e.g. inside "for (i = 0; i < s.length(); i++)"): skip the
       // choice generator, each one costs a level of search depth
+      PathCondition curPC = PathCondition.getPC(th.getVM());
+      if (curPC != null) { // assume in bounds: 0 <= index < length
+        curPC._addDet(Comparator.LT, index, length);
+        curPC._addDet(Comparator.GE, index, new IntegerConstant(0));
+      }
       sf.pop();
       sf.pop();
       sf.push(0, false); // don't-care concrete value

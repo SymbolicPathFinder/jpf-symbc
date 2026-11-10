@@ -17,7 +17,7 @@
 #target=svcomp.shifting.Main
 #target=svcomp.float1.Main
 #target=svcomp.double2long.Main
-target=svcomp.InsertionSort_FunSat01.Main
+#target=svcomp.InsertionSort_FunSat01.Main
 #target=svcomp.MergeSortIterative_FunSat02.Main
 #target=svcomp.StaticCharMethods05.Main
 #target=svcomp.Tsp_FunSat01.Main
@@ -101,11 +101,19 @@ target=svcomp.InsertionSort_FunSat01.Main
 #target=svcomp.ExSymExeLongBytecodes_false.Main
 #target=svcomp.StringConcatenation03.Main
 #target=svcomp.StringConstructors03.Main
-#target=svcomp.objects09.Main
+#target=svcomp.objects10.Main
 #target=svcomp.JavaWebClassVisitor_false.Main
 #target=svcomp.RegionTextExtractorFilter_false.Main
-target=svcomp.NotificationCenter_true.Main
+#target=svcomp.NotificationCenter_true.Main
 #target=svcomp.CustomPrinterIconCache_exceptionprone.Main
+#target=svcomp.StringBuilderChars04.Main
+#target=svcomp.SubString02.Main
+#target=svcomp.SubStringTwoArgs01.Main
+target=svcomp.StringLengthFalseAlarm01.Main
+
+###### runtime-exception
+search.multiple_errors=true
+targetProperty=runtime-exception
 
 classpath=${jpf-symbc}/build/examples,${jpf-symbc}/lib/com.ibm.wala.util-1.4.4-SNAPSHOT.jar
 #symbolic.dp=z3
@@ -120,7 +128,7 @@ symbolic.strings=true
 symbolic.string_dp=z3str3
 symbolic.lazy=on
 symbolic.jrarrays=true
-veritestingMode = 3
+veritestingMode = 5
 recursiveDepth= 10
 singlePathOptimization=true
 listener = .symbc.VeritestingListener
@@ -128,7 +136,7 @@ listener = .symbc.VeritestingListener
 #listener = .symbc.SymbolicListener
 #,.symbc.SymbolicListener
 
-#symbolic.string_dp_timeout_ms=3000
+symbolic.string_dp_timeout_ms=3000
 #symbolic.string_dp=igen
 #symbolic.dp=z3bitvectorinc
 #symbolic.arrays=true

@@ -26,7 +26,7 @@ case "$1" in
   --32|--64) BIT_WIDTH="${1##--}" ; shift 1 ;;
   --propertyfile) PROP_FILE="$2" ; shift 2 ;;
   --graphml-witness) WITNESS_FILE="$2" ; shift 2 ;;
-  --version) echo 2025; exit 0 ;;
+  --version) echo 2027; exit 0 ;;
   *) SRC=(`eval "find $1 $FIND_OPTIONS"`) ; BM=("${BM[@]}" "${SRC[@]}") ; shift 1 ;;
 esac
 done
@@ -109,8 +109,13 @@ do
   #echo "symbolic.optimizechoices=false" >> $DIR/config.jpf
   echo "symbolic.fp = true" >> $DIR/config.jpf
   echo "vm.sysprop.keys=path.separator,line.separator,file.separator,user.name,user.dir,user.timezone,user.country,java.home,java.version,java.io.tmpdir,java.class.path,os.name,java.awt.headless/true" >> $DIR/config.jpf
+  # VeritestingListener sets search.multiple_errors from this (true for runtime_exception, false for validity)
   if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then
-    echo "search.multiple_errors = true" >> $DIR/config.jpf
+    echo "targetProperty=runtime_exception" >> $DIR/config.jpf
+  else
+    echo "targetProperty=validity" >> $DIR/config.jpf
+  fi
+  if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then
     # assert statements are not part of the runtime-exception property: disable them, but only in the
     # benchmark's own classes (everything javac compiled from the script arguments into
     # $DIR/target/classes), excluding the SV-COMP harness in org/sosy_lab (from ../common/).

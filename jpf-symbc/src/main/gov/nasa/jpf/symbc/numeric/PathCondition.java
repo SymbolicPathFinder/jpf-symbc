@@ -428,7 +428,7 @@ public class PathCondition implements Comparable<PathCondition> {
         String spsStr = spc.toString().toLowerCase();
         //trying to optimize, i.e., skip solving of string constraints
         // "length_" is the length of a symbolic string (e.g. Length_1_), its relation to the string is only known by the string solver
-        if ((spsStr.contains("string") || spsStr.contains("valueof") || (spsStr.contains("charat")) || spsStr.contains("length_"))&& (!spc.toString().contains("double"))) {
+        if ((spsStr.contains("string") || spsStr.contains("valueof") || (spsStr.contains("charat")))&& (!spc.toString().contains("double"))) {
             boolean result2 = spc.simplify(); // TODO to review: used for strings
             return result1 && result2;
         } else return result1;

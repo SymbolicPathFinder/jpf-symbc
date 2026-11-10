@@ -7,7 +7,6 @@ import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
 import gov.nasa.jpf.jvm.bytecode.JVMReturnInstruction;
 import gov.nasa.jpf.search.Search;
-import gov.nasa.jpf.symbc.SymbolicListener.MethodSummary;
 import gov.nasa.jpf.symbc.concolic.PCAnalyzer;
 import gov.nasa.jpf.symbc.veritesting.Heuristics.HeuristicManager;
 import gov.nasa.jpf.symbc.veritesting.Heuristics.PathStatus;
@@ -50,7 +49,6 @@ import gov.nasa.jpf.symbc.veritesting.branchcoverage.CoverageCriteria;
 import gov.nasa.jpf.symbc.veritesting.branchcoverage.obligation.CollectObligationsVisitor;
 import gov.nasa.jpf.symbc.veritesting.branchcoverage.obligation.IsolateObligationsVisitor;
 import gov.nasa.jpf.symbc.veritesting.branchcoverage.obligation.VeriObligationMgr;
-import gov.nasa.jpf.util.Pair;
 import gov.nasa.jpf.vm.*;
 import gov.nasa.jpf.vm.Instruction;
 import za.ac.sun.cs.green.expr.*;
@@ -83,7 +81,6 @@ import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.createEmptyWitness
 import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.maintainWitnessInterceptionState;
 import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.oneTimeFillAssumptionScope;
 import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.populateWitnessGraph;
-import static gov.nasa.jpf.symbc.witness.WitnessSymbolicState.witnessHasStringVar;
 
 public class VeritestingListener extends PropertyListenerAdapter implements PublisherExtension, ConfigChangeListener {
 
@@ -128,6 +125,10 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
     private static boolean spfCasesHeuristicsOn = false;
 
     public enum VeritestingMode {VANILLASPF, VERITESTING, HIGHORDER, SPFCASES, EARLYRETURNS}
+
+    public enum TargetProperty {VALIDITY, RUNTIME_EXCEPTION}
+
+    public static TargetProperty targetProperty = TargetProperty.VALIDITY;
 
     public static StaticBranchChoiceGenerator advancedSBCG = null;
 
@@ -277,6 +278,16 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
             conf.addChangeListener(this);
             if (System.getenv("TIMEOUT_MINS") != null) {
                 timeout_mins = Integer.parseInt(System.getenv("TIMEOUT_MINS"));
+            }
+            if (conf.hasValue("targetProperty")){
+                String targetPropertyConf = conf.getString("targetProperty");
+                if(targetPropertyConf.equals("validity"))
+                    targetProperty = TargetProperty.VALIDITY;
+                else if(targetPropertyConf.equals("runtime-exception"))
+                    targetProperty = TargetProperty.RUNTIME_EXCEPTION;
+                else
+                    assert false : "invalid targetProperty, choose either, \"validity\" or \"runtime-exception\"";
+                System.out.println("targetProperty=" + targetProperty);
             }
         }
     }
