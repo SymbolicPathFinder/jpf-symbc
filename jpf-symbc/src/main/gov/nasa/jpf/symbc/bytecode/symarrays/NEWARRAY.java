@@ -120,7 +120,7 @@ public class NEWARRAY extends gov.nasa.jpf.jvm.bytecode.NEWARRAY {
                 }
                 //SH: for now do not support any symbolic length array, that is outside the range of smallValues. TODO: extend that to support symbolic array length.
                 if (values.size() == 0)
-                    return ti.createAndThrowException("unsupported symbolic size of array length.");
+                    throw new RuntimeException("unsupported symbolic size of array length.");
 
                 // First choice is to explore negative array length
                 // Last choice is to explore unconstrained symbolic array length

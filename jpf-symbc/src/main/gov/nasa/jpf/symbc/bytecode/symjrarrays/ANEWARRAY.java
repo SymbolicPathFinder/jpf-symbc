@@ -104,7 +104,7 @@ public class ANEWARRAY extends gov.nasa.jpf.jvm.bytecode.ANEWARRAY {
                     else if (lastValue == smallValues[i]) values.add(lastValue);
                 }
                 if (values.size() == 0)
-                    return ti.createAndThrowException("unsupported symbolic size of array length.");
+                    throw new RuntimeException("unsupported symbolic size of array length.");
 
                 // First choice is to explore negative array length
                 // All the choices in the middle explore small array lengths

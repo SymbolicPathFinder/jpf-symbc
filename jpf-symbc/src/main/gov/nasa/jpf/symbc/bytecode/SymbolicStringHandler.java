@@ -758,10 +758,17 @@ public class SymbolicStringHandler {
       }
       // in bounds on every path (e.g. inside "for (i = 0; i < s.length(); i++)"): skip the
       // choice generator, each one costs a level of search depth
-      PathCondition curPC = PathCondition.getPC(th.getVM());
-      if (curPC != null) { // assume in bounds: 0 <= index < length
+      // assume in bounds: 0 <= index < length. getCurrentPC() returns a copy, so the
+      // constrained copy has to be stored back with setCurrentPC.
+      ChoiceGenerator<?> pcCG = th.getVM().getChoiceGenerator();
+      if (pcCG != null && !(pcCG instanceof PCChoiceGenerator)) {
+        pcCG = pcCG.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class);
+      }
+      if (pcCG instanceof PCChoiceGenerator) {
+        PathCondition curPC = ((PCChoiceGenerator) pcCG).getCurrentPC();
         curPC._addDet(Comparator.LT, index, length);
         curPC._addDet(Comparator.GE, index, new IntegerConstant(0));
+        ((PCChoiceGenerator) pcCG).setCurrentPC(curPC);
       }
       sf.pop();
       sf.pop();

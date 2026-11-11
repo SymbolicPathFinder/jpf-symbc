@@ -111,7 +111,7 @@ do
   echo "vm.sysprop.keys=path.separator,line.separator,file.separator,user.name,user.dir,user.timezone,user.country,java.home,java.version,java.io.tmpdir,java.class.path,os.name,java.awt.headless/true" >> $DIR/config.jpf
   # VeritestingListener sets search.multiple_errors from this (true for runtime_exception, false for validity)
   if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then
-    echo "targetProperty=runtime_exception" >> $DIR/config.jpf
+    echo "targetProperty=runtime-exception" >> $DIR/config.jpf
   else
     echo "targetProperty=validity" >> $DIR/config.jpf
   fi
