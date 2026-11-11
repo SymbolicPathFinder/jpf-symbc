@@ -23,22 +23,13 @@
        </node>
 
        <node id="n1">
-       </node>
-
-       <node id="n2">
              <data key="violation">true</data>
        </node>
        <edge source="n0" target="n1">
          <data key="originfile">Main.java</data>
          <data key="startline">13</data>
-         <data key="assumption">s1.equals("")</data>
-         <data key="assumption.scope">java::Lsvcomp.StringConcatenation03.Main;</data>
-       </edge>
-       <edge source="n1" target="n2">
-         <data key="originfile">Main.java</data>
-         <data key="startline">14</data>
-         <data key="assumption">s2.equals("")</data>
-         <data key="assumption.scope">java::Lsvcomp.StringConcatenation03.Main;</data>
+         <data key="assumption">letters.equals("DEFGHIABJKLCMNOPQRST")</data>
+         <data key="assumption.scope">java::Lsvcomp.SubString02.Main;</data>
        </edge>
 
   </graph>

@@ -794,7 +794,11 @@ public class SymbolicStringHandler {
       }
       curPC._addDet(Comparator.LT, index, length);
       curPC._addDet(Comparator.GE, index, new IntegerConstant(0));
-      ((PCChoiceGenerator) pcCG).setCurrentPC(curPC);
+      if (!curPC.simplify()) { // in bounds is not possible on this path: ignore it
+        th.getVM().getSystemState().setIgnored(true);
+      } else {
+        ((PCChoiceGenerator) pcCG).setCurrentPC(curPC);
+      }
       sf.pop();
       sf.pop();
       sf.push(0, false); // don't-care concrete value
@@ -822,9 +826,13 @@ public class SymbolicStringHandler {
       ((PCChoiceGenerator) cg).setCurrentPC(oobPC);
       return th.createAndThrowException("java.lang.StringIndexOutOfBoundsException", "String index out of range: " + index);
     }
-    pc._addDet(Comparator.LT, index, length); // in bounds: 0 <= index < length, not checked with the solver
+    pc._addDet(Comparator.LT, index, length); // in bounds: 0 <= index < length
     pc._addDet(Comparator.GE, index, new IntegerConstant(0));
-    ((PCChoiceGenerator) cg).setCurrentPC(pc);
+    if (!pc.simplify()) { // in bounds is not possible on this path: ignore it
+      th.getVM().getSystemState().setIgnored(true);
+    } else {
+      ((PCChoiceGenerator) cg).setCurrentPC(pc);
+    }
 
     sf.pop();
     sf.pop();
@@ -1565,7 +1573,11 @@ public class SymbolicStringHandler {
 				// in bounds: 0 <= begin <= length
 				pc._addDet(Comparator.GE, strLengthExp, val);
 				pc._addDet(Comparator.GE, new IntegerConstant(val), new IntegerConstant(0));
-				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
+				if (!pc.simplify()) {// not satisfiable
+					th.getVM().getSystemState().setIgnored(true); //place to raise the runtime exception
+				} else {
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+				}
 			} else {
 				IntegerExpression strLengthExp;
 				if (sym_v2 == null) {
@@ -1581,7 +1593,11 @@ public class SymbolicStringHandler {
 				// in bounds: 0 <= begin <= length
 				pc._addDet(Comparator.GE, strLengthExp, sym_v1);
 				pc._addDet(Comparator.GE, sym_v1, new IntegerConstant(0));
-				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
+				if (!pc.simplify()) {// not satisfiable
+					th.getVM().getSystemState().setIgnored(true);  //place to raise the runtime exception
+				} else {
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+				}
 			}
 			ElementInfo objRef = th.getHeap().newString("", th); /*
 																																	 * dummy
@@ -1655,7 +1671,11 @@ public class SymbolicStringHandler {
 				pc._addDet(Comparator.GE, strLengthExp, end);
 				pc._addDet(Comparator.GE, end, begin);
 				pc._addDet(Comparator.GE, begin, new IntegerConstant(0));
-				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
+				if (!pc.simplify()) {// not satisfiable
+					th.getVM().getSystemState().setIgnored(true); //place to raise the runtime exception
+				} else {
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+				}
 			} else { // sym_v1 is symbolic
 				IntegerExpression endBound = sym_v1;
 				if (sym_v2 == null) {
@@ -1685,7 +1705,11 @@ public class SymbolicStringHandler {
 				pc._addDet(Comparator.GE, strLengthExp, end);
 				pc._addDet(Comparator.GE, end, begin);
 				pc._addDet(Comparator.GE, begin, new IntegerConstant(0));
-				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
+				if (!pc.simplify()) {// not satisfiable
+					th.getVM().getSystemState().setIgnored(true);  //place to raise the runtime exception
+				} else {
+					((PCChoiceGenerator) cg).setCurrentPC(pc);
+				}
 			}
 			ElementInfo objRef = th.getHeap().newString("", th);
 			//System.out.println("[SymbolicStringHandler] " + sf.toString());

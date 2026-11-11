@@ -109,11 +109,15 @@
 #target=svcomp.StringBuilderChars04.Main
 #target=svcomp.SubString02.Main
 #target=svcomp.SubStringTwoArgs01.Main
-target=svcomp.StringLengthFalseAlarm01.Main
+#target=svcomp.StringLengthFalseAlarm01.Main
+#target=svcomp.charatcg.Main
+#target=svcomp.leakA.Main
+target=svcomp.StringLengthFalseAlarm02.Main
 
 ###### runtime-exception
 search.multiple_errors=true
 targetProperty=runtime-exception
+#targetProperty=validity
 
 classpath=${jpf-symbc}/build/examples,${jpf-symbc}/lib/com.ibm.wala.util-1.4.4-SNAPSHOT.jar
 #symbolic.dp=z3
