@@ -239,15 +239,43 @@ public class SymbolicStringHandler {
       } else if (shortName.equals("trim")) {
         handleTrim(invInst, th);
       } else if (shortName.equals("substring")) {
-				ChoiceGenerator<?> cg;
-				if (!th.isFirstStepInsn()) { // first time around
-					cg = new PCChoiceGenerator(2);
-					th.getVM().setNextChoiceGenerator(cg);
-					return invInst;
-				} else {
-					handleSubString(invInst, th);
-					return invInst.getNext(th);
-				}
+        // operands: substring(begin) [string, begin], substring(begin, end) [string, begin, end]
+        StackFrame sf = th.getModifiableTopFrame();
+        StringExpression str;
+        IntegerExpression length, begin, end;
+        if (invInst.getArgSize() == 2) { // substring(begin): slot 0 begin, slot 1 string
+          str = (StringExpression) sf.getOperandAttr(1);
+          length = (str != null) ? str._length()
+              : new IntegerConstant(th.getElementInfo(sf.peek(1)).asString().length()); // concrete string: its length is known
+          begin = (sf.getOperandAttr(0) != null) ? (IntegerExpression) sf.getOperandAttr(0) : new IntegerConstant(sf.peek(0));
+          end = length; // substring(begin) ends at the length
+        } else { // substring(begin, end): slot 0 end, slot 1 begin, slot 2 string
+          str = (StringExpression) sf.getOperandAttr(2);
+          length = (str != null) ? str._length()
+              : new IntegerConstant(th.getElementInfo(sf.peek(2)).asString().length()); // concrete string: its length is known
+          begin = (sf.getOperandAttr(1) != null) ? (IntegerExpression) sf.getOperandAttr(1) : new IntegerConstant(sf.peek(1));
+          end = (sf.getOperandAttr(0) != null) ? (IntegerExpression) sf.getOperandAttr(0) : new IntegerConstant(sf.peek(0));
+        }
+        if (!th.isFirstStepInsn()) { // first time around
+          // as in charAt: append to the current PC generator, or a single choice when the current choice generator is not one
+          if (!(th.getVM().getChoiceGenerator() instanceof PCChoiceGenerator)) {
+            th.getVM().setNextChoiceGenerator(new PCChoiceGenerator(1));
+            return invInst;
+          }
+        }
+        if (targetProperty == TargetProperty.RUNTIME_EXCEPTION) {
+          // first step: the current PC generator's PC. Second step: the PC before the single choice
+          PCChoiceGenerator cg = (PCChoiceGenerator) th.getVM().getChoiceGenerator();
+          PCChoiceGenerator pcCG = th.isFirstStepInsn() ? cg.getPreviousChoiceGeneratorOfType(PCChoiceGenerator.class) : cg;
+          PathCondition oobPC = substringOutOfBounds(pcCG != null ? pcCG.getCurrentPC() : new PathCondition(), begin, end, length);
+          if (oobPC != null) { // fail directly, the in-bounds case is not explored
+            cg.setCurrentPC(oobPC);
+            return th.createAndThrowException("java.lang.StringIndexOutOfBoundsException",
+                "begin " + begin + ", end " + end + ", length " + length);
+          }
+        }
+        handleSubString(invInst, th);
+        return invInst.getNext(th);
 //        Instruction handled = handleSubString(invInst, th);
 //        if (handled != null) {
 //          return handled;
@@ -749,19 +777,21 @@ public class SymbolicStringHandler {
       sym_v2 = new StringConstant(e1.asString());
     }
     IntegerExpression index = (sym_v1 != null) ? sym_v1 : new IntegerConstant(s1);
-    IntegerExpression length = sym_v2._length();
+    IntegerExpression length = (sym_v2 instanceof StringConstant)
+        ? new IntegerConstant(((StringConstant) sym_v2).value().length()) : sym_v2._length(); // concrete string: its length is known
 
     if (!th.isFirstStepInsn()) { // first time around
-      if (targetProperty == TargetProperty.RUNTIME_EXCEPTION && canBeOutOfBounds(th, index, length)) {
-        th.getVM().setNextChoiceGenerator(new PCChoiceGenerator(2));
-        return invInst;
-      }
       ChoiceGenerator<?> pcCG = th.getVM().getChoiceGenerator();
       if (!(pcCG instanceof PCChoiceGenerator)) {
         th.getVM().setNextChoiceGenerator(new PCChoiceGenerator(1));
         return invInst;
       }
       PathCondition curPC = ((PCChoiceGenerator) pcCG).getCurrentPC();
+      PathCondition oobPC = (targetProperty == TargetProperty.RUNTIME_EXCEPTION) ? charAtOutOfBounds(curPC, index, length) : null;
+      if (oobPC != null) { // fail directly, the in-bounds case is not explored
+        ((PCChoiceGenerator) pcCG).setCurrentPC(oobPC);
+        return th.createAndThrowException("java.lang.StringIndexOutOfBoundsException", "String index out of range: " + index);
+      }
       curPC._addDet(Comparator.LT, index, length);
       curPC._addDet(Comparator.GE, index, new IntegerConstant(0));
       ((PCChoiceGenerator) pcCG).setCurrentPC(curPC);
@@ -787,34 +817,14 @@ public class SymbolicStringHandler {
     }
     assert pc != null;
 
-    int choice = (Integer) cg.getNextChoice();
-    boolean sat;
-    if (choice == 0) { // in bounds: 0 <= index < length
-      pc._addDet(Comparator.LT, index, length);
-      pc._addDet(Comparator.GE, index, new IntegerConstant(0));
-      sat = pc.simplify();
-    } else { // out of bounds, one choice for both sides: index >= length if sat, else index < 0
-      PathCondition tooBig = pc.make_copy();
-      tooBig._addDet(Comparator.GE, index, length);
-      sat = tooBig.simplify();
-      if (sat) {
-        pc = tooBig;
-      } else {
-        pc._addDet(Comparator.LT, index, new IntegerConstant(0));
-        sat = pc.simplify();
-      }
+    PathCondition oobPC = (targetProperty == TargetProperty.RUNTIME_EXCEPTION) ? charAtOutOfBounds(pc, index, length) : null;
+    if (oobPC != null) { // fail directly, the in-bounds case is not explored
+      ((PCChoiceGenerator) cg).setCurrentPC(oobPC);
+      return th.createAndThrowException("java.lang.StringIndexOutOfBoundsException", "String index out of range: " + index);
     }
-
-    if (!sat) { // this path is not feasible
-      th.getVM().getSystemState().setIgnored(true);
-      return invInst.getNext(th);
-    }
+    pc._addDet(Comparator.LT, index, length); // in bounds: 0 <= index < length, not checked with the solver
+    pc._addDet(Comparator.GE, index, new IntegerConstant(0));
     ((PCChoiceGenerator) cg).setCurrentPC(pc);
-
-    if (choice != 0) {
-      return th.createAndThrowException("java.lang.StringIndexOutOfBoundsException",
-          "String index out of range: " + index);
-    }
 
     sf.pop();
     sf.pop();
@@ -823,17 +833,27 @@ public class SymbolicStringHandler {
     return invInst.getNext(th);
   }
 
-  // is "index >= length" or "index < 0" satisfiable on the current path?
-  private boolean canBeOutOfBounds(ThreadInfo th, IntegerExpression index, IntegerExpression length) {
-    PathCondition pc = PathCondition.getPC(th.getVM());
-    if (pc == null) {
-      pc = new PathCondition();
-    }
-    PathCondition tooBig = pc.make_copy();
-    tooBig._addDet(Comparator.GE, index, length);
-    PathCondition negative = pc.make_copy();
-    negative._addDet(Comparator.LT, index, new IntegerConstant(0));
-    return tooBig.simplify() || negative.simplify();
+  // the first out-of-bounds side satisfiable on pc (index >= length, else index < 0), added to a copy of pc; null if none
+  private PathCondition charAtOutOfBounds(PathCondition pc, IntegerExpression index, IntegerExpression length) {
+    PathCondition oob = pc.make_copy();
+    oob._addDet(Comparator.GE, index, length);
+    if (oob.simplify()) return oob;
+    oob = pc.make_copy();
+    oob._addDet(Comparator.LT, index, new IntegerConstant(0));
+    return oob.simplify() ? oob : null;
+  }
+
+  // the first out-of-bounds side satisfiable on pc (begin < 0, begin > end, end > length), added to a copy of pc; null if none
+  private PathCondition substringOutOfBounds(PathCondition pc, IntegerExpression begin, IntegerExpression end, IntegerExpression length) {
+    PathCondition oob = pc.make_copy();
+    oob._addDet(Comparator.LT, begin, new IntegerConstant(0));
+    if (oob.simplify()) return oob;
+    oob = pc.make_copy();
+    oob._addDet(Comparator.GT, begin, end);
+    if (oob.simplify()) return oob;
+    oob = pc.make_copy();
+    oob._addDet(Comparator.GT, end, length);
+    return oob.simplify() ? oob : null;
   }
 
 	public void handleLength(JVMInvokeInstruction invInst, ThreadInfo th) throws RuntimeException {
@@ -1515,7 +1535,7 @@ public class SymbolicStringHandler {
 		// get the path condition from the
 		// previous choice generator of the same type
 
-		ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+		ChoiceGenerator<?> prev_cg = th.isFirstStepInsn() ? cg.getPreviousChoiceGenerator() : cg; // first step: append to the current PC generator
 		while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
 			prev_cg = prev_cg.getPreviousChoiceGenerator();
 		}
@@ -1545,11 +1565,7 @@ public class SymbolicStringHandler {
 				// in bounds: 0 <= begin <= length
 				pc._addDet(Comparator.GE, strLengthExp, val);
 				pc._addDet(Comparator.GE, new IntegerConstant(val), new IntegerConstant(0));
-				if (!pc.simplify()) {// not satisfiable
-					th.getVM().getSystemState().setIgnored(true); //place to raise the runtime exception
-				} else {
-					((PCChoiceGenerator) cg).setCurrentPC(pc);
-				}
+				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
 			} else {
 				IntegerExpression strLengthExp;
 				if (sym_v2 == null) {
@@ -1565,11 +1581,7 @@ public class SymbolicStringHandler {
 				// in bounds: 0 <= begin <= length
 				pc._addDet(Comparator.GE, strLengthExp, sym_v1);
 				pc._addDet(Comparator.GE, sym_v1, new IntegerConstant(0));
-				if (!pc.simplify()) {// not satisfiable
-					th.getVM().getSystemState().setIgnored(true);  //place to raise the runtime exception
-				} else {
-					((PCChoiceGenerator) cg).setCurrentPC(pc);
-				}
+				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
 			}
 			ElementInfo objRef = th.getHeap().newString("", th); /*
 																																	 * dummy
@@ -1594,7 +1606,7 @@ public class SymbolicStringHandler {
 		// get the path condition from the
 		// previous choice generator of the same type
 
-		ChoiceGenerator<?> prev_cg = cg.getPreviousChoiceGenerator();
+		ChoiceGenerator<?> prev_cg = th.isFirstStepInsn() ? cg.getPreviousChoiceGenerator() : cg; // first step: append to the current PC generator
 		while (!((prev_cg == null) || (prev_cg instanceof PCChoiceGenerator))) {
 			prev_cg = prev_cg.getPreviousChoiceGenerator();
 		}
@@ -1619,6 +1631,8 @@ public class SymbolicStringHandler {
 			int s2 = sf.pop();
 			int s3 = sf.pop();
 			//System.out.printf("[SymbolicStringHandler] popped %d %d %d\n", s1, s2, s3);
+			IntegerExpression begin = (sym_v2 != null) ? sym_v2 : new IntegerConstant(s2);
+			IntegerExpression end = (sym_v1 != null) ? sym_v1 : new IntegerConstant(s1);
 			StringExpression result = null;
 			if (sym_v1 == null) { // operand 0 is concrete
 				int val = s1;
@@ -1635,13 +1649,13 @@ public class SymbolicStringHandler {
 						result = sym_v3._subString(val, sym_v2);
 					}
 				}
-				IntegerExpression strLengthExp = sym_v3._length();
-				pc._addDet(Comparator.GE, strLengthExp, val);
-				if (!pc.simplify()) {// not satisfiable
-					th.getVM().getSystemState().setIgnored(true); //place to raise the runtime exception
-				} else {
-					((PCChoiceGenerator) cg).setCurrentPC(pc);
-				}
+				IntegerExpression strLengthExp = (sym_v3 instanceof StringConstant)
+				    ? new IntegerConstant(((StringConstant) sym_v3).value().length()) : sym_v3._length(); // concrete string: its length is known
+				// in bounds: 0 <= begin <= end <= length
+				pc._addDet(Comparator.GE, strLengthExp, end);
+				pc._addDet(Comparator.GE, end, begin);
+				pc._addDet(Comparator.GE, begin, new IntegerConstant(0));
+				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
 			} else { // sym_v1 is symbolic
 				IntegerExpression endBound = sym_v1;
 				if (sym_v2 == null) {
@@ -1665,13 +1679,13 @@ public class SymbolicStringHandler {
 						result = sym_v3._subString(endBound, sym_v2);
 					}
 				}
-				IntegerExpression strLengthExp = sym_v3._length();
-				pc._addDet(Comparator.GE, strLengthExp, sym_v1);
-				if (!pc.simplify()) {// not satisfiable
-					th.getVM().getSystemState().setIgnored(true);  //place to raise the runtime exception
-				} else {
-					((PCChoiceGenerator) cg).setCurrentPC(pc);
-				}
+				IntegerExpression strLengthExp = (sym_v3 instanceof StringConstant)
+				    ? new IntegerConstant(((StringConstant) sym_v3).value().length()) : sym_v3._length(); // concrete string: its length is known
+				// in bounds: 0 <= begin <= end <= length
+				pc._addDet(Comparator.GE, strLengthExp, end);
+				pc._addDet(Comparator.GE, end, begin);
+				pc._addDet(Comparator.GE, begin, new IntegerConstant(0));
+				((PCChoiceGenerator) cg).setCurrentPC(pc); // in bounds, not checked with the solver
 			}
 			ElementInfo objRef = th.getHeap().newString("", th);
 			//System.out.println("[SymbolicStringHandler] " + sf.toString());
