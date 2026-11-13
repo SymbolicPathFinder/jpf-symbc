@@ -6,6 +6,7 @@ import gov.nasa.jpf.JPFException;
 import gov.nasa.jpf.jvm.bytecode.IfInstruction;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
 import gov.nasa.jpf.jvm.bytecode.JVMReturnInstruction;
+import gov.nasa.jpf.jvm.bytecode.NEW;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.symbc.concolic.PCAnalyzer;
 import gov.nasa.jpf.symbc.veritesting.Heuristics.HeuristicManager;
@@ -316,6 +317,15 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
             }
         }
         StackFrame curr = ti.getTopFrame();
+        if (targetProperty == TargetProperty.RUNTIME_EXCEPTION && instructionToExecute instanceof NEW
+                && ((NEW) instructionToExecute).getClassName().equals("java.lang.AssertionError")) {
+            String classFile = instructionToExecute.getMethodInfo().getClassInfo().getClassFileUrl();
+            String programDir = System.getenv("TARGET_CLASSPATH_WALA");
+            if (classFile != null && programDir != null && classFile.contains(programDir)) {
+                vm.getSystemState().setIgnored(true);
+                return;
+            }
+        }
 
         boolean isIfInstruction = instructionToExecute instanceof IfInstruction;
         boolean isEmptyRegionHeuristic = HeuristicManager.getRegionHeuristicSize() == 0;

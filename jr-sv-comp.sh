@@ -69,7 +69,7 @@ mkdir -p $DIR/target/classes
 PWD=`pwd`
 
 # build src files from benchmark
-javac --release 8 -g -cp $PWD/java-ranger/build/classes:$DIR/target/classes:$PWD/java-ranger/lib/JSAP-2.1.jar:$PWD/java-ranger/lib/foundry-1.0.jar -d $DIR/target/classes "${BM[@]}"
+javac -source 8 -target 8 -g -cp $PWD/java-ranger/build/classes:$DIR/target/classes:$PWD/java-ranger/lib/JSAP-2.1.jar:$PWD/java-ranger/lib/foundry-1.0.jar -d $DIR/target/classes "${BM[@]}"
 
 echo "after javac"
 
@@ -114,17 +114,6 @@ do
     echo "targetProperty=runtime-exception" >> $DIR/config.jpf
   else
     echo "targetProperty=validity" >> $DIR/config.jpf
-  fi
-  if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then
-    # assert statements are not part of the runtime-exception property: disable them, but only in the
-    # benchmark's own classes (everything javac compiled from the script arguments into
-    # $DIR/target/classes), excluding the SV-COMP harness in org/sosy_lab (from ../common/).
-    # Assertions in SPF/JR model classes stay enabled.
-    BM_CLASSES=$(cd $DIR/target/classes && find . -name '*.class' ! -path './org/sosy_lab/*' \
-                 | sed -e 's|^\./||' -e 's|\.class$||' -e 's|/|.|g' | paste -sd, -)
-    if [ -n "$BM_CLASSES" ]; then
-      echo "vm.disable_assertions=$BM_CLASSES" >> $DIR/config.jpf
-    fi
   fi
   cat $DIR/config.jpf
 
