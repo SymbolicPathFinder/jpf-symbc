@@ -341,6 +341,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object eq(Object exp1, Object exp2) {
         try {
+            if (exp1 instanceof FPExpr && exp2 instanceof FPExpr)
+                return ctx.mkFPEq((FPExpr) exp1, (FPExpr) exp2);
             return ctx.mkEq((Expr) exp1, (Expr) exp2);
         } catch (Exception e) {
             e.printStackTrace();
@@ -385,6 +387,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
     @Override
     public Object neq(Object exp1, Object exp2) {
         try {
+            if (exp1 instanceof FPExpr && exp2 instanceof FPExpr)
+                return ctx.mkNot(ctx.mkFPEq((FPExpr) exp1, (FPExpr) exp2));
             return ctx.mkNot(ctx.mkEq((Expr) exp1, (Expr) exp2));
         } catch (Exception e) {
             e.printStackTrace();
@@ -444,6 +448,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSLE((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkLe((IntExpr) exp1, (IntExpr) exp2);
+            } else if (exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkFPLEq((FPExpr) exp1, (FPExpr) exp2);
             } else {
                 throw new RuntimeException();
             }
@@ -494,6 +500,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSGE((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkGe((IntExpr) exp1, (IntExpr) exp2);
+            } else if (exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkFPGEq((FPExpr) exp1, (FPExpr) exp2);
             } else {
                 throw new RuntimeException();
             }
@@ -836,6 +844,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
                 return ctx.mkBVSDiv((BitVecExpr) exp1, (BitVecExpr) exp2);
             } else if (exp1 instanceof IntExpr && exp2 instanceof IntExpr) {
                 return ctx.mkDiv((IntExpr) exp1, (IntExpr) exp2);
+            } else if (exp1 instanceof FPExpr && exp2 instanceof FPExpr) {
+                return ctx.mkFPDiv(ctx.mkFPRoundNearestTiesToEven(), (FPExpr) exp1, (FPExpr) exp2);
             } else {
                 throw new RuntimeException();
             }
