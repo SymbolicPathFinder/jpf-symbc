@@ -19,6 +19,8 @@ public class SymbolicVariableInfo {
 
   public Object varValue = null;
 
+  public String sourceFile; // package-relative source of the nondet call, e.g. svcomp/objects/Factories.java
+
   public SymbolicVariableInfo() {}
 
   ;

@@ -108,6 +108,9 @@ do
   echo "singlePathOptimization=true" >> $DIR/config.jpf
   #echo "symbolic.optimizechoices=false" >> $DIR/config.jpf
   echo "symbolic.fp = true" >> $DIR/config.jpf
+  # inputs for the YAML witness (witness.yml) metadata
+  echo "witness.input_files=$(IFS=,; echo "${BM[*]}")" >> $DIR/config.jpf
+  echo "witness.property_file=$PROP_FILE" >> $DIR/config.jpf
   echo "vm.sysprop.keys=path.separator,line.separator,file.separator,user.name,user.dir,user.timezone,user.country,java.home,java.version,java.io.tmpdir,java.class.path,os.name,java.awt.headless/true" >> $DIR/config.jpf
   # VeritestingListener sets search.multiple_errors from this (true for runtime_exception, false for validity)
   if [ $RUNTIME_EXCEPTION_MODE = "TRUE" ] ; then

@@ -4,6 +4,7 @@ import gov.nasa.jpf.jvm.bytecode.EXECUTENATIVE;
 import gov.nasa.jpf.jvm.bytecode.JVMInvokeInstruction;
 import gov.nasa.jpf.symbc.SymbolicListener;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
+import gov.nasa.jpf.symbc.witness.yaml.YamlWitness;
 import gov.nasa.jpf.vm.ApplicationContext;
 import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.LocalVarInfo;
@@ -54,6 +55,7 @@ public class WitnessSymbolicState {
     Object symbolicVar = sf.getOperandAttr();
     if (interceptSymbolic && strIns.contains("nativereturn") && strIns.contains("makeSymbolic")) {
       symbolicVariableInfo.varSymName = symbolicVar.toString();
+      YamlWitness.recordNondet(symbolicVariableInfo);
       if(symbolicVariableInfo.varPgmName==null){
         // case where we couldn't find the program name of a variable, as in the case where the verifier invocation was within and expression, for example like an arrayIndex
         symbolicVariableInfo.varPgmName = symbolicVariableInfo.varSymName;
@@ -81,6 +83,7 @@ public class WitnessSymbolicState {
   public static void extractSymbolicVariableInfo(JVMInvokeInstruction md) {
     symbolicVariableInfo.lineNumber = md.getLineNumber();
     symbolicVariableInfo.returnType = md.getReturnTypeName();
+    symbolicVariableInfo.sourceFile = md.getMethodInfo().getClassInfo().getSourceFileName();
   }
 
   //maintain the state of whether we are still trying to intercept creation of symbolic variables
@@ -161,6 +164,7 @@ public class WitnessSymbolicState {
     if (!witnessAssumptionScopeIsFilled) {
       parseAssumptionScope(ti);
       witnessAssumptionScopeIsFilled = true;
+      YamlWitness.writeCorrectnessWitness(); // overwritten if a violation is found
     }
   }
 
@@ -175,6 +179,7 @@ public class WitnessSymbolicState {
       GraphML emptyWitness = new GraphML(inputStream, outputFilePath);
       String headerForEmptyWitness = emptyWitness.constructHeader();
       emptyWitness.serializeEmptyWitness(strNode, headerForEmptyWitness);
+      YamlWitness.writeViolationWitness(null);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -204,6 +209,7 @@ public class WitnessSymbolicState {
       GraphML graphML = new GraphML(inputStream, outputFilePath);
       String header = graphML.constructHeader();
       graphML.serializeWitness(edgeList, nodeList, header);
+      YamlWitness.writeViolationWitness(pc);
     } catch (IOException e) {
       e.printStackTrace();
     }
