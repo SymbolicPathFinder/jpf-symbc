@@ -47,21 +47,42 @@ class Manager extends TranslationManager {
 			replacements.put("/", "div");
 			replacements.put("&", "bvand");
 
-			map(SymbolicLastIndexOfCharInteger.class, "LastIndexof $getSource ?getExpression");
-			map(SymbolicLastIndexOfChar2Integer.class,
-					"LastIndexof ( str.substr $getSource %getMinDist ( - (str.len $getSource ) %getMinDist )) ?getExpression");
+			rules.put(SymbolicLastIndexOfCharInteger.class, (x) -> {
+				final SymbolicLastIndexOfCharInteger e = (SymbolicLastIndexOfCharInteger) x;
+				return lastIndexOf(manager.strExpr.collect(e.getSource()), charStr(e.getExpression()), null, validChar(e.getExpression()));
+			});
+			rules.put(SymbolicLastIndexOfChar2Integer.class, (x) -> {
+				final SymbolicLastIndexOfChar2Integer e = (SymbolicLastIndexOfChar2Integer) x;
+				return lastIndexOf(manager.strExpr.collect(e.getSource()), charStr(e.getExpression()),
+						collect(e.getMinDist()), validChar(e.getExpression()));
+			});
 
 			map(SymbolicCharAtInteger.class, "str.at $getExpression %getIndex");
 			map(SymbolicIndexOf2Integer.class, "str.indexof $getSource $getExpression %getMinIndex");
 			map(SymbolicIndexOfInteger.class, "str.indexof $getSource $getExpression");
 
-			map(SymbolicLastIndexOf2Integer.class,
-					"LastIndexof ( str.substr $getSource %getMinIndex ( - (str.len $getSource ) %getMinIndex )) $getExpression");
-			map(SymbolicLastIndexOfInteger.class, "LastIndexof $getSource $getExpression");
+			// z3 has no lastIndexOf: see lastIndexOf below
+			rules.put(SymbolicLastIndexOf2Integer.class, (x) -> {
+				final SymbolicLastIndexOf2Integer e = (SymbolicLastIndexOf2Integer) x;
+				return lastIndexOf(manager.strExpr.collect(e.getSource()), manager.strExpr.collect(e.getExpression()),
+						collect(e.getMinIndex()), null);
+			});
+			rules.put(SymbolicLastIndexOfInteger.class, (x) -> {
+				final SymbolicLastIndexOfInteger e = (SymbolicLastIndexOfInteger) x;
+				return lastIndexOf(manager.strExpr.collect(e.getSource()), manager.strExpr.collect(e.getExpression()), null, null);
+			});
 
 			map(SymbolicLengthInteger.class, "str.len $getExpression");
-			map(SymbolicIndexOfCharInteger.class, "str.indexof $getSource ?getExpression");
-			map(SymbolicIndexOfChar2Integer.class, "str.indexof $getSource ?getExpression %getMinDist");
+			// the char is an Int: it must be turned into a string for str.indexof
+			rules.put(SymbolicIndexOfCharInteger.class, (x) -> {
+				final SymbolicIndexOfCharInteger e = (SymbolicIndexOfCharInteger) x;
+				return indexOfChar(manager.strExpr.collect(e.getSource()), e.getExpression(), "0");
+			});
+			rules.put(SymbolicIndexOfChar2Integer.class, (x) -> {
+				final SymbolicIndexOfChar2Integer e = (SymbolicIndexOfChar2Integer) x;
+				final String s = manager.strExpr.collect(e.getSource());
+				return indexOfChar(s, e.getExpression(), clamp(collect(e.getMinDist()), s));
+			});
 
 			rules.put(IntegerConstant.class, (x) -> {
 				final int v = (int) ((IntegerConstant) x).value;
@@ -73,8 +94,10 @@ class Manager extends TranslationManager {
 
 			rules.put(SymbolicInteger.class, (x) -> {
 				final SymbolicInteger si = (SymbolicInteger) x;
-				Results.numericVariables.add(si.getName());
-				return si.getName();
+				// a field name such as object3[504].x is not a valid SMT-LIB symbol; z3 rejects it unless quoted as |..|
+				final String n = NumericExpressionTranslator.smtName(si.getName());
+				Results.numericVariables.add(n);
+				return n;
 			});
 
 			rules.put(BinaryLinearIntegerExpression.class, (x) -> {
@@ -97,6 +120,56 @@ class Manager extends TranslationManager {
 				}else
 					return evaluateExpression(BinaryLinearIntegerExpression.class, x, "_getOp %getLeft %getRight");
 			});
+		}
+
+		/** Java clamps fromIndex to [0, len]; z3's str.indexof gives -1 outside that range */
+		private static String clamp(String i, String s) {
+			return "(ite (< " + i + " 0) 0 (ite (> " + i + " (str.len " + s + ")) (str.len " + s + ") " + i + "))";
+		}
+
+		/** true when the int is a valid code point; Java's indexOf/lastIndexOf(int ch) give -1 otherwise */
+		private String validChar(IntegerExpression ch) {
+			if (ch instanceof SymbolicCharAtInteger) return "true";
+			final String c = collect(ch);
+			return "(and (<= 0 " + c + ") (<= " + c + " 1114111))";
+		}
+
+		/** the char (or code point, as its UTF-16 surrogate pair) as a string */
+		private String charStr(IntegerExpression ch) {
+			if (ch instanceof SymbolicCharAtInteger) return collect(ch); // already a one-char string: (str.at s i)
+			final String c = collect(ch);
+			return "(ite (<= " + c + " 65535) (str.from_code " + c + ") (str.++ (str.from_code (+ 55296 (div (- " + c
+					+ " 65536) 1024))) (str.from_code (+ 56320 (mod (- " + c + " 65536) 1024)))))";
+		}
+
+		private String indexOfChar(String s, IntegerExpression ch, String from) {
+			return "(ite " + validChar(ch) + " (str.indexof " + s + " " + charStr(ch) + " " + from + ") (- 1))";
+		}
+
+		/**
+		 * Java's s.lastIndexOf(t) / s.lastIndexOf(t, from) as a fresh Int r (z3 4.8 has no last-index operation).
+		 * With from, the search is in the prefix p = s[0 .. k+|t|), k = min(from, |s|-|t|), and r = -1 when k < 0.
+		 * r = |p| when t is empty; -1 when t does not occur in p; otherwise t is at r and does not occur in p after r.
+		 * valid (may be null) is a condition that, when false, makes r = -1 (an invalid code point).
+		 */
+		private String lastIndexOf(String s, String t, String from, String valid) {
+			final String r = "lio_" + Integer.toHexString((s + " " + t + " " + from + " " + valid).hashCode()).replace('-', 'n');
+			Results.numericVariables.add(r);
+			final String lt = "(str.len " + t + ")";
+			String p = s, guard = valid == null ? "true" : valid;
+			if (from != null) {
+				final String right = "(- (str.len " + s + ") " + lt + ")";
+				final String k = "(ite (< " + from + " " + right + ") " + from + " " + right + ")";
+				p = "(str.substr " + s + " 0 (+ " + k + " " + lt + "))";
+				guard = "(and " + guard + " (>= " + k + " 0))";
+			}
+			final String lp = "(str.len " + p + ")";
+			final String found = "(and (<= 0 " + r + ") (<= (+ " + r + " " + lt + ") " + lp + ") (= (str.substr " + p + " "
+					+ r + " " + lt + ") " + t + ") (not (str.contains (str.substr " + p + " (+ " + r + " 1) (- " + lp
+					+ " (+ " + r + " 1))) " + t + ")))";
+			Results.constraints.add("(assert (ite " + guard + " (ite (= " + t + " \"\") (= " + r + " " + lp
+					+ ") (ite (str.contains " + p + " " + t + ") " + found + " (= " + r + " (- 1)))) (= " + r + " (- 1))))");
+			return r;
 		}
 	}
 
@@ -212,7 +285,8 @@ class Manager extends TranslationManager {
 				};
 
 			map(StringOrOperation.NONSYM, (expr) -> {
-				return "\"" + ((StringConstant) expr).value + "\"";
+				// escaped: a constant containing " (e.g. "e =\"") ends the SMT-LIB string early and z3 rejects the query
+				return NumericExpressionTranslator.smtString(((StringConstant) expr).value);
 			});
 
 			map(StringOrOperation.SYM, (expr) -> {
@@ -261,13 +335,13 @@ class Manager extends TranslationManager {
 			map(StringOrOperation.TRIM, (expr) -> {
 				final DerivedStringExpression dse = (DerivedStringExpression) expr;
 				final String in_str = manager.strExpr.collect(dse.right);
-				String arg = "out_str";
-				Results.stringVariables.add("out_str");
-				Results.constraints.add("(declare-const ws RegLan)");
-				Results.constraints.add("(declare-const nwc RegLan)");
-				Results.constraints.add("(assert (= ws (re.union (re.+ (re.range (str.from_code 0) (str.from_code 32))) (str.to_re \"\"))))");
-				Results.constraints.add("(assert (= nwc (re.diff re.allchar (re.range (str.from_code 0) (str.from_code 32)))))");
-				Results.constraints.add("(assert (and (str.in_re " + in_str + " (re.++ ws (str.to_re out_str) ws)) (or (= out_str \"\")(and (str.in_re out_str (re.++ nwc re.all)) (str.in_re out_str (re.++ re.all nwc))))))");
+				// one result per input: a shared out_str would force the trims of different strings to be equal
+				String arg = "trim_" + Integer.toHexString(in_str.hashCode());
+				Results.stringVariables.add(arg);
+				// ws and nwc inlined: as declare-const'ed RegLan constants they could be emitted after their use
+				final String ws = "(re.union (re.+ (re.range (str.from_code 0) (str.from_code 32))) (str.to_re \"\"))";
+				final String nwc = "(re.diff re.allchar (re.range (str.from_code 0) (str.from_code 32)))";
+				Results.constraints.add("(assert (and (str.in_re " + in_str + " (re.++ " + ws + " (str.to_re " + arg + ") " + ws + ")) (or (= " + arg + " \"\")(and (str.in_re " + arg + " (re.++ " + nwc + " re.all)) (str.in_re " + arg + " (re.++ re.all " + nwc + "))))))");
 				return arg;
 			});
 			map(StringOrOperation.TOLOWERCASE, RightTemplate.apply("(toLowerCase"));

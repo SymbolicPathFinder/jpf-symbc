@@ -16,6 +16,22 @@ public abstract class NumericExpressionTranslator
 		extends NormalFormTranslator<IntegerExpression, Class<? extends IntegerExpression>, String> {
 	public HashMap<String, String> replacements;
 
+	/** an SMT-LIB symbol for a variable name; names such as object3[504].x must be quoted as |object3[504].x| */
+	public static String smtName(String n) {
+		return n.matches("[A-Za-z_~!@$%^&*+=<>.?/-][A-Za-z0-9_~!@$%^&*+=<>.?/-]*") ? n : "|" + n + "|";
+	}
+
+	/** an SMT-LIB string literal: " doubled, \\ and non-printable characters as \\u{..} */
+	public static String smtString(String v) {
+		final StringBuilder b = new StringBuilder("\"");
+		for (char c : v.toCharArray()) {
+			if (c == '"') b.append("\"\"");
+			else if (c >= 32 && c < 127 && c != '\\') b.append(c);
+			else b.append("\\u{").append(Integer.toHexString(c)).append('}');
+		}
+		return b.append('"').toString();
+	}
+
 	public NumericExpressionTranslator(TranslationManager manager) {
 		super((x) -> {
 			return x.toString() + "-Integer-Expression-not-yet-handled";

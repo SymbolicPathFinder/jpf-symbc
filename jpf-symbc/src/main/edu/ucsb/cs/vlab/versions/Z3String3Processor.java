@@ -125,7 +125,7 @@ public class Z3String3Processor {
 							String value = s.substring(begin, s.length() - 1);
 							String[] parts = s.split(" ");
 
-							model.put(parts[1], value);
+							model.put(parts[1].replace("|", ""), value); // names quoted as |..| by the translator come back quoted
 						}
 					}
 					else{
@@ -133,7 +133,7 @@ public class Z3String3Processor {
 						String value = s.substring(s.indexOf("Int ") + 3, s.length() - 1).replace("(","").replace(")","").replace(" ","");
 						String[] parts = s.split(" ");
 
-						model.put(parts[1], value);
+						model.put(parts[1].replace("|", ""), value); // names quoted as |..| by the translator come back quoted
 					}
 				}
 
