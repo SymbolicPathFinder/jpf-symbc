@@ -2924,8 +2924,8 @@ public class SymbolicStringHandler {
 			int s2 = sf.pop();
 
 			if (sym_v1 == null) { // operand 0 is concrete
-				ElementInfo e1 = th.getElementInfo(s1);
-				String val = e1.asString();
+				// append((String) null) appends "null", as in Java
+				String val = (s1 == gov.nasa.jpf.vm.MJIEnv.NULL) ? "null" : th.getElementInfo(s1).asString();
 				sym_v2._append(val);
 				sf.push(s2, true); /* symbolic string Builder element */
 			} else if (sym_v2.getstr() == null) { // operand 1 is concrete; get string
