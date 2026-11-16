@@ -1,7 +1,14 @@
 package gov.nasa.jpf.symbc.witness.yaml;
 
 import gov.nasa.jpf.Config;
+import gov.nasa.jpf.symbc.numeric.Constraint;
+import gov.nasa.jpf.symbc.numeric.ConstraintExpressionVisitor;
 import gov.nasa.jpf.symbc.numeric.PathCondition;
+import gov.nasa.jpf.symbc.numeric.SymbolicInteger;
+import gov.nasa.jpf.symbc.string.StringExpression;
+import gov.nasa.jpf.symbc.string.StringSymbolic;
+import gov.nasa.jpf.symbc.string.SymbolicCharAtInteger;
+import gov.nasa.jpf.symbc.string.SymbolicLengthInteger;
 import gov.nasa.jpf.symbc.witness.PathConditionParser;
 import gov.nasa.jpf.symbc.witness.SymbolicVariableInfo;
 import gov.nasa.jpf.vm.ClassInfo;
@@ -18,7 +25,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,8 +68,19 @@ public class YamlWitness {
         nondetByCounter.headMap(verifierCounter()).values());
     for (SymbolicVariableInfo info : path)
       info.varValue = null;
-    if (pc != null)
+    if (pc != null) {
       new PathConditionParser().parseSymVar(pc, path);
+      List<String> names = new ArrayList<>();
+      for (SymbolicVariableInfo info : path)
+        names.add(info.varSymName);
+      try {
+        Map<String, Object> model = pc.solveWithValuations(names);
+        for (SymbolicVariableInfo info : path)
+          if (model != null && model.get(info.varSymName) != null && !info.returnType.contains("String"))
+            info.varValue = model.get(info.varSymName);
+      } catch (Throwable t) { // keep the values parsed from the PC
+      }
+    }
 
     StringBuilder sb = new StringBuilder(header("violation_sequence"));
     sb.append("  content:\n");
@@ -108,7 +128,7 @@ public class YamlWitness {
       case "char":
         return "\\result == '" + escapeChar((char) (v == null ? 4 : Long.parseLong(v.toString()))) + "'";
       case "boolean":
-        return "\\result == " + (v == null || Boolean.parseBoolean(v.toString()));
+        return "\\result == " + (v == null || v.toString().equals("true") || v.toString().matches("-?[1-9]\\d*"));
       case "float": {
         float f = v == null ? 2.0f : (float) Double.parseDouble(v.toString());
         if (Float.isNaN(f)) return "\\result == Float.NaN";
@@ -124,6 +144,8 @@ public class YamlWitness {
       case "java.lang.String": {
         // raw solution of the string solver, not the backslash-escaped one kept for GraphML
         String s = (pc == null || pc.spc == null) ? null : pc.spc.solution.get(info.varSymName);
+        if (s == null && pc != null)
+          s = stringFromNumericModel(pc, info.varSymName);
         if (s == null) s = "";
         if (s.length() >= 2 && s.startsWith("\"") && s.endsWith("\""))
           s = s.substring(1, s.length() - 1);
@@ -135,6 +157,67 @@ public class YamlWitness {
       default:
         return null;
     }
+  }
+
+  /**
+   * Rebuilds a nondet string from the numeric model when the string solver gave no value for it.
+   * JR turns s.length() and s.charAt(i) into the integers Length_k_ and CharAt(i)_k_, so the
+   * numeric model has the string's length and the characters the path depends on; every other
+   * position is free and gets 'a'. Returns null if the path has no length symbol for this string.
+   */
+  static String stringFromNumericModel(PathCondition pc, String symName) {
+    try {
+      List<SymbolicInteger> vars = new ArrayList<>();       // every integer symbol of the PC
+      List<SymbolicLengthInteger> lengths = new ArrayList<>();
+      List<SymbolicCharAtInteger> chars = new ArrayList<>();
+      ConstraintExpressionVisitor collect = new ConstraintExpressionVisitor() {
+        @Override
+        public void preVisit(SymbolicInteger e) {
+          vars.add(e);
+          if (e instanceof SymbolicLengthInteger && isString(((SymbolicLengthInteger) e).getExpression(), symName))
+            lengths.add((SymbolicLengthInteger) e);
+          if (e instanceof SymbolicCharAtInteger && isString(((SymbolicCharAtInteger) e).getExpression(), symName)) {
+            chars.add((SymbolicCharAtInteger) e);
+            ((SymbolicCharAtInteger) e).getIndex().accept(this);  // index symbols, e.g. Length_0_ - 1
+          }
+        }
+      };
+      for (Constraint c = pc.header; c != null; c = c.and)
+        c.accept(collect);
+      if (lengths.isEmpty())
+        return null;
+
+      // symbols left unsolved (e.g. only used in veritesting regions): take them from the full model
+      List<String> unsolved = new ArrayList<>();
+      for (SymbolicInteger v : vars)
+        if (v.solution == SymbolicInteger.UNDEFINED)
+          unsolved.add(v.getName());
+      if (!unsolved.isEmpty()) {
+        Map<String, Object> model = pc.solveWithValuations(unsolved);
+        for (SymbolicInteger v : vars)
+          if (v.solution == SymbolicInteger.UNDEFINED && model != null && model.get(v.getName()) != null)
+            v.solution = Long.parseLong(model.get(v.getName()).toString());
+      }
+
+      long len = lengths.get(0).solution;
+      if (len < 0 || len > 100000)
+        return null;
+      char[] text = new char[(int) len];
+      Arrays.fill(text, 'a');
+      for (SymbolicCharAtInteger ch : chars) {
+        long i = ch.getIndex().solution();
+        if (i >= 0 && i < len && ch.solution != SymbolicInteger.UNDEFINED)
+          text[(int) i] = (char) ch.solution;
+      }
+      return new String(text);
+    } catch (Throwable t) { // no usable model: caller falls back to ""
+      return null;
+    }
+  }
+
+  static boolean isString(StringExpression se, String symName) {
+    return se instanceof StringSymbolic
+        && ((StringSymbolic) se).fixName(((StringSymbolic) se).getName()).equals(symName);
   }
 
   /** Java escape of a char inside a char or string literal (ASCII only output). */
@@ -210,9 +293,7 @@ public class YamlWitness {
   static List<String> inputFiles() {
     Config conf = VM.getVM().getConfig();
     String[] files = conf.getStringArray("witness.input_files", new String[0]);
-    List<String> list = new ArrayList<>(Arrays.asList(files));
-    list.sort(null);
-    return list;
+    return new ArrayList<>(new TreeSet<>(Arrays.asList(files)));
   }
 
   static String header(String entryType) {
