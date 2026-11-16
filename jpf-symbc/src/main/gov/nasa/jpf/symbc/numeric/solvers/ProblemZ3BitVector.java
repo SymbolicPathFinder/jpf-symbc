@@ -1531,6 +1531,15 @@ public class ProblemZ3BitVector extends ProblemGeneral {
 	}
 
 	public Object power(Object exp1, double exp2) {
+		if (exp1 instanceof FPExpr) {
+			FPExpr x = (FPExpr) exp1;
+			// Java spec: pow(x, +-0.0) == 1.0 and pow(x, 1.0) == x, for every x including NaN.
+			if (exp2 == 0.0) return ctx.mkFPNumeral(1.0, x.getSort());
+			if (exp2 == 1.0) return x;
+			// pow(x, 2.0) == x*x bit for bit on Java 11+; on Java 8 Math.pow can be 1 ulp off.
+			if (exp2 == 2.0) return ctx.mkFPMul(ctx.mkFPRoundNearestTiesToEven(), x, x);
+			throw new RuntimeException("## Error Z3: Math.pow(x, " + exp2 + ") not supported");
+		}
 		return ctx.mkPower((ArithExpr)exp1, ctx.mkReal("" + exp2));
 	}
 
