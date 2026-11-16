@@ -92,6 +92,8 @@ public class ProblemZ3BitVector extends ProblemGeneral {
             return this.ctx;
         }
     }
+    // set once Math.sin/cos/tan/asin/acos/atan has been over-approximated; a violation found after that is not trusted (VeritestingListener)
+    public static boolean mathApproximated = false;
 
     private static Solver solver;
     private static Context ctx;
@@ -1425,6 +1427,103 @@ public class ProblemZ3BitVector extends ProblemGeneral {
             e.printStackTrace();
             throw new RuntimeException("## Error Z3: div(double, Object) failed.\n" + e);
         }
+    }
+
+    // Z3 has no sin: over-approximate Math.sin(x) by a value in [-1, 1], or NaN when x is infinite or NaN.
+    // The value is named after its argument, so sin of the same expression is the same value.
+    @Override
+    public Object sin(Object exp) {
+        return approximateTrig("sin", exp, true);
+    }
+
+    // Same for Math.cos: in [-1, 1] for finite x, NaN when x is infinite or NaN.
+    @Override
+    public Object cos(Object exp) {
+        return approximateTrig("cos", exp, true);
+    }
+
+    // Math.tan has no bounded range: only "not NaN for finite x" and "NaN when x is infinite or NaN".
+    @Override
+    public Object tan(Object exp) {
+        return approximateTrig("tan", exp, false);
+    }
+
+    /**
+     * A fresh value standing for fn(x), named after its argument so that fn of the same expression is the
+     * same value, constrained only by facts that hold for Java's Math.fn: NaN when x is infinite or NaN,
+     * not NaN for finite x, and (when bounded) in [-1, 1] for finite x.
+     */
+    private Object approximateTrig(String fn, Object exp, boolean bounded) {
+        mathApproximated = true;
+        if (exp instanceof FPExpr) {
+            FPExpr x = (FPExpr) exp;
+            FPSort sort = x.getSort();
+            FPExpr r = (FPExpr) ctx.mkConst(fn + "(" + x + ")", sort);
+            BoolExpr finite = ctx.mkNot(ctx.mkOr(ctx.mkFPIsInfinite(x), ctx.mkFPIsNaN(x)));
+            BoolExpr whenFinite = ctx.mkNot(ctx.mkFPIsNaN(r));
+            if (bounded)
+                whenFinite = ctx.mkAnd(ctx.mkFPLEq(ctx.mkFP(-1.0, sort), r), ctx.mkFPLEq(r, ctx.mkFP(1.0, sort)));
+            solver.add(ctx.mkImplies(finite, whenFinite));
+            solver.add(ctx.mkImplies(ctx.mkNot(finite), ctx.mkFPIsNaN(r)));
+            return r;
+        } else if (exp instanceof RealExpr) {
+            RealExpr r = ctx.mkRealConst(fn + "(" + exp + ")");
+            if (bounded)
+                solver.add(ctx.mkAnd(ctx.mkGe(r, ctx.mkReal(-1)), ctx.mkLe(r, ctx.mkReal(1))));
+            return r;
+        }
+        throw new RuntimeException("## Error Z3: " + fn + "(Object) expects a real expression, got " + exp.getClass());
+    }
+
+    // Bounds just outside pi/2 and pi: Math.asin/acos/atan may be one ulp off the exact value, so the
+    // range must not be tighter than the double nearest to pi/2 (or pi).
+    private static final double HALF_PI_UP = Math.nextUp(Math.PI / 2);
+    private static final double PI_UP = Math.nextUp(Math.PI);
+
+    // Math.asin: in [-pi/2, pi/2] when -1 <= x <= 1, NaN otherwise (|x| > 1 or NaN).
+    @Override
+    public Object asin(Object exp) {
+        return approximateInverseTrig("asin", exp, -HALF_PI_UP, HALF_PI_UP, true);
+    }
+
+    // Math.acos: in [0, pi] when -1 <= x <= 1, NaN otherwise (|x| > 1 or NaN).
+    @Override
+    public Object acos(Object exp) {
+        return approximateInverseTrig("acos", exp, 0.0, PI_UP, true);
+    }
+
+    // Math.atan: in [-pi/2, pi/2] for any x that is not NaN (including +-infinity), NaN for NaN.
+    @Override
+    public Object atan(Object exp) {
+        return approximateInverseTrig("atan", exp, -HALF_PI_UP, HALF_PI_UP, false);
+    }
+
+    /**
+     * A fresh value standing for fn(x), named after its argument like approximateTrig, constrained only
+     * by facts that hold for Java's Math.fn: inside [lo, hi] when x is in the function's domain, NaN when
+     * it is not. The domain is [-1, 1] when domainIsUnitInterval (asin, acos), else every non-NaN x (atan).
+     */
+    private Object approximateInverseTrig(String fn, Object exp, double lo, double hi, boolean domainIsUnitInterval) {
+        mathApproximated = true;
+        if (exp instanceof FPExpr) {
+            FPExpr x = (FPExpr) exp;
+            FPSort sort = x.getSort();
+            FPExpr r = (FPExpr) ctx.mkConst(fn + "(" + x + ")", sort);
+            BoolExpr inDomain = domainIsUnitInterval
+                    ? ctx.mkAnd(ctx.mkFPLEq(ctx.mkFP(-1.0, sort), x), ctx.mkFPLEq(x, ctx.mkFP(1.0, sort))) // false for NaN
+                    : ctx.mkNot(ctx.mkFPIsNaN(x));
+            solver.add(ctx.mkImplies(inDomain,
+                    ctx.mkAnd(ctx.mkFPLEq(ctx.mkFP(lo, sort), r), ctx.mkFPLEq(r, ctx.mkFP(hi, sort)))));
+            solver.add(ctx.mkImplies(ctx.mkNot(inDomain), ctx.mkFPIsNaN(r)));
+            return r;
+        } else if (exp instanceof RealExpr) {
+            // real arithmetic has no NaN, so only atan (defined everywhere) gets its range; asin/acos stay free
+            RealExpr r = ctx.mkRealConst(fn + "(" + exp + ")");
+            if (!domainIsUnitInterval)
+                solver.add(ctx.mkAnd(ctx.mkGe(r, ctx.mkReal("" + lo)), ctx.mkLe(r, ctx.mkReal("" + hi))));
+            return r;
+        }
+        throw new RuntimeException("## Error Z3: " + fn + "(Object) expects a real expression, got " + exp.getClass());
     }
 
     public Object power(Object exp1, Object exp2) {

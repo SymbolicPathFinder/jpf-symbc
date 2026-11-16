@@ -21,6 +21,7 @@ import gov.nasa.jpf.report.ConsolePublisher;
 import gov.nasa.jpf.report.Publisher;
 import gov.nasa.jpf.report.PublisherExtension;
 import gov.nasa.jpf.symbc.numeric.*;
+import gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector;
 import gov.nasa.jpf.symbc.veritesting.*;
 import gov.nasa.jpf.symbc.veritesting.ChoiceGenerator.StaticBranchChoiceGenerator;
 import gov.nasa.jpf.symbc.veritesting.ChoiceGenerator.StaticPCChoiceGenerator;
@@ -739,6 +740,8 @@ public class VeritestingListener extends PropertyListenerAdapter implements Publ
 
     public void propertyViolated(Search search) {
         System.out.println("the depth of violation is" + search.getDepth());
+        if (ProblemZ3BitVector.mathApproximated) // the violation may only exist because a Math function (sin/cos/tan/asin/acos/atan) was over-approximated
+            throw new RuntimeException("violation found after over-approximating a Math function: not reported, verdict unknown");
 
 ////        check if there are any string type witness input, we can just produce no witness at all.
 //        if(witnessHasStringVar())
