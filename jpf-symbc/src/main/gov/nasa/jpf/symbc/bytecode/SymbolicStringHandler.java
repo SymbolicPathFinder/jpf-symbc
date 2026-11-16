@@ -409,6 +409,15 @@ public class SymbolicStringHandler {
           handleToLowerCase(invInst, th);
           return invInst.getNext(th);
         }
+      } else if (shortName.equals("hashCode") && th.getModifiableTopFrame().getOperandAttr(0) instanceof StringExpression
+              && invInst.getMethodInfo().getClassName().startsWith("java.util.")) {
+        // a symbolic String used as a key of a java.util hash collection (HashMap, HashSet, ...): the collection
+        // only needs equal strings to have equal hashes, so every symbolic String gets the same hash (0) and
+        // the collection compares keys with equals, which is handled symbolically
+        StackFrame sf = th.getModifiableTopFrame();
+        sf.pop(); // the receiver
+        sf.push(0, false);
+        return invInst.getNext(th);
       }
 			else {
         throw new RuntimeException("ERROR: symbolic method not handled: " + shortName);
