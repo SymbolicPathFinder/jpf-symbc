@@ -357,7 +357,8 @@ public class SymbolicStringHandler {
         } else {
           return null;
         }
-      } else if (shortName.equals("intValue")) {
+      } else if (shortName.equals("intValue") || shortName.equals("shortValue")
+              || shortName.equals("byteValue") || shortName.equals("charValue")) {
         handleintValue(invInst, th);
       } else if (shortName.equals("floatValue")) {
         handlefloatValue(invInst, th);
@@ -1905,6 +1906,10 @@ public class SymbolicStringHandler {
         } else { // converting int to Integer
           handleParseBooleanValueOf(invInst, th);
         }
+      } else if ((cname.equals("java.lang.Short") && argTypes[0].equals("short"))
+              || (cname.equals("java.lang.Byte") && argTypes[0].equals("byte"))
+              || (cname.equals("java.lang.Character") && argTypes[0].equals("char"))) {
+        handleParseIntValueOf(invInst, th); // int-sized primitive to box, same as Integer
       } else {
         throw new RuntimeException("ERROR: Type not handled in Symbolic Type ValueOf: " + cname);
       }
@@ -1965,17 +1970,21 @@ public class SymbolicStringHandler {
 
   public void handleParseLongValueOf(JVMInvokeInstruction invInst, ThreadInfo th) {
     StackFrame sf = th.getModifiableTopFrame();
-    Expression sym_v3 = (Expression) sf.getOperandAttr(0);
+    String[] argTypes = invInst.getInvokedMethod(th).getArgumentTypeNames();
+    Expression sym_v3 = (Expression) (argTypes[0].equals("long") ? sf.getLongOperandAttr() : sf.getOperandAttr(0));
 
 		if (sym_v3 == null) {
 			throw new RuntimeException("ERROR: symbolic method must have symbolic string operand");
 		} else {
 			if (sym_v3 instanceof IntegerExpression) {
 				IntegerExpression sym_v2 = (IntegerExpression) sym_v3;
-				sf.popLong();
-				int objRef = getNewObjRef(invInst, th); /* dummy Long Object */
+				long v = sf.popLong();
+				int objRef = getNewObjRef(invInst, th); /* Long box: concrete object, symbolic value field */
+				ElementInfo ei = th.getModifiableElementInfo(objRef);
+				FieldInfo fi = ei.getClassInfo().getInstanceField("value");
+				ei.set2SlotField(fi, v);
+				ei.setFieldAttr(fi, sym_v2);
 				sf.push(objRef, true);
-				sf.setOperandAttr(sym_v2);
 			} else {
 				IntegerExpression result = null;
 				ChoiceGenerator<?> cg;
@@ -2035,10 +2044,13 @@ public class SymbolicStringHandler {
 		} else {
 			if (sym_v3 instanceof IntegerExpression) {
 				IntegerExpression sym_v2 = (IntegerExpression) sym_v3;
-				sf.pop();
-				int objRef = getNewObjRef(invInst, th); /* dummy Boolean Object */
+				int v = sf.pop();
+				int objRef = getNewObjRef(invInst, th); /* Boolean box: concrete object, symbolic value field */
+				ElementInfo ei = th.getModifiableElementInfo(objRef);
+				FieldInfo fi = ei.getClassInfo().getInstanceField("value");
+				ei.set1SlotField(fi, v);
+				ei.setFieldAttr(fi, sym_v2);
 				sf.push(objRef, true);
-				sf.setOperandAttr(sym_v2);
 			} else {
 				IntegerExpression result = null;
 				ChoiceGenerator<?> cg;
@@ -2099,10 +2111,13 @@ public class SymbolicStringHandler {
 		} else {
 			if (sym_v3 instanceof IntegerExpression) {
 				IntegerExpression sym_v2 = (IntegerExpression) sym_v3;
-				sf.pop();
-				int objRef = getNewObjRef(invInst, th); /* dummy Integer Object */
+				int v = sf.pop();
+				int objRef = getNewObjRef(invInst, th); /* Integer/Short/Byte/Character box: concrete object, symbolic value field */
+				ElementInfo ei = th.getModifiableElementInfo(objRef);
+				FieldInfo fi = ei.getClassInfo().getInstanceField("value");
+				ei.set1SlotField(fi, v);
+				ei.setFieldAttr(fi, sym_v2);
 				sf.push(objRef, true);
-				sf.setOperandAttr(sym_v2);
 			} else {
 				IntegerExpression result = null;
 				ChoiceGenerator<?> cg;
