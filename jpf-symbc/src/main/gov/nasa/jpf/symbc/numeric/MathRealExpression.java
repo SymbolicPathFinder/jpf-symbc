@@ -53,7 +53,7 @@ public class MathRealExpression extends RealExpression
 		o == MathFunction.EXP ||
 		o == MathFunction.ASIN || o == MathFunction.ACOS ||
 		o == MathFunction.ATAN || o == MathFunction.LOG ||
-		o == MathFunction.TAN  || o == MathFunction.SQRT;
+		o == MathFunction.TAN  || o == MathFunction.SQRT || o == MathFunction.LOG10; // LOG10: symbolic Math.log10
 
 		op = o;
 		arg1 = a;
@@ -122,6 +122,7 @@ public class MathRealExpression extends RealExpression
 		   case ACOS: return Math.acos(a1);
 		   case ATAN: return Math.atan(a1);
 		   case LOG: return Math.log(a1);
+		   case LOG10: return Math.log10(a1); // symbolic Math.log10
 		   case TAN: return Math.tan(a1);
 		   case SQRT: return Math.sqrt(a1);
 		   case POW:  return Math.pow(a1,a2);
@@ -141,7 +142,7 @@ public class MathRealExpression extends RealExpression
 			op == MathFunction.EXP ||
 			op == MathFunction.ASIN || op == MathFunction.ACOS ||
 			op == MathFunction.ATAN || op == MathFunction.LOG ||
-			op == MathFunction.TAN || op == MathFunction.SQRT)
+			op == MathFunction.TAN || op == MathFunction.SQRT || op == MathFunction.LOG10) // LOG10 has one argument
 			return "(" + op.toString() + "(" + arg1.stringPC() + "))";
 		else //op == MathFunction.POW || op == MathFunction.ATAN2
 			return "(" + op.toString() + "(" + arg1.stringPC() + "," + arg2.stringPC() + "))";
@@ -152,7 +153,7 @@ public class MathRealExpression extends RealExpression
 				op == MathFunction.EXP ||
 				op == MathFunction.ASIN || op == MathFunction.ACOS ||
 				op == MathFunction.ATAN || op == MathFunction.LOG ||
-				op == MathFunction.TAN || op == MathFunction.SQRT)
+				op == MathFunction.TAN || op == MathFunction.SQRT || op == MathFunction.LOG10) // LOG10 has one argument
 			return  op.toString() + "(" + arg1.toString() + ")";
 		else //op == MathFunction.POW || op == MathFunction.ATAN2
 			return  op.toString() + "(" + arg1.toString() + "," + arg2.toString() + ")";

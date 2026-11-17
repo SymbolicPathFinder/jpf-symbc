@@ -270,7 +270,8 @@ public class JPF_java_lang_Math extends NativePeer{
 			  return Math.log10(a);
 		  }
 		  else {
-			  throw new RuntimeException("## Error: symbolic log10 not implemented ");
+			  env.setReturnAttribute(new MathRealExpression(MathFunction.LOG10, sym_arg)); // symbolic Math.log10, was "not implemented"
+			  return 0;
 		  }
 	  }
 

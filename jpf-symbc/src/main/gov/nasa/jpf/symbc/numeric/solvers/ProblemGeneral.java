@@ -157,6 +157,9 @@ public abstract class ProblemGeneral{
 		throw new RuntimeException("## Error: Math.log not supported");
 
 	}
+	public Object log10(Object exp) { // symbolic Math.log10: only z3bitvector supports it
+		throw new RuntimeException("## Error: Math.log10 not supported");
+	}
 	public Object tan(Object exp) {
 		throw new RuntimeException("## Error: Math.tan not supported");
 

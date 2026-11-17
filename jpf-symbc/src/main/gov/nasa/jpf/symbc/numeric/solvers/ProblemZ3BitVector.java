@@ -229,7 +229,10 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         	}
         	else{
         	    long t1 = System.nanoTime();
-        		result = solver.check() == Status.SATISFIABLE ? true : false;
+        		if (mathApproximated) { Params p = ctx.mkParams(); p.add("timeout", 10000); solver.setParameters(p); } // only after an over-approximation (violations are no longer reported anyway): give up on slow queries after 10 s
+        		Status status = solver.check();
+        		result = status != Status.UNSATISFIABLE; // UNKNOWN (timeout) keeps the branch: was treated as UNSAT, which silently dropped it
+        		if (status == Status.UNKNOWN) mathApproximated = true; // the kept branch may be infeasible, so later violations are not reported
                 VeritestingListener.z3Time += (System.nanoTime() - t1);
                 VeritestingListener.solverCount++;
         	}
@@ -1526,7 +1529,32 @@ public class ProblemZ3BitVector extends ProblemGeneral {
         throw new RuntimeException("## Error Z3: " + fn + "(Object) expects a real expression, got " + exp.getClass());
     }
 
+    // Z3 has no exp/log/log10/atan2/pow (and fp.sqrt on doubles does not finish): over-approximate them by an unconstrained value (NaN included), i.e., over-approximate them by a fresh, unconstrained double (any value, including NaN and ±infinity).
+    @Override
+    public Object sqrt(Object exp) { return anyMathValue("sqrt(" + exp + ")", exp); }
+    @Override
+    public Object exp(Object exp) { return anyMathValue("exp(" + exp + ")", exp); }
+    @Override
+    public Object log(Object exp) { return anyMathValue("log(" + exp + ")", exp); }
+    @Override
+    public Object log10(Object exp) { return anyMathValue("log10(" + exp + ")", exp); }
+    @Override
+    public Object atan2(Object exp1, Object exp2) { return anyMathValue("atan2(" + exp1 + "," + exp2 + ")", exp1); }
+    @Override
+    public Object atan2(Object exp1, double exp2) { return anyMathValue("atan2(" + exp1 + "," + exp2 + ")", exp1); }
+    @Override
+    public Object atan2(double exp1, Object exp2) { return anyMathValue("atan2(" + exp1 + "," + exp2 + ")", exp2); }
+
+    /** Any double of fpArg's sort, named after the call so the same call is the same value.
+     * This is just a placeholder can cannot be used for violations, thus we skip reporting violations, if they are encountered */
+    private Object anyMathValue(String call, Object fpArg) {
+        if (!(fpArg instanceof FPExpr)) throw new RuntimeException("## Error Z3: " + call + " expects a floating-point expression");
+        mathApproximated = true;
+        return ctx.mkConst(call, ((FPExpr) fpArg).getSort());
+    }
+
     public Object power(Object exp1, Object exp2) {
+		if (exp1 instanceof FPExpr) return anyMathValue("pow(" + exp1 + "," + exp2 + ")", exp1); // FPExpr crashed the ArithExpr cast below
 		return ctx.mkPower((ArithExpr)exp1, (ArithExpr)exp2);
 	}
 
@@ -1538,12 +1566,13 @@ public class ProblemZ3BitVector extends ProblemGeneral {
 			if (exp2 == 1.0) return x;
 			// pow(x, 2.0) == x*x bit for bit on Java 11+; on Java 8 Math.pow can be 1 ulp off.
 			if (exp2 == 2.0) return ctx.mkFPMul(ctx.mkFPRoundNearestTiesToEven(), x, x);
-			throw new RuntimeException("## Error Z3: Math.pow(x, " + exp2 + ") not supported");
+			return anyMathValue("pow(" + exp1 + "," + exp2 + ")", exp1); // other constant exponents: over-approximate
 		}
 		return ctx.mkPower((ArithExpr)exp1, ctx.mkReal("" + exp2));
 	}
 
 	public Object power(double exp1, Object exp2) {
+		if (exp2 instanceof FPExpr) return anyMathValue("pow(" + exp1 + "," + exp2 + ")", exp2); // symbolic exponent: over-approximate
 		return ctx.mkPower(ctx.mkReal("" + exp1), (ArithExpr)exp2);
 	}
 

@@ -52,6 +52,7 @@ public enum MathFunction{
 	ATAN(" atan "),
 	ATAN2(" atan2 "),
 	LOG(" log "),
+	LOG10(" log10 "),
 	TAN(" tan ");
 	
 	private final String str;

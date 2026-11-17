@@ -335,6 +335,7 @@ public class PCParser {
         case ACOS:return pb.acos(getExpression(e_arg1Ref));
         case ATAN: return pb.atan(getExpression(e_arg1Ref));
         case LOG:return pb.log(getExpression(e_arg1Ref));
+        case LOG10:return pb.log10(getExpression(e_arg1Ref)); // symbolic Math.log10
         case TAN:return pb.tan(getExpression(e_arg1Ref));
         case SQRT:return pb.sqrt(getExpression(e_arg1Ref));
         case POW:
