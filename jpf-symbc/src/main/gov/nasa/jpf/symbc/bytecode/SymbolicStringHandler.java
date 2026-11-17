@@ -150,6 +150,8 @@ public class SymbolicStringHandler {
     }
   }
 
+	private static int caseConversionCount = 0; // gives each toUpperCase/toLowerCase result its own symbolic string
+
 	public Instruction handleSymbolicStrings(JVMInvokeInstruction invInst, ThreadInfo th) {
 
 		boolean needToHandle = isMethodStringSymbolic(invInst, th);
@@ -389,6 +391,19 @@ public class SymbolicStringHandler {
 					return invInst.getNext(th);
 				}
 			}
+      /*Over-approximate String.toUpperCase/toLowerCase on symbolic strings as a fresh symbolic string, Locale argument ignored. The run is marked with mathApproximated, so later violations give unknown instead of a possibly wrong false. A better fix would be to encode the check similar to the Character.toUpper, Character.toLower with a loop for the size of the string.*/
+      else if ((shortName.equals("toUpperCase") || shortName.equals("toLowerCase"))
+              && invInst.getInvokedMethodClassName().equals("java.lang.String")) {
+        // String.toUpperCase/toLowerCase on a symbolic string: the string solver has no case conversion, so the result
+        // is a fresh symbolic string (over-approximation); mathApproximated makes a violation found later unreported
+        StackFrame sf = th.getModifiableTopFrame();
+        if (invInst.getInvokedMethod(th).getArgumentTypeNames().length == 1) sf.pop(); // the Locale argument
+        sf.pop(); // the receiver
+        gov.nasa.jpf.symbc.numeric.solvers.ProblemZ3BitVector.mathApproximated = true;
+        sf.push(th.getHeap().newString("", th).getObjectRef(), true);
+        sf.setOperandAttr(new StringSymbolic("caseConversion_" + (caseConversionCount++)));
+        return invInst.getNext(th);
+      }
       else if(shortName.equals("toUpperCase")){
         ChoiceGenerator<?> cg;
         if (!th.isFirstStepInsn()) { // first time around
