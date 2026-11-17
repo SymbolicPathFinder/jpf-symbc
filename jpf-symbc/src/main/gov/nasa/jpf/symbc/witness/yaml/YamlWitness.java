@@ -144,11 +144,13 @@ public class YamlWitness {
       case "java.lang.String": {
         // raw solution of the string solver, not the backslash-escaped one kept for GraphML
         String s = (pc == null || pc.spc == null) ? null : pc.spc.solution.get(info.varSymName);
+        boolean fromSolver = s != null; // Z3 literal: needs SMT-LIB unescaping below
         if (s == null && pc != null)
           s = stringFromNumericModel(pc, info.varSymName);
         if (s == null) s = "";
         if (s.length() >= 2 && s.startsWith("\"") && s.endsWith("\""))
           s = s.substring(1, s.length() - 1);
+        if (fromSolver) s = smtUnescape(s); // "" -> quote, u{h..} escape -> char, so the witness has the solver's real string
         StringBuilder sb = new StringBuilder("\\result.equals(\"");
         for (char c : s.toCharArray())
           sb.append(c == '\'' ? "'" : c == '"' ? "\\\"" : escapeChar(c));
@@ -218,6 +220,36 @@ public class YamlWitness {
   static boolean isString(StringExpression se, String symName) {
     return se instanceof StringSymbolic
         && ((StringSymbolic) se).fixName(((StringSymbolic) se).getName()).equals(symName);
+  }
+
+  static final Pattern SMT_CHAR = Pattern.compile("\\\\u\\{([0-9a-fA-F]{1,5})\\}|\\\\u([0-9a-fA-F]{4})");
+
+  /**
+   * Body of a Z3 string literal (outer quotes removed) as the Java string it stands for:
+   * "" is one quote, a backslash-u{h..} or backslash-uhhhh escape is one character. Code points above U+FFFF are kept
+   * as written, since they are one character for Z3 but two for Java.
+   */
+  static String smtUnescape(String s) {
+    StringBuilder out = new StringBuilder();
+    Matcher m = SMT_CHAR.matcher(s);
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      if (c == '"' && i + 1 < s.length() && s.charAt(i + 1) == '"') {
+        out.append('"');
+        i++;
+        continue;
+      }
+      if (c == '\\' && m.region(i, s.length()).lookingAt()) {
+        int cp = Integer.parseInt(m.group(1) != null ? m.group(1) : m.group(2), 16);
+        if (cp <= 0xFFFF) {
+          out.append((char) cp);
+          i = m.end() - 1;
+          continue;
+        }
+      }
+      out.append(c);
+    }
+    return out.toString();
   }
 
   /** Java escape of a char inside a char or string literal (ASCII only output). */
