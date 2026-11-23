@@ -69,7 +69,7 @@ mkdir -p $DIR/target/classes
 PWD=`pwd`
 
 # build src files from benchmark
-javac -source 8 -target 8 -g -cp $PWD/java-ranger/build/classes:$DIR/target/classes:$PWD/java-ranger/lib/JSAP-2.1.jar:$PWD/java-ranger/lib/foundry-1.0.jar -d $DIR/target/classes "${BM[@]}"
+/usr/lib/jvm/java-8-openjdk-amd64/bin/javac -g -cp $PWD/java-ranger/build/classes:$DIR/target/classes:$PWD/java-ranger/lib/JSAP-2.1.jar:$PWD/java-ranger/lib/foundry-1.0.jar -d $DIR/target/classes "${BM[@]}"
 
 echo "after javac"
 
